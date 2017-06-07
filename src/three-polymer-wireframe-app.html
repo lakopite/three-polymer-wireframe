@@ -1,0 +1,281 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animation.html">
+<link rel="import" href="../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-styles/paper-styles.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/three-polymer/three-view.html">
+<link rel="import" href="../bower_components/three-polymer/three-lattice.html">
+<link rel="import" href="my-icons.html">
+
+<dom-module id="three-polymer-wireframe-app">
+  <template>
+    <style>
+      :host {
+        --app-primary-color: #4285f4;
+        --app-secondary-color: black;
+
+        display: block;
+      }
+
+      app-drawer-layout:not([narrow]) [drawer-toggle] {
+        display: none;
+      }
+
+      app-header {
+        color: #fff;
+        background-color: var(--app-primary-color);
+      }
+
+      app-header paper-icon-button {
+        --paper-icon-button-ink-color: white;
+      }
+
+      .drawer-list {
+        margin: 0 20px;
+      }
+
+      .drawer-list a {
+        display: block;
+        padding: 0 16px;
+        text-decoration: none;
+        color: var(--app-secondary-color);
+        line-height: 40px;
+      }
+
+      .drawer-list a.iron-selected {
+        color: black;
+        font-weight: bold;
+      }
+
+      .three-container {
+        @apply(--layout-horizontal);
+        @apply(--layout-center-justified);
+        height: 100%;
+      }
+
+      #parent {
+        @apply(--layout-self-center);
+        @apply(--shadow-elevation-2dp);
+        height: 375px;
+        width: 375px;
+      }
+
+      #filter-container {
+        margin-top: 60px;
+      }
+
+      .horizontal {
+        @apply(--layout-horizontal);
+      }
+
+      .inline-input {
+        padding: 0.1em;
+        @apply(--layout-flex);
+      }
+    </style>
+
+    <app-drawer-layout fullbleed>
+      <!-- Drawer content -->
+      <app-drawer id="drawer" slot="drawer">
+        <app-toolbar>
+          <paper-item>Model Options</paper-item>
+        </app-toolbar>
+        <div class="drawer-list">
+          <paper-dropdown-menu label="Model">
+            <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
+              <template is="dom-repeat" items="[[data]]">
+                <paper-item name="{{item.id}}">{{item.id}}</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
+          <paper-dropdown-menu label="Contour">
+            <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
+              <paper-item name="axial">Axial</paper-item>
+              <paper-item name="flexure">Flexure</paper-item>
+            </paper-listbox>
+          </paper-dropdown-menu>
+          <div id="filter-container">
+            <paper-item>Model Filters</paper-item>
+            <div class="horizontal">
+              <paper-input auto-validate label="min x" class="inline-input" type="number" value="{{filterMap.x.min}}" max="{{filterMap.x.max}}" min="{{filterMap.bounds.x.min}}"></paper-input>
+              <paper-input auto-validate label="max x" class="inline-input" type="number" value="{{filterMap.x.max}}" max="{{filterMap.bounds.x.max}}" min="{{filterMap.x.min}}"></paper-input>
+            </div>
+            <div class="horizontal">
+              <paper-input auto-validate label="min y" class="inline-input" type="number" value="{{filterMap.y.min}}" max="{{filterMap.y.max}}" min="{{filterMap.bounds.y.min}}"></paper-input>
+              <paper-input auto-validate label="max y" class="inline-input" type="number" value="{{filterMap.y.max}}" max="{{filterMap.bounds.y.max}}" min="{{filterMap.y.min}}"></paper-input>
+            </div>
+            <div class="horizontal">
+              <paper-input auto-validate label="min z" class="inline-input" type="number" value="{{filterMap.z.min}}" max="{{filterMap.z.max}}" min="{{filterMap.bounds.z.min}}"></paper-input>
+              <paper-input auto-validate label="max z" class="inline-input" type="number" value="{{filterMap.z.max}}" max="{{filterMap.bounds.z.max}}" min="{{filterMap.z.min}}"></paper-input>
+            </div>
+            <div class="horizontal">
+              <paper-button>Apply</paper-button>
+              <paper-button on-tap="resetFilters">Reset</paper-button>
+            </div>
+          </div>
+        </div>
+      </app-drawer>
+
+      <!-- Main content -->
+      <app-header-layout has-scrolling-region>
+
+        <app-header slot="header" condenses reveals effects="waterfall">
+          <app-toolbar>
+            <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
+            <div main-title>Three Polymer Wireframe</div>
+          </app-toolbar>
+        </app-header>
+        <div class="three-container">
+          <three-view
+            id="parent"
+            scene-background-color="#F5F5F5"
+            renderer-height="375"
+            renderer-width="375">
+            <three-lattice
+              id="triangle"
+              slot="lattice"
+              contour-by="[[selectedContourBy]]"
+              data="[[getModelData(selectedModel)]]"
+              color="#00BFA5">
+            </three-lattice>
+          </three-view>
+        </div>
+      </app-header-layout>
+    </app-drawer-layout>
+  </template>
+
+  <script>
+    class ThreePolymerWireframe extends Polymer.Element {
+
+      static get is() { return 'three-polymer-wireframe-app'; }
+
+      static get properties() {
+        return {
+/*         page: {
+            type: String,
+            reflectToAttribute: true,
+            observer: '_pageChanged',
+          },
+          rootPattern: String,
+          routeData: Object,
+          subroute: String,*/
+          filterMap: Object,
+          selectedModel: {
+            type: String,
+            value: "Model A"
+          },
+          selectedContourBy: {
+            type: String,
+            value: "flexure"
+          },
+          data: {
+            type: Array,
+            value: [
+              {
+                "id": "Model A",
+                "payload": [
+                  {"vertices":[[-10, 0, -10],[-10, 0, 10]], "metadata": {"axial": 10, "flexure": 40}},
+                  {"vertices":[[-10, 0, 10],[10, 0, 10]], "metadata": {"axial": 40, "flexure": 55}},
+                  {"vertices":[[10, 0, 10],[10, 0, -10]], "metadata": {"axial": 100, "flexure": 20}}
+                ]
+              },
+              {
+                "id": "Model B",
+                "payload": [
+                  {"vertices":[[-10, 0, -10],[-10, 0, 10]], "metadata": {"axial": 40, "flexure": 20}},
+                  {"vertices":[[-10, 0, 10],[10, 0, 10]], "metadata": {"axial": 10, "flexure": 55}},
+                  {"vertices":[[10, 0, 10],[10, 0, 30]], "metadata": {"axial": 100, "flexure": 40}}
+                ]
+              },
+              {
+                "id": "Model C",
+                "payload": [
+                  {"vertices":[[-10, 0, 30],[-10, 0, 10]], "metadata": {"axial": 100, "flexure": 55}},
+                  {"vertices":[[-10, 0, 10],[10, 0, 10]], "metadata": {"axial": 40, "flexure": 20}},
+                  {"vertices":[[10, 0, 10],[10, 0, -10]], "metadata": {"axial": 10, "flexure": 40}}
+                ]
+              }
+            ]
+          }
+        };
+      }
+
+      static get observers() {
+        return [];
+      }
+
+      constructor() {
+        super();
+      }
+
+      setFilterMap(payload_) {
+        var filtermap_ = {}
+        var indexmap_ = ['x','y','z'];
+        for (var i in payload_) {
+          for (var n in payload_[i].vertices) {
+            if (_.isEmpty(filtermap_)) {
+              filtermap_ = {'bounds': {'x':{},'y':{},'z':{}}}
+              for (let ix in indexmap_) {
+                filtermap_.bounds[indexmap_[ix]] = {'min': payload_[i].vertices[n][ix], 'max': payload_[i].vertices[n][ix]};
+              }
+            }
+            else {
+              for (let ix in indexmap_) {
+                filtermap_.bounds[indexmap_[ix]].min = Math.min(filtermap_.bounds[indexmap_[ix]].min,payload_[i].vertices[n][ix])
+                filtermap_.bounds[indexmap_[ix]].max = Math.max(filtermap_.bounds[indexmap_[ix]].max,payload_[i].vertices[n][ix])
+              }
+            }
+          }
+        }
+        filtermap_.x = _.cloneDeep(filtermap_.bounds.x);
+        filtermap_.y = _.cloneDeep(filtermap_.bounds.y);
+        filtermap_.z = _.cloneDeep(filtermap_.bounds.z);
+        this.set('filterMap',filtermap_);
+      }
+
+      resetFilters() {
+        this.set('filterMap.x', _.cloneDeep(this.filterMap.bounds.x));
+        this.set('filterMap.y', _.cloneDeep(this.filterMap.bounds.y));
+        this.set('filterMap.z', _.cloneDeep(this.filterMap.bounds.z));
+      }
+
+      applyFilters() {
+        //parse filter map and pass on the boundaries to the three-view
+      }
+
+      getModelData(_selectedModel) {
+        var result = _.find(this.data,function(o) {return o.id === _selectedModel}).payload;
+        this.setFilterMap(result);
+        return result;
+      }
+    }
+
+    window.customElements.define(ThreePolymerWireframe.is, ThreePolymerWireframe);
+  </script>
+</dom-module>
