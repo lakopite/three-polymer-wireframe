@@ -30,7 +30,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/three-polymer/three-view.html">
-<link rel="import" href="../bower_components/three-polymer/three-lattice.html">
+<link rel="import" href="../bower_components/three-polymer/three-model.html">
 <link rel="import" href="my-icons.html">
 
 <dom-module id="three-polymer-wireframe-app">
@@ -153,17 +153,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </app-header>
         <div class="three-container">
           <three-view
-            id="parent"
+            id="view"
             scene-background-color="#F5F5F5"
             renderer-height="375"
             renderer-width="375">
-            <three-lattice
-              id="triangle"
-              slot="lattice"
+            <three-model
+              id="model"
+              slot="model"
               contour-by="[[selectedContourBy]]"
-              data="[[getModelData(selectedModel)]]"
-              color="#00BFA5">
-            </three-lattice>
+              data="[[getModelData(selectedModel)]]">
+            </three-model>
           </three-view>
         </div>
       </app-header-layout>
