@@ -21,7 +21,8 @@
     "neon-animation": "PolymerElements/neon-animation#2.0.0",
     "web-animations-js": "~2.2.5",
     "paper-button": "PolymerElements/paper-button#2.0.0",
-    "three-polymer": "lakopite/three-polymer#master"
+    "three-polymer": "lakopite/three-polymer#master",
+    "iron-ajax": "PolymerElements/iron-ajax#~2.0.2"
   },
   "resolutions": {
     "polymer": "^2.0.0-rc.3",
