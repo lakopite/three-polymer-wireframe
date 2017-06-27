@@ -128,16 +128,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <div id="filter-container">
             <paper-item>Model Filters</paper-item>
             <div class="horizontal">
-              <paper-input auto-validate label="min x" class="inline-input" type="number" value="{{filterMap.x.min}}" max="{{filterMap.x.max}}" min="{{filterMap.bounds.x.min}}"></paper-input>
-              <paper-input auto-validate label="max x" class="inline-input" type="number" value="{{filterMap.x.max}}" max="{{filterMap.bounds.x.max}}" min="{{filterMap.x.min}}"></paper-input>
+              <paper-input auto-validate label="min x" class="inline-input" type="number" value="0" max="0" min="0"></paper-input>
+              <paper-input auto-validate label="max x" class="inline-input" type="number" value="0" max="0" min="0"></paper-input>
             </div>
             <div class="horizontal">
-              <paper-input auto-validate label="min y" class="inline-input" type="number" value="{{filterMap.y.min}}" max="{{filterMap.y.max}}" min="{{filterMap.bounds.y.min}}"></paper-input>
-              <paper-input auto-validate label="max y" class="inline-input" type="number" value="{{filterMap.y.max}}" max="{{filterMap.bounds.y.max}}" min="{{filterMap.y.min}}"></paper-input>
+              <paper-input auto-validate label="min y" class="inline-input" type="number" value="0" max="0" min="0"></paper-input>
+              <paper-input auto-validate label="max y" class="inline-input" type="number" value="0" max="0" min="0"></paper-input>
             </div>
             <div class="horizontal">
-              <paper-input auto-validate label="min z" class="inline-input" type="number" value="{{filterMap.z.min}}" max="{{filterMap.z.max}}" min="{{filterMap.bounds.z.min}}"></paper-input>
-              <paper-input auto-validate label="max z" class="inline-input" type="number" value="{{filterMap.z.max}}" max="{{filterMap.bounds.z.max}}" min="{{filterMap.z.min}}"></paper-input>
+              <paper-input auto-validate label="min z" class="inline-input" type="number" value="0" max="0" min="0"></paper-input>
+              <paper-input auto-validate label="max z" class="inline-input" type="number" value="0" max="0" min="0"></paper-input>
             </div>
             <div class="horizontal">
               <paper-button>Apply</paper-button>
@@ -189,7 +189,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           rootPattern: String,
           routeData: Object,
           subroute: String,*/
-          filterMap: Object,
           selectedModel: {
             type: String
           },
@@ -212,39 +211,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         super();
       }
 
-      setFilterMap(payload_) {
-        var filtermap_ = {}
-        var indexmap_ = ['x','y','z'];
-        for (var i in payload_) {
-          for (var n in payload_[i].vertices) {
-            if (_.isEmpty(filtermap_)) {
-              filtermap_ = {'bounds': {'x':{},'y':{},'z':{}}}
-              for (let ix in indexmap_) {
-                filtermap_.bounds[indexmap_[ix]] = {'min': Math.floor(payload_[i].vertices[n][ix]), 'max': Math.ceil(payload_[i].vertices[n][ix])};
-              }
-            }
-            else {
-              for (let ix in indexmap_) {
-                filtermap_.bounds[indexmap_[ix]].min = Math.floor(Math.min(filtermap_.bounds[indexmap_[ix]].min,payload_[i].vertices[n][ix]))
-                filtermap_.bounds[indexmap_[ix]].max = Math.ceil(Math.max(filtermap_.bounds[indexmap_[ix]].max,payload_[i].vertices[n][ix]))
-              }
-            }
-          }
-        }
-        filtermap_.x = _.cloneDeep(filtermap_.bounds.x);
-        filtermap_.y = _.cloneDeep(filtermap_.bounds.y);
-        filtermap_.z = _.cloneDeep(filtermap_.bounds.z);
-        this.set('filterMap',filtermap_);
-      }
-
       resetFilters() {
-        this.set('filterMap.x', _.cloneDeep(this.filterMap.bounds.x));
-        this.set('filterMap.y', _.cloneDeep(this.filterMap.bounds.y));
-        this.set('filterMap.z', _.cloneDeep(this.filterMap.bounds.z));
+        //reset filter selection to the model boundaries
       }
 
       applyFilters() {
-        //parse filter map and pass on the boundaries to the three-view
+        //parse filter selection and pass the range to three-model
       }
 
       _initData(data_) {
@@ -272,7 +244,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       getModelData(_selectedModel) {
         var result = _.find(this.data,function(o) {return o.id === _selectedModel});
         if (result) {
-          this.setFilterMap(result.payload);
           return result.payload;
         }
         return []
