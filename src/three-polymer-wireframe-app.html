@@ -140,7 +140,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <paper-input auto-validate label="max z" class="inline-input" type="number" value="[[boundaries.zMax]]" max="[[boundaries.zMax]]" min="[[boundaries.zMin]]"></paper-input>
             </div>
             <div class="horizontal">
-              <paper-button>Apply</paper-button>
+              <paper-button on-tap="applyFilters">Apply</paper-button>
               <paper-button on-tap="resetFilters">Reset</paper-button>
             </div>
           </div>
@@ -167,6 +167,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               slot="model"
               contour-by="[[selectedContourBy]]"
               boundaries="{{boundaries}}"
+              geometry-filter="[[geometryFilter]]"
               data="[[getModelData(selectedModel)]]">
             </three-model>
           </three-view>
@@ -201,6 +202,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Object,
             //observer: '_boundariesChanged'
           },
+          geometryFilter: {
+            type: Object
+          },
           data: {
             type: Array,
             value: []
@@ -209,7 +213,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       static get observers() {
-        return [];
+        return []
       }
 
       constructor() {
@@ -217,10 +221,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       resetFilters() {
+        //uncomment below for example usage
+        // this.geometryFilter = {
+        //   'xMin': this.boundaries.xMin,
+        //   'xMax': this.boundaries.xMax,
+        //   'yMin': this.boundaries.yMin,
+        //   'yMax': this.boundaries.yMax,
+        //   'zMin': this.boundaries.zMin,
+        //   'zMax': this.boundaries.zMax
+        // }
         //reset filter selection to the model boundaries
       }
 
       applyFilters() {
+        //uncomment below for example usage
+        // this.geometryFilter = {
+        //   'xMin': 0,
+        //   'xMax': this.boundaries.xMax,
+        //   'yMin': this.boundaries.yMin,
+        //   'yMax': this.boundaries.yMax,
+        //   'zMin': this.boundaries.zMin,
+        //   'zMax': this.boundaries.zMax
+        // }
         //parse filter selection and pass the range to three-model
       }
 
