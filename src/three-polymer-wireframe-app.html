@@ -128,16 +128,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <div id="filter-container">
             <paper-item>Model Filters</paper-item>
             <div class="horizontal">
-              <paper-input auto-validate label="min x" class="inline-input" type="number" value="0" max="0" min="0"></paper-input>
-              <paper-input auto-validate label="max x" class="inline-input" type="number" value="0" max="0" min="0"></paper-input>
+              <paper-input auto-validate label="min x" class="inline-input" type="number" value="[[boundaries.xMin]]" max="[[boundaries.xMax]]" min="[[boundaries.xMin]]"></paper-input>
+              <paper-input auto-validate label="max x" class="inline-input" type="number" value="[[boundaries.xMax]]" max="[[boundaries.xMax]]" min="[[boundaries.xMin]]"></paper-input>
             </div>
             <div class="horizontal">
-              <paper-input auto-validate label="min y" class="inline-input" type="number" value="0" max="0" min="0"></paper-input>
-              <paper-input auto-validate label="max y" class="inline-input" type="number" value="0" max="0" min="0"></paper-input>
+              <paper-input auto-validate label="min y" class="inline-input" type="number" value="[[boundaries.yMin]]" max="[[boundaries.yMax]]" min="[[boundaries.yMin]]"></paper-input>
+              <paper-input auto-validate label="max y" class="inline-input" type="number" value="[[boundaries.yMax]]" max="[[boundaries.yMax]]" min="[[boundaries.yMin]]"></paper-input>
             </div>
             <div class="horizontal">
-              <paper-input auto-validate label="min z" class="inline-input" type="number" value="0" max="0" min="0"></paper-input>
-              <paper-input auto-validate label="max z" class="inline-input" type="number" value="0" max="0" min="0"></paper-input>
+              <paper-input auto-validate label="min z" class="inline-input" type="number" value="[[boundaries.zMin]]" max="[[boundaries.zMax]]" min="[[boundaries.zMin]]"></paper-input>
+              <paper-input auto-validate label="max z" class="inline-input" type="number" value="[[boundaries.zMax]]" max="[[boundaries.zMax]]" min="[[boundaries.zMin]]"></paper-input>
             </div>
             <div class="horizontal">
               <paper-button>Apply</paper-button>
@@ -166,6 +166,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               id="model"
               slot="model"
               contour-by="[[selectedContourBy]]"
+              boundaries="{{boundaries}}"
               data="[[getModelData(selectedModel)]]">
             </three-model>
           </three-view>
@@ -196,6 +197,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: String,
             value: "flexure"
           },
+          boundaries: {
+            type: Object,
+            //observer: '_boundariesChanged'
+          },
           data: {
             type: Array,
             value: []
@@ -217,6 +222,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       applyFilters() {
         //parse filter selection and pass the range to three-model
+      }
+
+      _boundariesChanged() {
+        //implement on-data-change logic here (trigger reset)
       }
 
       _initData(data_) {
