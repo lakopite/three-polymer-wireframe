@@ -199,8 +199,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             value: "flexure"
           },
           boundaries: {
-            type: Object,
-            //observer: '_boundariesChanged'
+            type: Object
           },
           geometryFilter: {
             type: Object
@@ -221,43 +220,36 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       resetFilters() {
-        //uncomment below for example usage
-        // this.geometryFilter = {
-        //   'xMin': this.boundaries.xMin,
-        //   'xMax': this.boundaries.xMax,
-        //   'yMin': this.boundaries.yMin,
-        //   'yMax': this.boundaries.yMax,
-        //   'zMin': this.boundaries.zMin,
-        //   'zMax': this.boundaries.zMax
-        // }
+        this.geometryFilter = {
+          'xMin': this.boundaries.xMin,
+          'xMax': this.boundaries.xMax,
+          'yMin': this.boundaries.yMin,
+          'yMax': this.boundaries.yMax,
+          'zMin': this.boundaries.zMin,
+          'zMax': this.boundaries.zMax
+        }
         //reset filter selection to the model boundaries
+        // console.log(this.geometryFilter)
+        // console.log(this.boundaries)
       }
+
 
       applyFilters() {
-      this.geometryFilter = {
-        'xMin': parseFloat(this.geometryFilter.xMin),
-        'xMax': parseFloat(this.geometryFilter.xMax),
-        'yMin': parseFloat(this.geometryFilter.yMin),
-        'yMax': parseFloat(this.geometryFilter.yMax),
-        'zMin': parseFloat(this.geometryFilter.zMin),
-        'zMax': parseFloat(this.geometryFilter.zMax)
+        this.geometryFilter = {
+          'xMin': parseFloat(this.geometryFilter.xMin),
+          'xMax': parseFloat(this.geometryFilter.xMax),
+          'yMin': parseFloat(this.geometryFilter.yMin),
+          'yMax': parseFloat(this.geometryFilter.yMax),
+          'zMin': parseFloat(this.geometryFilter.zMin),
+          'zMax': parseFloat(this.geometryFilter.zMax)
+        }
       }
+      //parse filter selection and pass the range to three-model
       // console.log(this.geometryFilter)
-      //uncomment below for example usage
-        // this.geometryFilter = {
-        //   'xMin': 0,
-        //   'xMax': this.boundaries.xMax,
-        //   'yMin': this.boundaries.yMin,
-        //   'yMax': this.boundaries.yMax,
-        //   'zMin': this.boundaries.zMin,
-        //   'zMax': this.boundaries.zMax
-        // }
-        //parse filter selection and pass the range to three-model
-      }
+      // console.log(this.boundaries)
 
-      _boundariesChanged() {
-        //implement on-data-change logic here (trigger reset)
-      }
+      // _boundariesChanged() {
+      // }
 
       _initData(data_) {
         this.set('data',data_);
