@@ -30,7 +30,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-styles/paper-styles.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/three-polymer/three-view.html">
 <link rel="import" href="../bower_components/three-polymer/three-model.html">
 <link rel="import" href="my-icons.html">
@@ -104,21 +103,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       .dropdown-item {
         cursor: pointer;
       }
-
-      paper-dialog#addModelDialog {
-        padding: 1em;
-      }
     </style>
     <iron-ajax auto url="/data/test_response.json" handle-as="json" on-response="handleResponse" on-error="handleError"></iron-ajax>
-    <paper-dialog modal id="addModelDialog">
-      <h2>Add a Model</h2>
-      <paper-input label="JSON file" type="file"></paper-input>
-      <paper-input label="meta val" type="text"></paper-input>
-      <div class="buttons">
-        <paper-button dialog-dismiss>Cancel</paper-button>
-        <paper-button dialog-confirm autofocus>Accept</paper-button>
-      </div>
-    </paper-dialog>
     <app-drawer-layout fullbleed>
       <!-- Drawer content -->
       <app-drawer id="drawer" slot="drawer">
@@ -167,9 +153,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <app-header slot="header" condenses reveals effects="waterfall">
           <app-toolbar>
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-            <div main-title>Arup Model QuickView</div>
-            <div class="spacer"></div>
-            <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
+            <div main-title>Three Polymer Wireframe</div>
           </app-toolbar>
         </app-header>
         <div class="three-container">
@@ -236,21 +220,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       resetFilters() {
-        this.geometryFilter = {
-          'xMin': this.boundaries.xMin,
-          'xMax': this.boundaries.xMax,
-          'yMin': this.boundaries.yMin,
-          'yMax': this.boundaries.yMax,
-          'zMin': this.boundaries.zMin,
-          'zMax': this.boundaries.zMax
-        }
+
+        this.geometryFilter = _.cloneDeep(this.boundaries)
+        // this.geometryFilter = {
+        //   'xMin': this.boundaries.xMin,
+        //   'xMax': this.boundaries.xMax,
+        //   'yMin': this.boundaries.yMin,
+        //   'yMax': this.boundaries.yMax,
+        //   'zMin': this.boundaries.zMin,
+        //   'zMax': this.boundaries.zMax
+        // }
         //reset filter selection to the model boundaries
-        // console.log(this.geometryFilter)
-        // console.log(this.boundaries)
+        console.log(this.geometryFilter)
+        console.log(this.boundaries)
       }
 
 
       applyFilters() {
+        //this below works, but it turns values into strings. must parseFloat *values*. -rsc
+        // this.geometryFilter = _.cloneDeep(this.geometryFilter)
         this.geometryFilter = {
           'xMin': parseFloat(this.geometryFilter.xMin),
           'xMax': parseFloat(this.geometryFilter.xMax),
@@ -259,10 +247,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'zMin': parseFloat(this.geometryFilter.zMin),
           'zMax': parseFloat(this.geometryFilter.zMax)
         }
+        console.log(this.geometryFilter)
+        console.log(this.boundaries)
       }
       //parse filter selection and pass the range to three-model
-      // console.log(this.geometryFilter)
-      // console.log(this.boundaries)
 
       // _boundariesChanged() {
       // }
@@ -295,10 +283,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return result.payload;
         }
         return []
-      }
-
-      showDialog() {
-        this.$.addModelDialog.open();
       }
     }
 
