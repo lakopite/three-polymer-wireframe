@@ -138,8 +138,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <paper-input auto-validate label="max z" class="inline-input" type="number" value="{{geometryFilter.zMax}}" max="[[boundaries.zMax]]" min="[[boundaries.zMin]]"></paper-input>
             </div>
             <div class="horizontal">
-              <paper-button on-tap="applyFilters">Apply</paper-button>
-              <paper-button on-tap="resetFilters">Reset</paper-button>
+              <paper-button id="applyBtn" on-tap="applyFilters">Apply</paper-button>
+              <paper-button id="resetBtn" on-tap="resetFilters">Reset</paper-button>
             </div>
           </div>
         </div>
@@ -218,14 +218,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       resetFilters() {
 
         this.geometryFilter = _.cloneDeep(this.boundaries)
-        // this.geometryFilter = {
-        //   'xMin': this.boundaries.xMin,
-        //   'xMax': this.boundaries.xMax,
-        //   'yMin': this.boundaries.yMin,
-        //   'yMax': this.boundaries.yMax,
-        //   'zMin': this.boundaries.zMin,
-        //   'zMax': this.boundaries.zMax
-        // }
         //reset filter selection to the model boundaries
         console.log(this.geometryFilter)
         console.log(this.boundaries)
@@ -233,20 +225,37 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 
       applyFilters() {
-        //this below works, but it turns values into strings. must parseFloat *values*. -rsc
+        //this clone below works, but it turns values into strings. must parseFloat *values*. -rsc
         // this.geometryFilter = _.cloneDeep(this.geometryFilter)
-        this.geometryFilter = {
-          'xMin': parseFloat(this.geometryFilter.xMin),
-          'xMax': parseFloat(this.geometryFilter.xMax),
-          'yMin': parseFloat(this.geometryFilter.yMin),
-          'yMax': parseFloat(this.geometryFilter.yMax),
-          'zMin': parseFloat(this.geometryFilter.zMin),
-          'zMax': parseFloat(this.geometryFilter.zMax)
-        }
-        console.log(this.geometryFilter)
-        console.log(this.boundaries)
-      }
       //parse filter selection and pass the range to three-model
+      var inputBeyondBoundaries =  this.geometryFilter.xMin < this.boundaries.xMin ||
+                                  this.geometryFilter.yMin < this.boundaries.yMin ||
+                                  this.geometryFilter.zMin < this.boundaries.zMin ||
+                                  this.geometryFilter.xMax > this.boundaries.xMax ||
+                                  this.geometryFilter.yMax > this.boundaries.yMax ||
+                                  this.geometryFilter.zMax > this.boundaries.zMax
+
+      if (inputBeyondBoundaries) {
+            alert("Input is invalid")
+          } else if (this.geometryFilter.xMin >= this.boundaries.xMin &&
+          this.geometryFilter.yMin >= this.boundaries.yMin &&
+          this.geometryFilter.zMin >= this.boundaries.zMin &&
+          this.geometryFilter.xMax <= this.boundaries.xMax &&
+          this.geometryFilter.yMax <= this.boundaries.yMax &&
+          this.geometryFilter.zMax <= this.boundaries.zMax) {
+
+            this.geometryFilter = {
+              'xMin': parseFloat(this.geometryFilter.xMin),
+              'xMax': parseFloat(this.geometryFilter.xMax),
+              'yMin': parseFloat(this.geometryFilter.yMin),
+              'yMax': parseFloat(this.geometryFilter.yMax),
+              'zMin': parseFloat(this.geometryFilter.zMin),
+              'zMax': parseFloat(this.geometryFilter.zMax)
+            }
+      console.log(this.geometryFilter)
+      console.log(this.boundaries)
+    }
+  }
 
       // _boundariesChanged() {
       // }
