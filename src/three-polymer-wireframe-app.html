@@ -230,16 +230,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       inputBeyondBoundaries() {
-        //do the validation
-        var invalidFilterInput = this.geometryFilter.xMin < this.boundaries.xMin ||
+        this._filtersDisabled = this.geometryFilter.xMin < this.boundaries.xMin ||
           this.geometryFilter.yMin < this.boundaries.yMin ||
           this.geometryFilter.zMin < this.boundaries.zMin ||
           this.geometryFilter.xMax > this.boundaries.xMax ||
           this.geometryFilter.yMax > this.boundaries.yMax ||
           this.geometryFilter.zMax > this.boundaries.zMax
-        if (invalidFilterInput) {
-          this._filtersDisabled = true
-        }
       }
 
       applyFilters() {
