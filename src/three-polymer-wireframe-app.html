@@ -115,78 +115,72 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template is="dom-repeat" items="[[data]]">
                 <paper-item class="dropdown-item" name="{{item.id}}">{{item.id}}</paper-item>
               </template>
-            </paper-listbox>
-          </paper-dropdown-menu>
-          <paper-dropdown-menu label="Contour">
-            <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-              <paper-item class="dropdown-item" name="axial">Axial</paper-item>
-              <paper-item class="dropdown-item" name="flexure">Flexure</paper-item>
-            </paper-listbox>
-          </paper-dropdown-menu>
-          <div id="filter-container">
-            <paper-item>Model Filters</paper-item>
-            <div class="horizontal">
-              <paper-input auto-validate label="min x" class="inline-input" type="number" value="{{geometryFilter.xMin}}" max="[[boundaries.xMax]]" min="[[boundaries.xMin]]"></paper-input>
-              <paper-input auto-validate label="max x" class="inline-input" type="number" value="{{geometryFilter.xMax}}" max="[[boundaries.xMax]]" min="[[boundaries.xMin]]"></paper-input>
-            </div>
-            <div class="horizontal">
-              <paper-input auto-validate label="min y" class="inline-input" type="number" value="{{geometryFilter.yMin}}" max="[[boundaries.yMax]]" min="[[boundaries.yMin]]"></paper-input>
-              <paper-input auto-validate label="max y" class="inline-input" type="number" value="{{geometryFilter.yMax}}" max="[[boundaries.yMax]]" min="[[boundaries.yMin]]"></paper-input>
-            </div>
-            <div class="horizontal">
-              <paper-input auto-validate label="min z" class="inline-input" type="number" value="{{geometryFilter.zMin}}" max="[[boundaries.zMax]]" min="[[boundaries.zMin]]"></paper-input>
-              <paper-input auto-validate label="max z" class="inline-input" type="number" value="{{geometryFilter.zMax}}" max="[[boundaries.zMax]]" min="[[boundaries.zMin]]"></paper-input>
-            </div>
-            <div class="horizontal">
-              <paper-button id="applyBtn" on-tap="applyFilters">Apply</paper-button>
-              <paper-button id="resetBtn" on-tap="resetFilters">Reset</paper-button>
-            </div>
-          </div>
-        </div>
-      </app-drawer>
+  </paper-listbox>
+  </paper-dropdown-menu>
+  <paper-dropdown-menu label="Contour">
+    <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
+      <paper-item class="dropdown-item" name="axial">Axial</paper-item>
+      <paper-item class="dropdown-item" name="flexure">Flexure</paper-item>
+    </paper-listbox>
+  </paper-dropdown-menu>
+  <div id="filter-container">
+    <paper-item>Model Filters</paper-item>
+    <div class="horizontal">
+      <paper-input on-change="inputBeyondBoundaries" auto-validate label="min x" class="inline-input" type="number" value="{{geometryFilter.xMin}}" max="[[boundaries.xMax]]" min="[[boundaries.xMin]]"></paper-input>
+      <paper-input on-change="inputBeyondBoundaries" auto-validate label="max x" class="inline-input" type="number" value="{{geometryFilter.xMax}}" max="[[boundaries.xMax]]" min="[[boundaries.xMin]]"></paper-input>
+    </div>
+    <div class="horizontal">
+      <paper-input on-change="inputBeyondBoundaries" auto-validate label="min y" class="inline-input" type="number" value="{{geometryFilter.yMin}}" max="[[boundaries.yMax]]" min="[[boundaries.yMin]]"></paper-input>
+      <paper-input on-change="inputBeyondBoundaries" auto-validate label="max y" class="inline-input" type="number" value="{{geometryFilter.yMax}}" max="[[boundaries.yMax]]" min="[[boundaries.yMin]]"></paper-input>
+    </div>
+    <div class="horizontal">
+      <paper-input on-change="inputBeyondBoundaries" auto-validate label="min z" class="inline-input" type="number" value="{{geometryFilter.zMin}}" max="[[boundaries.zMax]]" min="[[boundaries.zMin]]"></paper-input>
+      <paper-input on-change="inputBeyondBoundaries" auto-validate label="max z" class="inline-input" type="number" value="{{geometryFilter.zMax}}" max="[[boundaries.zMax]]" min="[[boundaries.zMin]]"></paper-input>
+    </div>
+    <div class="horizontal">
+      <paper-button disabled$="{{_filtersDisabled}}" id="applyBtn" on-tap="applyFilters">Apply</paper-button>
+      <paper-button id="resetBtn" on-tap="resetFilters">Reset</paper-button>
+    </div>
+  </div>
+  </div>
+  </app-drawer>
 
-      <!-- Main content -->
-      <app-header-layout has-scrolling-region>
+  <!-- Main content -->
+  <app-header-layout has-scrolling-region>
 
-        <app-header slot="header" condenses reveals effects="waterfall">
-          <app-toolbar>
-            <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-            <div main-title>Three Polymer Wireframe</div>
-          </app-toolbar>
-        </app-header>
-        <div class="three-container">
-          <three-view
-            id="view"
-            scene-background-color="#F5F5F5">
-            <three-model
-              id="model"
-              slot="model"
-              contour-by="[[selectedContourBy]]"
-              boundaries="{{boundaries}}"
-              geometry-filter="{{geometryFilter}}"
-              data="[[getModelData(selectedModel)]]">
-            </three-model>
-          </three-view>
-        </div>
-      </app-header-layout>
-    </app-drawer-layout>
+    <app-header slot="header" condenses reveals effects="waterfall">
+      <app-toolbar>
+        <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
+        <div main-title>Three Polymer Wireframe</div>
+      </app-toolbar>
+    </app-header>
+    <div class="three-container">
+      <three-view id="view" scene-background-color="#F5F5F5">
+        <three-model id="model" slot="model" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[getModelData(selectedModel)]]">
+        </three-model>
+      </three-view>
+    </div>
+  </app-header-layout>
+  </app-drawer-layout>
   </template>
 
   <script>
     class ThreePolymerWireframe extends Polymer.Element {
 
-      static get is() { return 'three-polymer-wireframe-app'; }
+      static get is() {
+        return 'three-polymer-wireframe-app';
+      }
 
       static get properties() {
         return {
-/*         page: {
-            type: String,
-            reflectToAttribute: true,
-            observer: '_pageChanged',
-          },
-          rootPattern: String,
-          routeData: Object,
-          subroute: String,*/
+          /*         page: {
+                      type: String,
+                      reflectToAttribute: true,
+                      observer: '_pageChanged',
+                    },
+                    rootPattern: String,
+                    routeData: Object,
+                    subroute: String,*/
           selectedModel: {
             type: String
           },
@@ -203,9 +197,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           data: {
             type: Array,
             value: []
+          },
+          _filtersDisabled: {
+            type: Boolean,
+            value: false
           }
         };
       }
+
+    //aggregation
+    // _.meanBy(payload, function(o) {return o.metadata[this.selectedContourBy]})
+    //
+    // _mean() {
+    //   var that = this;
+    //   _.meanBy(payload, function(o) {return o.metadata[that.selectedContourBy]})
+    // }
 
       static get observers() {
         return []
@@ -223,21 +229,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         console.log(this.boundaries)
       }
 
+      inputBeyondBoundaries() {
+        //do the validation
+        var invalidFilterInput = this.geometryFilter.xMin < this.boundaries.xMin ||
+          this.geometryFilter.yMin < this.boundaries.yMin ||
+          this.geometryFilter.zMin < this.boundaries.zMin ||
+          this.geometryFilter.xMax > this.boundaries.xMax ||
+          this.geometryFilter.yMax > this.boundaries.yMax ||
+          this.geometryFilter.zMax > this.boundaries.zMax
+        if (invalidFilterInput) {
+          this._filtersDisabled = true
+        }
+      }
 
       applyFilters() {
         //this clone below works, but it turns values into strings. must parseFloat *values*. -rsc
         // this.geometryFilter = _.cloneDeep(this.geometryFilter)
-      //parse filter selection and pass the range to three-model
-      var inputBeyondBoundaries =  this.geometryFilter.xMin < this.boundaries.xMin ||
-                                  this.geometryFilter.yMin < this.boundaries.yMin ||
-                                  this.geometryFilter.zMin < this.boundaries.zMin ||
-                                  this.geometryFilter.xMax > this.boundaries.xMax ||
-                                  this.geometryFilter.yMax > this.boundaries.yMax ||
-                                  this.geometryFilter.zMax > this.boundaries.zMax
-
-      if (inputBeyondBoundaries) {
-            alert("Input is invalid")
-          } else if (this.geometryFilter.xMin >= this.boundaries.xMin &&
+        //parse filter selection and pass the range to three-model
+        if (this.geometryFilter.xMin >= this.boundaries.xMin &&
           this.geometryFilter.yMin >= this.boundaries.yMin &&
           this.geometryFilter.zMin >= this.boundaries.zMin &&
           this.geometryFilter.xMax <= this.boundaries.xMax &&
@@ -252,18 +261,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               'zMin': parseFloat(this.geometryFilter.zMin),
               'zMax': parseFloat(this.geometryFilter.zMax)
             }
-      console.log(this.geometryFilter)
-      console.log(this.boundaries)
-    }
-  }
+          console.log(this.geometryFilter)
+          console.log(this.boundaries)
+        }
+      }
 
       // _boundariesChanged() {
       // }
 
       _initData(data_) {
-        this.set('data',data_);
+        this.set('data', data_);
         if (this.data.length > 0) {
-          this.set('selectedModel',this.data[0].id)
+          this.set('selectedModel', this.data[0].id)
         }
       }
 
@@ -271,19 +280,110 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var resp = response.response;
         if (resp) {
           this._initData(resp);
-        }
-        else {
+        } else {
           this.handleError();
         }
       }
 
       handleError(event, response) {
-        this._initData([{"id":"Model A","payload":[{"vertices":[[-10,0,-10],[-10,0,10]],"metadata":{"axial":10,"flexure":40}},{"vertices":[[-10,0,10],[10,0,10]],"metadata":{"axial":40,"flexure":55}},{"vertices":[[10,0,10],[10,0,-10]],"metadata":{"axial":100,"flexure":20}}]},{"id":"Model B","payload":[{"vertices":[[-10,0,-10],[-10,0,10]],"metadata":{"axial":40,"flexure":20}},{"vertices":[[-10,0,10],[10,0,10]],"metadata":{"axial":10,"flexure":55}},{"vertices":[[10,0,10],[10,0,30]],"metadata":{"axial":100,"flexure":40}}]},{"id":"Model C","payload":[{"vertices":[[-10,0,30],[-10,0,10]],"metadata":{"axial":100,"flexure":55}},{"vertices":[[-10,0,10],[10,0,10]],"metadata":{"axial":40,"flexure":20}},{"vertices":[[10,0,10],[10,0,-10]],"metadata":{"axial":10,"flexure":40}}]}])
+        this._initData([{
+          "id": "Model A",
+          "payload": [{
+            "vertices": [
+              [-10, 0, -10],
+              [-10, 0, 10]
+            ],
+            "metadata": {
+              "axial": 10,
+              "flexure": 40
+            }
+          }, {
+            "vertices": [
+              [-10, 0, 10],
+              [10, 0, 10]
+            ],
+            "metadata": {
+              "axial": 40,
+              "flexure": 55
+            }
+          }, {
+            "vertices": [
+              [10, 0, 10],
+              [10, 0, -10]
+            ],
+            "metadata": {
+              "axial": 100,
+              "flexure": 20
+            }
+          }]
+        }, {
+          "id": "Model B",
+          "payload": [{
+            "vertices": [
+              [-10, 0, -10],
+              [-10, 0, 10]
+            ],
+            "metadata": {
+              "axial": 40,
+              "flexure": 20
+            }
+          }, {
+            "vertices": [
+              [-10, 0, 10],
+              [10, 0, 10]
+            ],
+            "metadata": {
+              "axial": 10,
+              "flexure": 55
+            }
+          }, {
+            "vertices": [
+              [10, 0, 10],
+              [10, 0, 30]
+            ],
+            "metadata": {
+              "axial": 100,
+              "flexure": 40
+            }
+          }]
+        }, {
+          "id": "Model C",
+          "payload": [{
+            "vertices": [
+              [-10, 0, 30],
+              [-10, 0, 10]
+            ],
+            "metadata": {
+              "axial": 100,
+              "flexure": 55
+            }
+          }, {
+            "vertices": [
+              [-10, 0, 10],
+              [10, 0, 10]
+            ],
+            "metadata": {
+              "axial": 40,
+              "flexure": 20
+            }
+          }, {
+            "vertices": [
+              [10, 0, 10],
+              [10, 0, -10]
+            ],
+            "metadata": {
+              "axial": 10,
+              "flexure": 40
+            }
+          }]
+        }])
         alert("Couldn't fetch sample data, using three stick models.")
       }
 
       getModelData(_selectedModel) {
-        var result = _.find(this.data,function(o) {return o.id === _selectedModel});
+        var result = _.find(this.data, function(o) {
+          return o.id === _selectedModel
+        });
         if (result) {
           return result.payload;
         }
