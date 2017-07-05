@@ -30,6 +30,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-styles/paper-styles.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/three-polymer/three-view/three-view.html">
 <link rel="import" href="../bower_components/three-polymer/three-model/three-model.html">
 <link rel="import" href="my-icons.html">
@@ -101,8 +102,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       .dropdown-item {
         cursor: pointer;
       }
+
+      paper-dialog#addModelDialog {
+        padding: 1em;
+      }
     </style>
     <iron-ajax auto url="/data/test_response.json" handle-as="json" on-response="handleResponse" on-error="handleError"></iron-ajax>
+    <paper-dialog modal id="addModelDialog">
+      <h2>Add a Model</h2>
+      <paper-input label="JSON file" type="file"></paper-input>
+      <paper-input label="meta val" type="text"></paper-input>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-confirm autofocus>Accept</paper-button>
+      </div>
+    </paper-dialog>
     <app-drawer-layout fullbleed>
       <!-- Drawer content -->
       <app-drawer id="drawer" slot="drawer">
@@ -115,53 +129,55 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template is="dom-repeat" items="[[data]]">
                 <paper-item class="dropdown-item" name="{{item.id}}">{{item.id}}</paper-item>
               </template>
-  </paper-listbox>
-  </paper-dropdown-menu>
-  <paper-dropdown-menu label="Contour">
-    <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-      <paper-item class="dropdown-item" name="axial">Axial</paper-item>
-      <paper-item class="dropdown-item" name="flexure">Flexure</paper-item>
-    </paper-listbox>
-  </paper-dropdown-menu>
-  <div id="filter-container">
-    <paper-item>Model Filters</paper-item>
-    <div class="horizontal">
-      <paper-input on-change="inputBeyondBoundaries" auto-validate label="min x" class="inline-input" type="number" value="{{geometryFilter.xMin}}" max="[[boundaries.xMax]]" min="[[boundaries.xMin]]"></paper-input>
-      <paper-input on-change="inputBeyondBoundaries" auto-validate label="max x" class="inline-input" type="number" value="{{geometryFilter.xMax}}" max="[[boundaries.xMax]]" min="[[boundaries.xMin]]"></paper-input>
-    </div>
-    <div class="horizontal">
-      <paper-input on-change="inputBeyondBoundaries" auto-validate label="min y" class="inline-input" type="number" value="{{geometryFilter.yMin}}" max="[[boundaries.yMax]]" min="[[boundaries.yMin]]"></paper-input>
-      <paper-input on-change="inputBeyondBoundaries" auto-validate label="max y" class="inline-input" type="number" value="{{geometryFilter.yMax}}" max="[[boundaries.yMax]]" min="[[boundaries.yMin]]"></paper-input>
-    </div>
-    <div class="horizontal">
-      <paper-input on-change="inputBeyondBoundaries" auto-validate label="min z" class="inline-input" type="number" value="{{geometryFilter.zMin}}" max="[[boundaries.zMax]]" min="[[boundaries.zMin]]"></paper-input>
-      <paper-input on-change="inputBeyondBoundaries" auto-validate label="max z" class="inline-input" type="number" value="{{geometryFilter.zMax}}" max="[[boundaries.zMax]]" min="[[boundaries.zMin]]"></paper-input>
-    </div>
-    <div class="horizontal">
-      <paper-button disabled$="{{_filtersDisabled}}" id="applyBtn" on-tap="applyFilters">Apply</paper-button>
-      <paper-button id="resetBtn" on-tap="resetFilters">Reset</paper-button>
-    </div>
-  </div>
-  </div>
-  </app-drawer>
+            </paper-listbox>
+          </paper-dropdown-menu>
+          <paper-dropdown-menu label="Contour">
+            <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
+              <paper-item class="dropdown-item" name="axial">Axial</paper-item>
+              <paper-item class="dropdown-item" name="flexure">Flexure</paper-item>
+            </paper-listbox>
+          </paper-dropdown-menu>
+          <div id="filter-container">
+          <paper-item>Model Filters</paper-item>
+            <div class="horizontal">
+              <paper-input on-change="inputBeyondBoundaries" auto-validate label="min x" class="inline-input" type="number" value="{{geometryFilter.xMin}}" max="[[boundaries.xMax]]" min="[[boundaries.xMin]]"></paper-input>
+              <paper-input on-change="inputBeyondBoundaries" auto-validate label="max x" class="inline-input" type="number" value="{{geometryFilter.xMax}}" max="[[boundaries.xMax]]" min="[[boundaries.xMin]]"></paper-input>
+            </div>
+            <div class="horizontal">
+              <paper-input on-change="inputBeyondBoundaries" auto-validate label="min y" class="inline-input" type="number" value="{{geometryFilter.yMin}}" max="[[boundaries.yMax]]" min="[[boundaries.yMin]]"></paper-input>
+              <paper-input on-change="inputBeyondBoundaries" auto-validate label="max y" class="inline-input" type="number" value="{{geometryFilter.yMax}}" max="[[boundaries.yMax]]" min="[[boundaries.yMin]]"></paper-input>
+            </div>
+            <div class="horizontal">
+              <paper-input on-change="inputBeyondBoundaries" auto-validate label="min z" class="inline-input" type="number" value="{{geometryFilter.zMin}}" max="[[boundaries.zMax]]" min="[[boundaries.zMin]]"></paper-input>
+              <paper-input on-change="inputBeyondBoundaries" auto-validate label="max z" class="inline-input" type="number" value="{{geometryFilter.zMax}}" max="[[boundaries.zMax]]" min="[[boundaries.zMin]]"></paper-input>
+            </div>
+            <div class="horizontal">
+              <paper-button disabled$="{{_filtersDisabled}}" id="applyBtn" on-tap="applyFilters">Apply</paper-button>
+              <paper-button id="resetBtn" on-tap="resetFilters">Reset</paper-button>
+            </div>
+          </div>
+        </div>
+      </app-drawer>
 
-  <!-- Main content -->
-  <app-header-layout has-scrolling-region>
+      <!-- Main content -->
+      <app-header-layout has-scrolling-region>
 
-    <app-header slot="header" condenses reveals effects="waterfall">
-      <app-toolbar>
-        <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-        <div main-title>Three Polymer Wireframe</div>
-      </app-toolbar>
-    </app-header>
-    <div class="three-container">
-      <three-view id="view" scene-background-color="#F5F5F5">
-        <three-model id="model" slot="model" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[getModelData(selectedModel)]]">
-        </three-model>
-      </three-view>
-    </div>
-  </app-header-layout>
-  </app-drawer-layout>
+        <app-header slot="header" condenses reveals effects="waterfall">
+          <app-toolbar>
+            <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
+            <div main-title>Arup Model QuickView</div>
+            <div class="spacer"></div>
+            <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
+          </app-toolbar>
+        </app-header>
+        <div class="three-container">
+          <three-view id="view" scene-background-color="#F5F5F5">
+            <three-model id="model" slot="model" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[getModelData(selectedModel)]]">
+            </three-model>
+          </three-view>
+        </div>
+      </app-header-layout>
+    </app-drawer-layout>
   </template>
 
   <script>
@@ -384,6 +400,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return result.payload;
         }
         return []
+      }
+
+      showDialog() {
+        this.$.addModelDialog.open();
       }
     }
 
