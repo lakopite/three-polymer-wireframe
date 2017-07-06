@@ -1,5 +1,5 @@
-<!--
 @license
+<!--
 Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
 The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
@@ -192,7 +192,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </app-header>
         <div class="three-container">
           <three-view id="view" scene-background-color="#F5F5F5">
-            <three-model id="model" slot="model" metadata-fields="{{metadataFields}}" is-loading="{{modelLoading}}" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[getModelData(selectedModel)]]">
+            <three-model id="model" slot="model" metadata-fields="{{metadataFields}}" is-loading="{{modelLoading}}" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[_modelData]]">
             </three-model>
           </three-view>
         </div>
@@ -209,14 +209,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       static get properties() {
         return {
-          /*         page: {
-                      type: String,
-                      reflectToAttribute: true,
-                      observer: '_pageChanged',
-                    },
-                    rootPattern: String,
-                    routeData: Object,
-                    subroute: String,*/
           selectedModel: {
             type: String
           },
@@ -237,6 +229,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           _filtersDisabled: {
             type: Boolean,
             value: false
+          },
+          _modelData: {
+            type: Array,
+            value: []
           },
           modelLoading: {
             type: Boolean
@@ -260,7 +256,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return [
           '_boundariesChanged(boundaries.*)',
           '_loadingChanged(modelLoading)',
-          '_contourPropsChanged(metadataFields)'
+          '_contourPropsChanged(metadataFields)',
+          '_getModelData(selectedModel)'
         ]
       }
 
@@ -465,14 +462,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         alert("Couldn't fetch sample data, using three stick models.")
       }
 
-      getModelData(_selectedModel) {
+      _getModelData(_selectedModel) {
         var result = _.find(this.data, function(o) {
           return o.id === _selectedModel
         });
         if (result) {
-          return result.payload;
+          this._modelData = result.payload;
         }
-        return []
+        else {
+          this.modelData = [];
+        }
       }
 
       showDialog() {
