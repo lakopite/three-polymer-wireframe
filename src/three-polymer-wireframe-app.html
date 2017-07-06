@@ -175,12 +175,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-button class="filterBtn" raised disabled$="{{modelLoading}}" id="resetBtn" on-tap="resetFilters">Reset</paper-button>
     </div>
   </div>
-  </div>
   <div id="aggegation-container">
     <paper-item>Aggregations</paper-item>
-  <paper-input label="average"></paper-input>
-    <paper-input label="minimum value"></paper-input>
-    <paper-input label="maximum value"></paper-input>
+    <paper-input readonly label="average" value="[[meanResult]]"></paper-input>
+    <paper-input readonly label="minimum value" value="[[minResult]]"></paper-input>
+    <paper-input readonly label="maximum value" value="[[maxResult]]"></paper-input>
+  </div>
   </div>
   </app-drawer>
 
@@ -247,6 +247,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Array,
             value: []
           },
+          meanResult: {
+            type: Number,
+            value: 0
+          },
+          minResult: {
+            type: Number,
+            value: 0
+          },
+          maxResult: {
+            type: Number,
+            value: 0
+          }
         };
       }
 
@@ -267,51 +279,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _aggregations(_modelData, selectedContourBy) {
 
         if (!_.isEmpty(_modelData) && this.selectedContourBy) {
-            var that = this;
-            var meanResult = console.log("The average is: "+ _.meanBy(that._modelData, function(o) {
-              return o.metadata[that.selectedContourBy]
-            }));
-            //min
-            var minResult = _.minBy(_modelData, function(o) {
-              console.log(that.selectedContourBy)
-              return o.metadata[that.selectedContourBy]
-            });
-            console.log("The minimum value is: " + minResult.metadata[this.selectedContourBy])
-            //max
-            var maxResult = _.maxBy(that._modelData, function(o) {
-              console.log(that.selectedContourBy)
-              return o.metadata[that.selectedContourBy]
-            });
-            console.log("The maximum value is: " + maxResult.metadata[this.selectedContourBy])
-        }
-        else {
-          console.log("no mean could be calculated")
+          var that = this;
+
+          this.meanResult = _.meanBy(_.filter(that._modelData, function(i) {}), function(o) {
+            return o.metadata[that.selectedContourBy]
+          });
+          //min
+          this.minResult = _.minBy(_modelData, function(o) {
+            // console.log(that.selectedContourBy)
+            return o.metadata[that.selectedContourBy]
+          }).metadata[this.selectedContourBy];
+          // console.log("The minimum value is: " + minResult.metadata[this.selectedContourBy])
+          //max
+          this.maxResult = _.maxBy(that._modelData, function(o) {
+            // console.log(that.selectedContourBy)
+            return o.metadata[that.selectedContourBy]
+          }).metadata[this.selectedContourBy];
+          // console.log("The maximum value is: " + maxResult.metadata[this.selectedContourBy])
+        } else {
+          this.meanResult = 0
+          this.minResult = 0
+          this.maxResult = 0
+          // console.log("no mean could be calculated")
         }
       }
-      //aggregations
-      // _mean(_modelData) {
-      //   var that = this;
-      //   console.log(this._modelData)
-      //   console.log(_.meanBy(that._modelData, function(o) {
-      //     return o.metadata.axial
-      //   }));
-      // }
-      //
-      // _min(_modelData, selectedContourBy) {
-      //   var that = this;
-      //   console.log("minimum value is" + _.minBy(that._modelData, function(o) {
-      //     return o.metadata.axial
-      //   }));
-      // }
-      //
-      // _max(_modelData, selectedContourBy) {
-      //   var that = this;
-      //   var maxResult = _.maxBy(that._modelData, function(o) {
-      //     console.log(that.selectedContourBy)
-      //     return o.metadata[that.selectedContourBy]
-      //   });
-      //   console.log(maxResult.metadata[this.selectedContourBy])
-      // }
 
       //Ensure that the geometry input is within boundaries and is compatible with its input sibling
       _computeMin(_b, _g) {
