@@ -308,12 +308,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         //console.log(this.geometryFilter)
         if (!_.isEmpty(this.geometryFilter) && !_.isEmpty(this.boundaries) && !this.modelLoading && _.every(_.values(this.geometryFilter),function(o){return o !==""})) {
           this._filtersDisabled =
-            this.geometryFilter.xMin < this.boundaries.xMin || this.geometryFilter.xMin > this.geometryFilter.xMax ||
-            this.geometryFilter.yMin < this.boundaries.yMin || this.geometryFilter.yMin > this.geometryFilter.yMax ||
-            this.geometryFilter.zMin < this.boundaries.zMin || this.geometryFilter.zMin > this.geometryFilter.zMax ||
-            this.geometryFilter.xMax > this.boundaries.xMax || this.geometryFilter.xMax < this.geometryFilter.xMin ||
-            this.geometryFilter.yMax > this.boundaries.yMax || this.geometryFilter.yMax < this.geometryFilter.yMin ||
-            this.geometryFilter.zMax > this.boundaries.zMax || this.geometryFilter.zMax < this.geometryFilter.zMin
+            parseFloat(this.geometryFilter.xMin) < this.boundaries.xMin || parseFloat(this.geometryFilter.xMin) > this.geometryFilter.xMax ||
+            parseFloat(this.geometryFilter.yMin) < this.boundaries.yMin || parseFloat(this.geometryFilter.yMin) > this.geometryFilter.yMax ||
+            parseFloat(this.geometryFilter.zMin) < this.boundaries.zMin || parseFloat(this.geometryFilter.zMin) > this.geometryFilter.zMax ||
+            parseFloat(this.geometryFilter.xMax) > this.boundaries.xMax ||
+            parseFloat(this.geometryFilter.yMax) > this.boundaries.yMax ||
+            parseFloat(this.geometryFilter.zMax) > this.boundaries.zMax
         }
         else {this._filtersDisabled = true;}
       }
