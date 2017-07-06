@@ -140,16 +140,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <div id="filter-container">
           <paper-item>Model Filters</paper-item>
             <div class="horizontal">
-              <paper-input on-change="inputBeyondBoundaries" auto-validate label="min x" class="inline-input" type="number" value="{{geometryFilter.xMin}}" max="[[boundaries.xMax]]" min="[[boundaries.xMin]]"></paper-input>
-              <paper-input on-change="inputBeyondBoundaries" auto-validate label="max x" class="inline-input" type="number" value="{{geometryFilter.xMax}}" max="[[boundaries.xMax]]" min="[[boundaries.xMin]]"></paper-input>
+              <paper-input on-invalid-changed="inputBeyondBoundaries" auto-validate label="min x" class="inline-input" type="number" value="{{geometryFilter.xMin}}" max="[[boundaries.xMax]]" min="[[boundaries.xMin]]"></paper-input>
+              <paper-input on-invalid-changed="inputBeyondBoundaries" auto-validate label="max x" class="inline-input" type="number" value="{{geometryFilter.xMax}}" max="[[boundaries.xMax]]" min="[[boundaries.xMin]]"></paper-input>
             </div>
             <div class="horizontal">
-              <paper-input on-change="inputBeyondBoundaries" auto-validate label="min y" class="inline-input" type="number" value="{{geometryFilter.yMin}}" max="[[boundaries.yMax]]" min="[[boundaries.yMin]]"></paper-input>
-              <paper-input on-change="inputBeyondBoundaries" auto-validate label="max y" class="inline-input" type="number" value="{{geometryFilter.yMax}}" max="[[boundaries.yMax]]" min="[[boundaries.yMin]]"></paper-input>
+              <paper-input on-invalid-changed="inputBeyondBoundaries" auto-validate label="min y" class="inline-input" type="number" value="{{geometryFilter.yMin}}" max="[[boundaries.yMax]]" min="[[boundaries.yMin]]"></paper-input>
+              <paper-input on-invalid-changed="inputBeyondBoundaries" auto-validate label="max y" class="inline-input" type="number" value="{{geometryFilter.yMax}}" max="[[boundaries.yMax]]" min="[[boundaries.yMin]]"></paper-input>
             </div>
             <div class="horizontal">
-              <paper-input on-change="inputBeyondBoundaries" auto-validate label="min z" class="inline-input" type="number" value="{{geometryFilter.zMin}}" max="[[boundaries.zMax]]" min="[[boundaries.zMin]]"></paper-input>
-              <paper-input on-change="inputBeyondBoundaries" auto-validate label="max z" class="inline-input" type="number" value="{{geometryFilter.zMax}}" max="[[boundaries.zMax]]" min="[[boundaries.zMin]]"></paper-input>
+              <paper-input on-invalid-changed="inputBeyondBoundaries" auto-validate label="min z" class="inline-input" type="number" value="{{geometryFilter.zMin}}" max="[[boundaries.zMax]]" min="[[boundaries.zMin]]"></paper-input>
+              <paper-input on-invalid-changed="inputBeyondBoundaries" auto-validate label="max z" class="inline-input" type="number" value="{{geometryFilter.zMax}}" max="[[boundaries.zMax]]" min="[[boundaries.zMin]]"></paper-input>
             </div>
             <div class="horizontal">
               <paper-button disabled$="{{_filtersDisabled}}" id="applyBtn" on-tap="applyFilters">Apply</paper-button>
@@ -172,7 +172,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </app-header>
         <div class="three-container">
           <three-view id="view" scene-background-color="#F5F5F5">
-            <three-model id="model" slot="model" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[getModelData(selectedModel)]]">
+            <three-model id="model" slot="model" is-loading="{{modelLoading}}" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[getModelData(selectedModel)]]">
             </three-model>
           </three-view>
         </div>
@@ -217,6 +217,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           _filtersDisabled: {
             type: Boolean,
             value: false
+          },
+          modelLoading: {
+            type: Boolean
           }
         };
       }
@@ -230,7 +233,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     // }
 
       static get observers() {
-        return []
+        return [
+          '_boundariesChanged(boundaries.*)',
+          '_loadingChanged(modelLoading)'
+        ]
       }
 
       constructor() {
@@ -238,20 +244,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       resetFilters() {
-
         this.geometryFilter = _.cloneDeep(this.boundaries)
         //reset filter selection to the model boundaries
-        console.log(this.geometryFilter)
-        console.log(this.boundaries)
+        //console.log(this.geometryFilter)
+        //console.log(this.boundaries)
+      }
+
+      _boundariesChanged(boundaries) {
+        this.resetFilters();
+      }
+
+      _loadingChanged(modelLoading) {
+        //console.log(modelLoading)
+        this.inputBeyondBoundaries();
       }
 
       inputBeyondBoundaries() {
-        this._filtersDisabled = this.geometryFilter.xMin < this.boundaries.xMin ||
-          this.geometryFilter.yMin < this.boundaries.yMin ||
-          this.geometryFilter.zMin < this.boundaries.zMin ||
-          this.geometryFilter.xMax > this.boundaries.xMax ||
-          this.geometryFilter.yMax > this.boundaries.yMax ||
-          this.geometryFilter.zMax > this.boundaries.zMax
+        if (this.modelLoading) {
+          this._filtersDisabled = true;
+        }
+        else {
+          this._filtersDisabled =
+            this.geometryFilter.xMin < this.boundaries.xMin ||
+            this.geometryFilter.yMin < this.boundaries.yMin ||
+            this.geometryFilter.zMin < this.boundaries.zMin ||
+            this.geometryFilter.xMax > this.boundaries.xMax ||
+            this.geometryFilter.yMax > this.boundaries.yMax ||
+            this.geometryFilter.zMax > this.boundaries.zMax
+        }
       }
 
       applyFilters() {
@@ -273,13 +293,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               'zMin': parseFloat(this.geometryFilter.zMin),
               'zMax': parseFloat(this.geometryFilter.zMax)
             }
-          console.log(this.geometryFilter)
-          console.log(this.boundaries)
+          //console.log(this.geometryFilter)
+          //console.log(this.boundaries)
         }
       }
-
-      // _boundariesChanged() {
-      // }
 
       _initData(data_) {
         this.set('data', data_);
