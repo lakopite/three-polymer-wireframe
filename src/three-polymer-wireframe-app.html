@@ -151,8 +151,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </paper-dropdown-menu>
           <paper-dropdown-menu label="Contour">
             <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-              <paper-item class="dropdown-item" name="axial">Axial</paper-item>
-              <paper-item class="dropdown-item" name="flexure">Flexure</paper-item>
+              <template is="dom-repeat" items="[[metadataFields]]">
+                <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+              </template>
             </paper-listbox>
           </paper-dropdown-menu>
           <div id="filter-container">
@@ -191,7 +192,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </app-header>
         <div class="three-container">
           <three-view id="view" scene-background-color="#F5F5F5">
-            <three-model id="model" slot="model" is-loading="{{modelLoading}}" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[getModelData(selectedModel)]]">
+            <three-model id="model" slot="model" metadata-fields="{{metadataFields}}" is-loading="{{modelLoading}}" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[getModelData(selectedModel)]]">
             </three-model>
           </three-view>
         </div>
@@ -239,6 +240,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           },
           modelLoading: {
             type: Boolean
+          },
+          metadataFields: {
+            type: Array,
+            value: []
           }
         };
       }
@@ -254,7 +259,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       static get observers() {
         return [
           '_boundariesChanged(boundaries.*)',
-          '_loadingChanged(modelLoading)'
+          '_loadingChanged(modelLoading)',
+          '_contourPropsChanged(metadataFields)'
         ]
       }
 
@@ -287,6 +293,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _loadingChanged(modelLoading) {
         //console.log(modelLoading)
         this.checkValidInput();
+      }
+
+      _contourPropsChanged(metadataFields) {
+        if (this.metadataFields.indexOf(this.selectedContourBy) === -1) {
+          this.selectedContourBy = undefined;
+          if (this.metadataFields.length > 0) {
+            var that = this;
+            setTimeout(function() {
+              that.selectedContourBy = that.metadataFields[0];
+            },0);
+          }
+        }
       }
 
       checkValidInput() {
@@ -346,6 +364,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var resp = response.response;
         if (resp) {
           this._initData(resp);
+          //this.handleError();
         } else {
           this.handleError();
         }
