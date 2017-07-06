@@ -244,20 +244,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         };
       }
 
-    //aggregation
-    // _.meanBy(payload, function(o) {return o.metadata[this.selectedContourBy]})
-    //
-    // _mean() {
-    //   var that = this;
-    //   _.meanBy(payload, function(o) {return o.metadata[that.selectedContourBy]})
-    // }
+            //aggregation
+            _mean(_modelData) {
+              var that = this;
+              console.log(_.meanBy(that._modelData, function(o) {
+                return o.metadata.axial
+              }))
+            }
+
+          
 
       static get observers() {
         return [
           '_boundariesChanged(boundaries.*)',
           '_loadingChanged(modelLoading)',
           '_contourPropsChanged(metadataFields)',
-          '_getModelData(selectedModel)'
+          '_getModelData(selectedModel)',
+          '_mean(_modelData)'
         ]
       }
 
