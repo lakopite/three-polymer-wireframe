@@ -177,9 +177,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </div>
   <div id="aggegation-container">
     <paper-item>Aggregations</paper-item>
-    <paper-input label="Average" value="[[meanResult]]" readonly></paper-input>
-    <paper-input label="Min Value" value="[[minResult]]" readonly></paper-input>
-    <paper-input label="Max Value" value="[[maxResult]]" readonly></paper-input>
+    <paper-input label="[[getMeanLabel(selectedContourBy)]]" value="[[meanResult]]" readonly></paper-input>
+    <paper-input label="[[getMinLabel(selectedContourBy)]]" value="[[minResult]]" readonly></paper-input>
+    <paper-input label="[[getMaxLabel(selectedContourBy)]]" value="[[maxResult]]" readonly></paper-input>
   </div>
   </div>
   </app-drawer>
@@ -258,7 +258,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           maxResult: {
             type: Number,
             value: 0
-          }
+          },
+          // getMeanLabel: {
+          //   type: String,
+          //   value: "average"
+          // },
+          // getMinLabel: {
+          //   type: String,
+          //   value: "min value"
+          // },
+          // getMaxLabel: {
+          //   type: String,
+          //   value: "max value"
+          // }
         };
       }
 
@@ -268,7 +280,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_loadingChanged(modelLoading)',
           '_contourPropsChanged(metadataFields)',
           '_getModelData(selectedModel)',
-          '_aggregations(_modelData,selectedContourBy)'
+          '_aggregations(_modelData,selectedContourBy)',
+          '_getAggregationLabels(_modelData, selectedContourBy)'
         ]
       }
 
@@ -304,8 +317,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-
-
+      _getAggregationLabels() {
+        //this.getMeanLabel
+        console.log(this.selectedContourBy)
+        //this.getMinLabel:
+        //this.getMaxLabel:
+      }
       //Ensure that the geometry input is within boundaries and is compatible with its input sibling
       _computeMin(_b, _g) {
         _g = parseFloat(_g)
