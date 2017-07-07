@@ -308,6 +308,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.meanResult = _.meanBy(that._modelData, function(o) {
             return o.metadata[that.selectedContourBy]
           });
+          // ==================================ATTEMPTING FILTERED AGGREGATIONS START========================================================
+          this.resultTestFilter = _.filter(that._modelData, function(o) {
+              return o.vertices[0][2] < that.geometryFilter.zMax
+            })
+
+            console.log(this.resultTestFilter)
+
+            console.log(_.meanBy(this.resultTestFilter, function(o) {return o.metadata[that.selectedContourBy]}))
+         // ==================================ATTEMPTING FILTERED AGGREGATIONS END========================================================
           //min
           this.minResult = _.minBy(_modelData, function(o) {
             // console.log(that.selectedContourBy)
@@ -330,7 +339,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _getAggregationLabels() {
         if (typeof this.selectedContourBy === 'undefined' || typeof this.selectedModel === 'undefined') {
-          this.getMeanLabel = "Average unavailable"
+          this.getMeanLabel = "Avg unavailable"
           this.getMinLabel = "Min unavailable"
           this.getMaxLabel = "Max unavailable"
         } else {
@@ -426,9 +435,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'zMin': parseFloat(this.geometryFilter.zMin),
           'zMax': parseFloat(this.geometryFilter.zMax)
         }
-        //console.log(this.geometryFilter)
-        //console.log(this.boundaries)
-        //}
       }
 
       _initData(dataOptions_) {
@@ -457,10 +463,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleDataResponse(event, response) {
         var resp = response.response;
-        console.log("data received")
+        // console.log("data received")
         if (resp && resp.modelInformation.name === this.selectedModel && "payload" in resp) {
           this.appLoading = false;
           this.set('_modelData',resp.payload);
+          console.log(this._modelData)
         }
         else {
           this.handleDataError()
