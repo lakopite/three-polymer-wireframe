@@ -177,9 +177,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </div>
   <div id="aggegation-container">
     <paper-item>Aggregations</paper-item>
-    <paper-input label="[[getMeanLabel(selectedContourBy)]]" value="[[meanResult]]" readonly></paper-input>
-    <paper-input label="[[getMinLabel(selectedContourBy)]]" value="[[minResult]]" readonly></paper-input>
-    <paper-input label="[[getMaxLabel(selectedContourBy)]]" value="[[maxResult]]" readonly></paper-input>
+    <paper-input label="[[getMeanLabel]]" value="[[meanResult]]" readonly></paper-input>
+    <paper-input label="[[getMinLabel]]" value="[[minResult]]" readonly></paper-input>
+    <paper-input label="[[getMaxLabel]]" value="[[maxResult]]" readonly></paper-input>
   </div>
   </div>
   </app-drawer>
@@ -318,10 +318,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _getAggregationLabels() {
-        //this.getMeanLabel
-        console.log("Average for " + this.selectedContourBy + " of " + this.selectedModel)
-        //this.getMinLabel:
-        //this.getMaxLabel:
+        this.getMeanLabel = "Average for " + this.selectedContourBy + " of " + this.selectedModel
+        this.getMinLabel = "Min value for " + this.selectedContourBy + " of " + this.selectedModel
+        this.getMaxLabel = "Max value for " + this.selectedContourBy + " of " + this.selectedModel
       }
       //Ensure that the geometry input is within boundaries and is compatible with its input sibling
       _computeMin(_b, _g) {
