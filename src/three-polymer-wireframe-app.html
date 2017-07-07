@@ -147,57 +147,63 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template is="dom-repeat" items="[[data]]">
                 <paper-item class="dropdown-item" name="{{item.id}}">{{item.id}}</paper-item>
               </template>
-            </paper-listbox>
-          </paper-dropdown-menu>
-          <paper-dropdown-menu label="Contour">
-            <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-              <template is="dom-repeat" items="[[metadataFields]]">
+  </paper-listbox>
+  </paper-dropdown-menu>
+  <paper-dropdown-menu label="Contour">
+    <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
+      <template is="dom-repeat" items="[[metadataFields]]">
                 <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
               </template>
-            </paper-listbox>
-          </paper-dropdown-menu>
-          <div id="filter-container">
-          <paper-item>Model Filters</paper-item>
-            <div class="horizontal">
-              <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min x" class="inline-input" type="number" value="{{geometryFilter.xMin}}" max="[[_computeMax(boundaries.xMax,geometryFilter.xMax)]]" min="[[boundaries.xMin]]"></paper-input>
-              <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max x" class="inline-input" type="number" value="{{geometryFilter.xMax}}" max="[[boundaries.xMax]]" min="[[_computeMin(boundaries.xMin,geometryFilter.xMin)]]"></paper-input>
-            </div>
-            <div class="horizontal">
-              <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min y" class="inline-input" type="number" value="{{geometryFilter.yMin}}" max="[[_computeMax(boundaries.yMax,geometryFilter.yMax)]]" min="[[boundaries.yMin]]"></paper-input>
-              <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max y" class="inline-input" type="number" value="{{geometryFilter.yMax}}" max="[[boundaries.yMax]]" min="[[_computeMin(boundaries.yMin,geometryFilter.yMin)]]"></paper-input>
-            </div>
-            <div class="horizontal">
-              <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min z" class="inline-input" type="number" value="{{geometryFilter.zMin}}" max="[[_computeMax(boundaries.zMax,geometryFilter.zMax)]]" min="[[boundaries.zMin]]"></paper-input>
-              <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max z" class="inline-input" type="number" value="{{geometryFilter.zMax}}" max="[[boundaries.zMax]]" min="[[_computeMin(boundaries.zMin,geometryFilter.zMin)]]"></paper-input>
-            </div>
-            <div class="horizontal">
-              <paper-button class="filterBtn" raised disabled$="{{_filtersDisabled}}" id="applyBtn" on-tap="applyFilters">Apply</paper-button>
-              <paper-button class="filterBtn" raised disabled$="{{modelLoading}}" id="resetBtn" on-tap="resetFilters">Reset</paper-button>
-            </div>
-          </div>
-        </div>
-      </app-drawer>
+    </paper-listbox>
+  </paper-dropdown-menu>
+  <div id="filter-container">
+    <paper-item>Model Filters</paper-item>
+    <div class="horizontal">
+      <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min x" class="inline-input" type="number" value="{{geometryFilter.xMin}}" max="[[_computeMax(boundaries.xMax,geometryFilter.xMax)]]" min="[[boundaries.xMin]]"></paper-input>
+      <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max x" class="inline-input" type="number" value="{{geometryFilter.xMax}}" max="[[boundaries.xMax]]" min="[[_computeMin(boundaries.xMin,geometryFilter.xMin)]]"></paper-input>
+    </div>
+    <div class="horizontal">
+      <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min y" class="inline-input" type="number" value="{{geometryFilter.yMin}}" max="[[_computeMax(boundaries.yMax,geometryFilter.yMax)]]" min="[[boundaries.yMin]]"></paper-input>
+      <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max y" class="inline-input" type="number" value="{{geometryFilter.yMax}}" max="[[boundaries.yMax]]" min="[[_computeMin(boundaries.yMin,geometryFilter.yMin)]]"></paper-input>
+    </div>
+    <div class="horizontal">
+      <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min z" class="inline-input" type="number" value="{{geometryFilter.zMin}}" max="[[_computeMax(boundaries.zMax,geometryFilter.zMax)]]" min="[[boundaries.zMin]]"></paper-input>
+      <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max z" class="inline-input" type="number" value="{{geometryFilter.zMax}}" max="[[boundaries.zMax]]" min="[[_computeMin(boundaries.zMin,geometryFilter.zMin)]]"></paper-input>
+    </div>
+    <div class="horizontal">
+      <paper-button class="filterBtn" raised disabled$="{{_filtersDisabled}}" id="applyBtn" on-tap="applyFilters">Apply</paper-button>
+      <paper-button class="filterBtn" raised disabled$="{{modelLoading}}" id="resetBtn" on-tap="resetFilters">Reset</paper-button>
+    </div>
+  </div>
+  <div id="aggegation-container">
+    <paper-item>Aggregations</paper-item>
+    <paper-input label="[[getMeanLabel]]" value="[[meanResult]]" readonly></paper-input>
+    <paper-input label="[[getMinLabel]]" value="[[minResult]]" readonly></paper-input>
+    <paper-input label="[[getMaxLabel]]" value="[[maxResult]]" readonly></paper-input>
+  </div>
+  </div>
+  </app-drawer>
 
-      <!-- Main content -->
-      <app-header-layout has-scrolling-region>
+  <!-- Main content -->
+  <app-header-layout has-scrolling-region>
 
-        <app-header slot="header" condenses reveals effects="waterfall">
-          <app-toolbar>
-            <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-            <div main-title>Arup Model QuickView</div>
-            <div class="spacer"></div>
-            <paper-spinner active$="{{modelLoading}}"></paper-spinner>
-            <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
-          </app-toolbar>
-        </app-header>
-        <div class="three-container">
-          <three-view id="view" scene-background-color="#F5F5F5">
-            <three-model id="model" slot="model" metadata-fields="{{metadataFields}}" is-loading="{{modelLoading}}" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[_modelData]]">
-            </three-model>
-          </three-view>
-        </div>
-      </app-header-layout>
-    </app-drawer-layout>
+    <app-header slot="header" condenses reveals effects="waterfall">
+      <app-toolbar>
+        <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
+        <div main-title>Arup Model QuickView</div>
+        <div class="spacer"></div>
+        <paper-spinner active$="{{modelLoading}}"></paper-spinner>
+        <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
+      </app-toolbar>
+    </app-header>
+    <div class="three-container">
+      <three-view id="view" scene-background-color="#F5F5F5">
+        <three-model id="model" slot="model" metadata-fields="{{metadataFields}}" is-loading="{{modelLoading}}" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[_modelData]]">
+        </three-model>
+      </three-view>
+    </div>
+  </app-header-layout>
+  </app-drawer-layout>
   </template>
 
   <script>
@@ -240,24 +246,42 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           metadataFields: {
             type: Array,
             value: []
+          },
+          meanResult: {
+            type: Number,
+            value: 0
+          },
+          minResult: {
+            type: Number,
+            value: 0
+          },
+          maxResult: {
+            type: Number,
+            value: 0
+          },
+          getMeanLabel: {
+            type: String,
+            value: "average"
+          },
+          getMinLabel: {
+            type: String,
+            value: "min value"
+          },
+          getMaxLabel: {
+            type: String,
+            value: "max value"
           }
         };
       }
-
-    //aggregation
-    // _.meanBy(payload, function(o) {return o.metadata[this.selectedContourBy]})
-    //
-    // _mean() {
-    //   var that = this;
-    //   _.meanBy(payload, function(o) {return o.metadata[that.selectedContourBy]})
-    // }
 
       static get observers() {
         return [
           '_boundariesChanged(boundaries.*)',
           '_loadingChanged(modelLoading)',
           '_contourPropsChanged(metadataFields)',
-          '_getModelData(selectedModel)'
+          '_getModelData(selectedModel)',
+          '_aggregations(_modelData,selectedContourBy)',
+          '_getAggregationLabels(_modelData, selectedContourBy)'
         ]
       }
 
@@ -265,8 +289,41 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         super();
       }
 
+      _aggregations(_modelData, selectedContourBy) {
+
+        if (!_.isEmpty(_modelData) && this.selectedContourBy) {
+          var that = this;
+          //avg
+          this.meanResult = _.meanBy(that._modelData, function(o) {
+            return o.metadata[that.selectedContourBy]
+          });
+          //min
+          this.minResult = _.minBy(_modelData, function(o) {
+            // console.log(that.selectedContourBy)
+            return o.metadata[that.selectedContourBy]
+          }).metadata[this.selectedContourBy];
+          // console.log("The minimum value is: " + minResult.metadata[this.selectedContourBy])
+          //max
+          this.maxResult = _.maxBy(that._modelData, function(o) {
+            // console.log(that.selectedContourBy)
+            return o.metadata[that.selectedContourBy]
+          }).metadata[this.selectedContourBy];
+          // console.log("The maximum value is: " + maxResult.metadata[this.selectedContourBy])
+        } else {
+          this.meanResult = 0
+          this.minResult = 0
+          this.maxResult = 0
+          // console.log("no mean could be calculated")
+        }
+      }
+
+      _getAggregationLabels() {
+        this.getMeanLabel = "Average for " + this.selectedContourBy + " of " + this.selectedModel
+        this.getMinLabel = "Min value for " + this.selectedContourBy + " of " + this.selectedModel
+        this.getMaxLabel = "Max value for " + this.selectedContourBy + " of " + this.selectedModel
+      }
       //Ensure that the geometry input is within boundaries and is compatible with its input sibling
-      _computeMin(_b,_g) {
+      _computeMin(_b, _g) {
         _g = parseFloat(_g)
         if (_.isNumber(_g)) {
           return (_g > _b) ? _g : _b
@@ -274,7 +331,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return _b
       }
 
-      _computeMax(_b,_g) {
+      _computeMax(_b, _g) {
         _g = parseFloat(_g)
         if (_.isNumber(_g)) {
           return (_g < _b) ? _g : _b
@@ -299,14 +356,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var that = this;
             setTimeout(function() {
               that.selectedContourBy = that.metadataFields[0];
-            },0);
+            }, 0);
           }
         }
       }
 
       checkValidInput() {
         //console.log(this.geometryFilter)
-        if (!_.isEmpty(this.geometryFilter) && !_.isEmpty(this.boundaries) && !this.modelLoading && _.every(_.values(this.geometryFilter),function(o){return o !==""})) {
+        if (!_.isEmpty(this.geometryFilter) && !_.isEmpty(this.boundaries) && !this.modelLoading && _.every(_.values(this.geometryFilter), function(o) {
+            return o !== ""
+          })) {
           this._filtersDisabled =
             parseFloat(this.geometryFilter.xMin) < this.boundaries.xMin || parseFloat(this.geometryFilter.xMin) > this.geometryFilter.xMax ||
             parseFloat(this.geometryFilter.yMin) < this.boundaries.yMin || parseFloat(this.geometryFilter.yMin) > this.geometryFilter.yMax ||
@@ -314,8 +373,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             parseFloat(this.geometryFilter.xMax) > this.boundaries.xMax ||
             parseFloat(this.geometryFilter.yMax) > this.boundaries.yMax ||
             parseFloat(this.geometryFilter.zMax) > this.boundaries.zMax
+        } else {
+          this._filtersDisabled = true;
         }
-        else {this._filtersDisabled = true;}
       }
 
       resetFilters() {
@@ -345,13 +405,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'zMin': parseFloat(this.geometryFilter.zMin),
           'zMax': parseFloat(this.geometryFilter.zMax)
         }
-          //console.log(this.geometryFilter)
-          //console.log(this.boundaries)
+        //console.log(this.geometryFilter)
+        //console.log(this.boundaries)
         //}
       }
 
       _initData(data_) {
         this.set('data', data_);
+        console.log(this.data)
         if (this.data.length > 0) {
           this.set('selectedModel', this.data[0].id)
         }
@@ -468,8 +529,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
         if (result) {
           this._modelData = result.payload;
-        }
-        else {
+        } else {
           this.modelData = [];
         }
       }
