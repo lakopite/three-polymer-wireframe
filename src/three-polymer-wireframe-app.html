@@ -218,8 +218,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return {
           baseUrl: {
             type: String,
-            //DO NOT COMMIT WITH __BASEURL__ - CI pipeline will replace with the production api link
-            value: "__BASEURL__",
+            //CI pipeline will replace with the production api link
+            value: _BACKEND_URL_,
             readOnly: true
           },
           selectedModel: {
