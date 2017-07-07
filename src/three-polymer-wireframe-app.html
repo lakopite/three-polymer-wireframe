@@ -331,12 +331,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _getAggregationLabels() {
         if (typeof this.selectedContourBy === 'undefined' || typeof this.selectedModel === 'undefined') {
           this.getMeanLabel = "Average unavailable"
-          this.getMinLabel = "Minunavailable"
+          this.getMinLabel = "Min unavailable"
           this.getMaxLabel = "Max unavailable"
         } else {
-          this.getMeanLabel = "Avg " + this.selectedContourBy
-          this.getMinLabel = "Min " + this.selectedContourBy
-          this.getMaxLabel = "Max " + this.selectedContourBy
+          this.getMeanLabel = "Avg " + _.capitalize(this.selectedContourBy)
+          this.getMinLabel = "Min " + _.capitalize(this.selectedContourBy)
+          this.getMaxLabel = "Max " + _.capitalize(this.selectedContourBy)
         }
       }
       //Ensure that the geometry input is within boundaries and is compatible with its input sibling
