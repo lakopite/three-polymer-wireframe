@@ -177,9 +177,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </div>
   <div id="aggegation-container">
     <paper-item>Aggregations</paper-item>
-    <paper-input readonly label="average" value="[[meanResult]]"></paper-input>
-    <paper-input readonly label="minimum value" value="[[minResult]]"></paper-input>
-    <paper-input readonly label="maximum value" value="[[maxResult]]"></paper-input>
+    <paper-input label="Average" value="[[meanResult]]" readonly></paper-input>
+    <paper-input label="Min Value" value="[[minResult]]" readonly></paper-input>
+    <paper-input label="Max Value" value="[[maxResult]]" readonly></paper-input>
   </div>
   </div>
   </app-drawer>
@@ -280,8 +280,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         if (!_.isEmpty(_modelData) && this.selectedContourBy) {
           var that = this;
-
-          this.meanResult = _.meanBy(_.filter(that._modelData, function(i) {}), function(o) {
+          //avg
+          this.meanResult = _.meanBy(that._modelData, function(o) {
             return o.metadata[that.selectedContourBy]
           });
           //min
@@ -303,6 +303,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           // console.log("no mean could be calculated")
         }
       }
+
+
 
       //Ensure that the geometry input is within boundaries and is compatible with its input sibling
       _computeMin(_b, _g) {
