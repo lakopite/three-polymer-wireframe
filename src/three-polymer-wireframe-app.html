@@ -125,7 +125,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         --paper-spinner-layer-4-color: #FFF;
       }
     </style>
-    <iron-ajax auto url="/data/test_response.json" handle-as="json" on-response="handleResponse" on-error="handleError"></iron-ajax>
+    <iron-ajax auto url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
+    <iron-ajax id="model-request" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
       <paper-input label="JSON file" type="file"></paper-input>
@@ -144,8 +145,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <div class="drawer-list">
           <paper-dropdown-menu label="Model">
             <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
-              <template is="dom-repeat" items="[[data]]">
-                <paper-item class="dropdown-item" name="{{item.id}}">{{item.id}}</paper-item>
+              <template is="dom-repeat" items="[[dataOptions]]">
+                <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
               </template>
   </paper-listbox>
   </paper-dropdown-menu>
@@ -192,7 +193,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView</div>
         <div class="spacer"></div>
-        <paper-spinner active$="{{modelLoading}}"></paper-spinner>
+        <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
       </app-toolbar>
     </app-header>
@@ -215,6 +216,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       static get properties() {
         return {
+          baseUrl: {
+            type: String,
+            //DO NOT COMMIT WITH __BASEURL__ - CI pipeline will replace with the production api link
+            value: "__BASEURL__",
+            readOnly: true
+          },
           selectedModel: {
             type: String
           },
@@ -228,7 +235,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           geometryFilter: {
             type: Object
           },
-          data: {
+          dataOptions: {
             type: Array,
             value: []
           },
@@ -242,6 +249,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           },
           modelLoading: {
             type: Boolean
+          },
+          appLoading: {
+            type: Boolean,
+            value: true
           },
           metadataFields: {
             type: Array,
@@ -361,6 +372,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
+      isLoadingState(modelLoading,appLoading) {
+        return modelLoading || appLoading
+      }
+
       checkValidInput() {
         //console.log(this.geometryFilter)
         if (!_.isEmpty(this.geometryFilter) && !_.isEmpty(this.boundaries) && !this.modelLoading && _.every(_.values(this.geometryFilter), function(o) {
@@ -410,128 +425,52 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         //}
       }
 
-      _initData(data_) {
-        this.set('data', data_);
-        console.log(this.data)
-        if (this.data.length > 0) {
-          this.set('selectedModel', this.data[0].id)
+      _initData(dataOptions_) {
+        this.set('dataOptions', dataOptions_);
+        console.log(this.dataOptions)
+        if (this.dataOptions.length > 0) {
+          this.set('selectedModel', this.dataOptions[0])
         }
       }
 
-      handleResponse(event, response) {
+      handleOptionsResponse(event, response) {
         var resp = response.response;
         if (resp) {
+          this.appLoading = false
           this._initData(resp);
-          //this.handleError();
         } else {
-          this.handleError();
+          this.handleOptionsError();
         }
       }
 
-      handleError(event, response) {
-        this._initData([{
-          "id": "Model A",
-          "payload": [{
-            "vertices": [
-              [-10, 0, -10],
-              [-10, 0, 10]
-            ],
-            "metadata": {
-              "axial": 10,
-              "flexure": 40
-            }
-          }, {
-            "vertices": [
-              [-10, 0, 10],
-              [10, 0, 10]
-            ],
-            "metadata": {
-              "axial": 40,
-              "flexure": 55
-            }
-          }, {
-            "vertices": [
-              [10, 0, 10],
-              [10, 0, -10]
-            ],
-            "metadata": {
-              "axial": 100,
-              "flexure": 20
-            }
-          }]
-        }, {
-          "id": "Model B",
-          "payload": [{
-            "vertices": [
-              [-10, 0, -10],
-              [-10, 0, 10]
-            ],
-            "metadata": {
-              "axial": 40,
-              "flexure": 20
-            }
-          }, {
-            "vertices": [
-              [-10, 0, 10],
-              [10, 0, 10]
-            ],
-            "metadata": {
-              "axial": 10,
-              "flexure": 55
-            }
-          }, {
-            "vertices": [
-              [10, 0, 10],
-              [10, 0, 30]
-            ],
-            "metadata": {
-              "axial": 100,
-              "flexure": 40
-            }
-          }]
-        }, {
-          "id": "Model C",
-          "payload": [{
-            "vertices": [
-              [-10, 0, 30],
-              [-10, 0, 10]
-            ],
-            "metadata": {
-              "axial": 100,
-              "flexure": 55
-            }
-          }, {
-            "vertices": [
-              [-10, 0, 10],
-              [10, 0, 10]
-            ],
-            "metadata": {
-              "axial": 40,
-              "flexure": 20
-            }
-          }, {
-            "vertices": [
-              [10, 0, 10],
-              [10, 0, -10]
-            ],
-            "metadata": {
-              "axial": 10,
-              "flexure": 40
-            }
-          }]
-        }])
-        alert("Couldn't fetch sample data, using three stick models.")
+      handleOptionsError(event, response) {
+        this.appLoading = false;
+        this._initData([]);
+        alert("Couldn't fetch data.  Please check your internet connection");
+      }
+
+      handleDataResponse(event, response) {
+        var resp = response.response;
+        console.log("data received")
+        if (resp && resp.modelInformation.name === this.selectedModel && "payload" in resp) {
+          this.appLoading = false;
+          this.set('_modelData',resp.payload);
+        }
+        else {
+          this.handleDataError()
+        }
+      }
+
+      handleDataError(event, response) {
+        this.appLoading = false;
+        alert("couldn't retrieve " + this.selectedModel)
       }
 
       _getModelData(_selectedModel) {
-        var result = _.find(this.data, function(o) {
-          return o.id === _selectedModel
-        });
-        if (result) {
-          this._modelData = result.payload;
-        } else {
-          this.modelData = [];
-        }
+        this._modelData = [];
+        this.$['model-request'].url = this.baseUrl + "get-model-data/"+this.selectedModel
+        this.$['model-request'].generateRequest();
+        this.appLoading = true;
       }
 
       showDialog() {
