@@ -300,6 +300,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         super();
       }
 
+      _isWithinBounds(val,min,max) {
+        return val >= min && val <= max
+      }
+
       _aggregations(_modelData, selectedContourBy) {
 
         if (!_.isEmpty(_modelData) && this.selectedContourBy) {
@@ -309,18 +313,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return o.metadata[that.selectedContourBy]
           });
           // ==================================ATTEMPTING FILTERED AGGREGATIONS START========================================================
-          this.resultTestFilter = _.filter(that._modelData, function(o) {
-              return o.vertices[0][2] < that.geometryFilter.zMax
+
+            var resultFilterInput = _.filter(that._modelData, function(o) {
+              return _.every(o.vertices, function(j) {
+                        return  that._isWithinBounds(j[0],that.geometryFilter.xMin,that.geometryFilter.xMax) &&
+                                that._isWithinBounds(j[1],that.geometryFilter.yMin,that.geometryFilter.yMax) &&
+                                that._isWithinBounds(j[2],that.geometryFilter.zMin,that.geometryFilter.zMax)
+                    })
             })
+            console.log(resultFilterInput)
 
-            console.log(this.resultTestFilter)
+            console.log(_.meanBy(resultFilterInput, function(o) {return o.metadata[that.selectedContourBy]}))
 
-            console.log(_.meanBy(this.resultTestFilter, function(o) {return o.metadata[that.selectedContourBy]}))
+            console.log(_.minBy(resultFilterInput, function(o) {
+             return o.metadata[that.selectedContourBy]
+           }).metadata[this.selectedContourBy])
+
+           console.log(_.maxBy(resultFilterInput, function(o) {
+            return o.metadata[that.selectedContourBy]
+          }).metadata[this.selectedContourBy])
+
          // ==================================ATTEMPTING FILTERED AGGREGATIONS END========================================================
           //min
           this.minResult = _.minBy(_modelData, function(o) {
             // console.log(that.selectedContourBy)
-            return o.metadata[that.selectedContourBy]
+            return o.metadata[that.selectedContourBy] 
           }).metadata[this.selectedContourBy];
           // console.log("The minimum value is: " + minResult.metadata[this.selectedContourBy])
           //max
@@ -435,6 +452,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'zMin': parseFloat(this.geometryFilter.zMin),
           'zMax': parseFloat(this.geometryFilter.zMax)
         }
+        this._aggregations(this._modelData,this.selectedContourBy);
       }
 
       _initData(dataOptions_) {
