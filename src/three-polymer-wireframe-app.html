@@ -323,21 +323,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             })
             console.log(resultFilterInput)
 
+            console.log("Average for user input is:")
             console.log(_.meanBy(resultFilterInput, function(o) {return o.metadata[that.selectedContourBy]}))
 
+            console.log("Min val for user input is:")
             console.log(_.minBy(resultFilterInput, function(o) {
              return o.metadata[that.selectedContourBy]
            }).metadata[this.selectedContourBy])
 
+           console.log("Max val user input is:")
            console.log(_.maxBy(resultFilterInput, function(o) {
             return o.metadata[that.selectedContourBy]
           }).metadata[this.selectedContourBy])
 
          // ==================================ATTEMPTING FILTERED AGGREGATIONS END========================================================
           //min
-          this.minResult = _.minBy(_modelData, function(o) {
+          this.minResult = _.minBy(that._modelData, function(o) {
             // console.log(that.selectedContourBy)
-            return o.metadata[that.selectedContourBy] 
+            return o.metadata[that.selectedContourBy]
           }).metadata[this.selectedContourBy];
           // console.log("The minimum value is: " + minResult.metadata[this.selectedContourBy])
           //max
