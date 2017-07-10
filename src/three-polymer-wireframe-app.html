@@ -334,12 +334,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.maxResult = _.maxBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
         }).metadata[this.selectedContourBy]
-        this.showAggregations = true;
+        this.showNumericalAggregations = true;
       }
 
       _stringAggregations() {
         this.showNumericalAggregations = false;
         //sum group by stuff here
+        this.showStringAggregations = true;
       }
 
       _aggregations(_modelData, selectedContourBy) {
