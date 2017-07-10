@@ -309,51 +309,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (!_.isEmpty(_modelData) && this.selectedContourBy) {
           var that = this;
           //avg
-          this.meanResult = _.meanBy(that._modelData, function(o) {
-            return o.metadata[that.selectedContourBy]
-          });
-          // ==================================ATTEMPTING FILTERED AGGREGATIONS START========================================================
-
-            var resultFilterInput = _.filter(that._modelData, function(o) {
-              return _.every(o.vertices, function(j) {
-                        return  that._isWithinBounds(j[0],that.geometryFilter.xMin,that.geometryFilter.xMax) &&
-                                that._isWithinBounds(j[1],that.geometryFilter.yMin,that.geometryFilter.yMax) &&
-                                that._isWithinBounds(j[2],that.geometryFilter.zMin,that.geometryFilter.zMax)
-                    })
+          var resultFilterInput = _.filter(that._modelData, function(o) {
+            return _.every(o.vertices, function(j) {
+              return  that._isWithinBounds(j[0],that.geometryFilter.xMin,that.geometryFilter.xMax) &&
+              that._isWithinBounds(j[1],that.geometryFilter.yMin,that.geometryFilter.yMax) &&
+              that._isWithinBounds(j[2],that.geometryFilter.zMin,that.geometryFilter.zMax)
             })
-            console.log(resultFilterInput)
-
-            console.log("Average for user input is:")
-            console.log(_.meanBy(resultFilterInput, function(o) {return o.metadata[that.selectedContourBy]}))
-
-            console.log("Min val for user input is:")
-            console.log(_.minBy(resultFilterInput, function(o) {
+          })
+          this.meanResult = _.meanBy(resultFilterInput, function(o) {return o.metadata[that.selectedContourBy]});
+          this.minResult = _.minBy(resultFilterInput, function(o) {
              return o.metadata[that.selectedContourBy]
-           }).metadata[this.selectedContourBy])
-
-           console.log("Max val user input is:")
-           console.log(_.maxBy(resultFilterInput, function(o) {
+           }).metadata[this.selectedContourBy]
+          this.maxResult = _.maxBy(resultFilterInput, function(o) {
             return o.metadata[that.selectedContourBy]
-          }).metadata[this.selectedContourBy])
-
-         // ==================================ATTEMPTING FILTERED AGGREGATIONS END========================================================
-          //min
-          this.minResult = _.minBy(that._modelData, function(o) {
-            // console.log(that.selectedContourBy)
-            return o.metadata[that.selectedContourBy]
-          }).metadata[this.selectedContourBy];
-          // console.log("The minimum value is: " + minResult.metadata[this.selectedContourBy])
-          //max
-          this.maxResult = _.maxBy(that._modelData, function(o) {
-            // console.log(that.selectedContourBy)
-            return o.metadata[that.selectedContourBy]
-          }).metadata[this.selectedContourBy];
-          // console.log("The maximum value is: " + maxResult.metadata[this.selectedContourBy])
+          }).metadata[this.selectedContourBy]
         } else {
           this.meanResult = 0
           this.minResult = 0
           this.maxResult = 0
-          // console.log("no mean could be calculated")
+          // console.log("no mean/min/max could be calculated")
         }
       }
 
@@ -439,14 +413,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       applyFilters() {
         //this clone below works, but it turns values into strings. must parseFloat *values*. -rsc
         // this.geometryFilter = _.cloneDeep(this.geometryFilter)
-        //parse filter selection and pass the range to three-model
-        // if (this.geometryFilter.xMin >= this.boundaries.xMin &&
-        //   this.geometryFilter.yMin >= this.boundaries.yMin &&
-        //   this.geometryFilter.zMin >= this.boundaries.zMin &&
-        //   this.geometryFilter.xMax <= this.boundaries.xMax &&
-        //   this.geometryFilter.yMax <= this.boundaries.yMax &&
-        //   this.geometryFilter.zMax <= this.boundaries.zMax) {
-
         this.geometryFilter = {
           'xMin': parseFloat(this.geometryFilter.xMin),
           'xMax': parseFloat(this.geometryFilter.xMax),
