@@ -139,6 +139,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <app-drawer-layout fullbleed>
       <!-- Drawer content -->
       <app-drawer id="drawer" slot="drawer">
+        <div style="height: 100%; overflow: auto;">
         <app-toolbar>
           <paper-item>Model Options</paper-item>
         </app-toolbar>
@@ -176,11 +177,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-button class="filterBtn" raised disabled$="{{modelLoading}}" id="resetBtn" on-tap="resetFilters">Reset</paper-button>
     </div>
   </div>
-  <div id="aggegation-container">
+  <div hidden$="[[!showNumericalAggregations]]">
     <paper-item>Aggregations</paper-item>
     <paper-input label="[[getMeanLabel]]" value="[[meanResult]]" readonly></paper-input>
     <paper-input label="[[getMinLabel]]" value="[[minResult]]" readonly></paper-input>
     <paper-input label="[[getMaxLabel]]" value="[[maxResult]]" readonly></paper-input>
+  </div>
+  <div hidden$="[[!showStringAggregations]]">
+    <!-- sum group by stuff here -->
+  </div>
   </div>
   </div>
   </app-drawer>
@@ -281,6 +286,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           getMaxLabel: {
             type: String,
             value: "max value"
+          },
+          showNumericalAggregations: {
+            type: Boolean,
+            value: false
+          },
+          showStringAggregations: {
+            type: Boolean,
+            value: false
           }
         };
       }
@@ -304,31 +317,36 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return val >= min && val <= max
       }
 
-      _aggregations(_modelData, selectedContourBy) {
-
-        if (!_.isEmpty(_modelData) && this.selectedContourBy) {
-          var that = this;
-          //avg
-          var resultFilterInput = _.filter(that._modelData, function(o) {
-            return _.every(o.vertices, function(j) {
-              return  that._isWithinBounds(j[0],that.geometryFilter.xMin,that.geometryFilter.xMax) &&
-              that._isWithinBounds(j[1],that.geometryFilter.yMin,that.geometryFilter.yMax) &&
-              that._isWithinBounds(j[2],that.geometryFilter.zMin,that.geometryFilter.zMax)
-            })
+      _numericalAggregations() {
+        this.showStringAggregations = false;
+        var that = this;
+        var resultFilterInput = _.filter(that._modelData, function(o) {
+          return _.every(o.vertices, function(j) {
+            return  that._isWithinBounds(j[0],that.geometryFilter.xMin,that.geometryFilter.xMax) &&
+            that._isWithinBounds(j[1],that.geometryFilter.yMin,that.geometryFilter.yMax) &&
+            that._isWithinBounds(j[2],that.geometryFilter.zMin,that.geometryFilter.zMax)
           })
-          this.meanResult = _.meanBy(resultFilterInput, function(o) {return o.metadata[that.selectedContourBy]});
-          this.minResult = _.minBy(resultFilterInput, function(o) {
-             return o.metadata[that.selectedContourBy]
-           }).metadata[this.selectedContourBy]
-          this.maxResult = _.maxBy(resultFilterInput, function(o) {
-            return o.metadata[that.selectedContourBy]
-          }).metadata[this.selectedContourBy]
-        } else {
-          this.meanResult = 0
-          this.minResult = 0
-          this.maxResult = 0
-          // console.log("no mean/min/max could be calculated")
-        }
+        })
+        this.meanResult = _.meanBy(resultFilterInput, function(o) {return o.metadata[that.selectedContourBy]});
+        this.minResult = _.minBy(resultFilterInput, function(o) {
+           return o.metadata[that.selectedContourBy]
+         }).metadata[this.selectedContourBy]
+        this.maxResult = _.maxBy(resultFilterInput, function(o) {
+          return o.metadata[that.selectedContourBy]
+        }).metadata[this.selectedContourBy]
+        this.showAggregations = true;
+      }
+
+      _stringAggregations() {
+        this.showNumericalAggregations = false;
+        //sum group by stuff here
+      }
+
+      _aggregations(_modelData, selectedContourBy) {
+        if (this._isNumberField(_modelData,selectedContourBy)) {this._numericalAggregations(); return}
+        if (this._isStringField(_modelData,selectedContourBy)) {this._stringAggregations(); return}
+        this.showStringAggregations = false;
+        this.showNumericalAggregations = false;
       }
 
       _getAggregationLabels() {
@@ -381,6 +399,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
+      _isNumberField(_modelData, selectedContourBy) {
+        return !_.isEmpty(_modelData) && this.selectedContourBy && _.isNumber(_modelData[0].metadata[this.selectedContourBy])
+      }
+
+      _isStringField(_modelData, selectedContourBy) {
+        return !_.isEmpty(_modelData) && this.selectedContourBy && !_.isNumber(_modelData[0].metadata[this.selectedContourBy])
+      }
+
       isLoadingState(modelLoading,appLoading) {
         return modelLoading || appLoading
       }
@@ -405,6 +431,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       resetFilters() {
         this.geometryFilter = _.cloneDeep(this.boundaries);
         this.checkValidInput();
+        this._aggregations(this._modelData,this.selectedContourBy);
         //reset filter selection to the model boundaries
         //console.log(this.geometryFilter)
         //console.log(this.boundaries)
