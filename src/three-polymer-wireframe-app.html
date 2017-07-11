@@ -347,17 +347,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var resultGroupByName = _.groupBy(that._modelData, function(o) {
           return o.metadata[that.selectedContourBy]
         })
-
-        console.log("Logging keys: " + _.keys(resultGroupByName))
+        // console.log("Logging keys: " + _.keys(resultGroupByName))
         var groupKeys =  _.keys(resultGroupByName)
 
         for (var i in groupKeys) {
-          console.log("current group name key: " + groupKeys[i])
-          console.log("See corresponding objects below:")
-          console.log(resultGroupByName[groupKeys[i]])
-          // console.log(_.sumBy(resultGroupByName, function(o) {
-          //   return o.metadata.axial
-          // }))
+          // console.log("current group name key: " + groupKeys[i])
+          // console.log("See corresponding objects below:")
+          // console.log(resultGroupByName[groupKeys[i]])
+          this.sumByGroup =  _.sumBy(resultGroupByName[groupKeys[i]], function(o) {
+            return o.metadata.axial
+          })
+
+          console.log("Sum of " + groupKeys[i] + "is: " + this.sumByGroup)
         }
         this.showStringAggregations = true;
       }
