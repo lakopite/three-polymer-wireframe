@@ -327,6 +327,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             that._isWithinBounds(j[2],that.geometryFilter.zMin,that.geometryFilter.zMax)
           })
         })
+        console.log(resultFilterInput)
         this.meanResult = _.meanBy(resultFilterInput, function(o) {return o.metadata[that.selectedContourBy]});
         this.minResult = _.minBy(resultFilterInput, function(o) {
            return o.metadata[that.selectedContourBy]
@@ -340,9 +341,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _stringAggregations() {
         this.showNumericalAggregations = false;
         //sum group by stuff here
+        //=================================================ATTEMPTING GROUPBY SUMS STARTS+++++++++++++++++++++++
+        var that = this
+
+        var resultGroupByName = _.groupBy(that._modelData, function(o) {
+          return o.metadata[that.selectedContourBy]
+        })
+
+        console.log("Logging keys: " + _.keys(resultGroupByName))
+        var groupKeys =  _.keys(resultGroupByName)
+
+        for (var i in groupKeys) {
+          console.log("current group name key: " + groupKeys[i])
+          console.log("See corresponding objects below:")
+          console.log(resultGroupByName[groupKeys[i]])
+          // console.log(_.sumBy(resultGroupByName, function(o) {
+          //   return o.metadata.axial
+          // }))
+        }
         this.showStringAggregations = true;
       }
-
+//=======================================================ATTEMPTING GROUPBY SUMS ENDS++++++++++++++++++++++++++++++++
       _aggregations(_modelData, selectedContourBy) {
         if (this._isNumberField(_modelData,selectedContourBy)) {this._numericalAggregations(); return}
         if (this._isStringField(_modelData,selectedContourBy)) {this._stringAggregations(); return}
