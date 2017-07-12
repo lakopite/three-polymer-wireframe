@@ -185,6 +185,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </div>
   <div hidden$="[[!showStringAggregations]]">
     <!-- sum group by stuff here -->
+    <paper-item>Sum by group</paper-item>
+      <template is="dom-repeat" items="{{groupSumData}}">
+              <paper-input label="{{item.group}}" value="{{item.sum}}" readonly></paper-input>
+          </template>
   </div>
   </div>
   </div>
@@ -287,6 +291,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: String,
             value: "max value"
           },
+          getSumByGroupLabels: {
+            type: String,
+            value: "Sum by group"
+          },
+          groupSumData: {
+            type: Array,
+            value: []
+          },
           showNumericalAggregations: {
             type: Boolean,
             value: false
@@ -305,7 +317,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_contourPropsChanged(metadataFields)',
           '_getModelData(selectedModel)',
           '_aggregations(_modelData,selectedContourBy)',
-          '_getAggregationLabels(_modelData, selectedContourBy)'
+          '_getAggregationLabels(_modelData, selectedContourBy)',
+          '_getGroupSumLabels(_modelData, selectedContourBy)'
         ]
       }
 
@@ -341,33 +354,49 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _stringAggregations() {
         this.showNumericalAggregations = false;
         //sum group by stuff here
-        //=================================================ATTEMPTING GROUPBY SUMS STARTS+++++++++++++++++++++++
         var that = this
-
         var resultGroupByName = _.groupBy(that._modelData, function(o) {
           return o.metadata[that.selectedContourBy]
         })
-        // console.log("Logging keys: " + _.keys(resultGroupByName))
-        var groupKeys =  _.keys(resultGroupByName)
+        this.groupKeys =  _.keys(resultGroupByName)
+        // console.log("Group by name:");
+        // console.log(resultGroupByName)
 
-        for (var i in groupKeys) {
-          // console.log("current group name key: " + groupKeys[i])
-          // console.log("See corresponding objects below:")
-          // console.log(resultGroupByName[groupKeys[i]])
-          this.sumByGroup =  _.sumBy(resultGroupByName[groupKeys[i]], function(o) {
+        this.groupSumData = _.castArray([])
+
+        for (var i in this.groupKeys) {
+          var groupObjects = resultGroupByName[this.groupKeys[i]]
+
+          var sumByGroup =  _.sumBy(groupObjects, function(o) {
             return o.metadata.axial
           })
 
-          console.log("Sum of " + groupKeys[i] + "is: " + this.sumByGroup)
+          var groupSumDataSetup = {'group': this.groupKeys[i], 'sum': sumByGroup}
+          this.groupSumData.push(groupSumDataSetup)
+          // // console.log("Group objects:");
+          // // console.log(groupObjects)
+          // console.log("Axial sum for " + this.groupKeys[i] + " is: " + sumByGroup)
         }
+        // console.log(this.groupSumData)
         this.showStringAggregations = true;
       }
-//=======================================================ATTEMPTING GROUPBY SUMS ENDS++++++++++++++++++++++++++++++++
+
       _aggregations(_modelData, selectedContourBy) {
         if (this._isNumberField(_modelData,selectedContourBy)) {this._numericalAggregations(); return}
         if (this._isStringField(_modelData,selectedContourBy)) {this._stringAggregations(); return}
         this.showStringAggregations = false;
         this.showNumericalAggregations = false;
+      }
+
+      _getGroupSumLabels() {
+        //does something need to be added to the line below?
+        if (typeof this.selectedContourBy === 'undefined' || typeof this.selectedModel === 'undefined') {
+          this.getSumByGroupLabels = "No sum available"
+        } else {
+          for (var i in this.groupKeys) {
+            this.getSumByGroupLabels = "Axial sum for " + this.groupKeys[i]
+          }
+        }
       }
 
       _getAggregationLabels() {
