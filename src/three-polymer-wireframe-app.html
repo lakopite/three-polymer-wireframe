@@ -353,31 +353,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _stringAggregations() {
         this.showNumericalAggregations = false;
-        //sum group by stuff here
         var that = this
         var resultGroupByName = _.groupBy(that._modelData, function(o) {
           return o.metadata[that.selectedContourBy]
         })
         this.groupKeys =  _.keys(resultGroupByName)
-        // console.log("Group by name:");
-        // console.log(resultGroupByName)
-
         this.groupSumData = _.castArray([])
-
         for (var i in this.groupKeys) {
           var groupObjects = resultGroupByName[this.groupKeys[i]]
-
           var sumByGroup =  _.sumBy(groupObjects, function(o) {
             return o.metadata.axial
           })
-
           var groupSumDataSetup = {'group': this.groupKeys[i], 'sum': sumByGroup}
           this.groupSumData.push(groupSumDataSetup)
-          // // console.log("Group objects:");
-          // // console.log(groupObjects)
-          // console.log("Axial sum for " + this.groupKeys[i] + " is: " + sumByGroup)
         }
-        // console.log(this.groupSumData)
         this.showStringAggregations = true;
       }
 
