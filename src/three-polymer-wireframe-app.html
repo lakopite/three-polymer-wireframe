@@ -359,12 +359,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         })
         this.groupKeys =  _.keys(resultGroupByName)
         this.groupSumData = _.castArray([])
+        //this line is for the demo hack
+        var selectedSumFieldPlaceholder = (this.metadataFields.indexOf('axial') !== -1) ? "axial" : "meta_mass";
         for (var i in this.groupKeys) {
           var groupObjects = resultGroupByName[this.groupKeys[i]]
           var sumByGroup =  _.sumBy(groupObjects, function(o) {
-            return o.metadata.axial
-          })
-          var groupSumDataSetup = {'group': this.groupKeys[i], 'sum': sumByGroup}
+            return o.metadata[selectedSumFieldPlaceholder]
+          });
+          var groupSumDataSetup = {'group': selectedSumFieldPlaceholder + " sum for " + this.groupKeys[i], 'sum': sumByGroup}
           this.groupSumData.push(groupSumDataSetup)
         }
         this.showStringAggregations = true;
