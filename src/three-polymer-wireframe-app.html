@@ -185,6 +185,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </div>
   <div hidden$="[[!showStringAggregations]]">
     <!-- sum group by stuff here -->
+    <paper-dropdown-menu label="Sum Fields">
+      <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedSumVar}}">
+        <template is="dom-repeat" items="{{numericalMetadataKeys}}">
+                  <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+                </template>
+      </paper-listbox>
+    </paper-dropdown-menu>
+
     <paper-item>Sum by group</paper-item>
       <template is="dom-repeat" items="{{groupSumData}}">
               <paper-input label="{{item.group}}" value="{{item.sum}}" readonly></paper-input>
@@ -266,6 +274,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           metadataFields: {
             type: Array,
             value: []
+          },
+          numericalMetadataKeys: {
+            type: Array
           },
           meanResult: {
             type: Number,
@@ -359,6 +370,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         })
         this.groupKeys =  _.keys(resultGroupByName)
         this.groupSumData = _.castArray([])
+        this.totalGroupObjects = []
+
         for (var i in this.groupKeys) {
           var groupObjects = resultGroupByName[this.groupKeys[i]]
           var sumByGroup =  _.sumBy(groupObjects, function(o) {
@@ -366,7 +379,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           })
           var groupSumDataSetup = {'group': this.groupKeys[i], 'sum': sumByGroup}
           this.groupSumData.push(groupSumDataSetup)
+          this.totalGroupObjects.push(groupObjects)
+          console.log(this.totalGroupObjects)
         }
+        console.log(this.totalGroupObjects)
+        this.numericalMetadataKeys = []
+        var flatTotalGroupObjects = _.flatten(this.totalGroupObjects)
+        for (var i = 0; i < flatTotalGroupObjects.length -1; i++) {
+          var metadataObject = flatTotalGroupObjects[i].metadata
+          //console.log(metadataObject);
+          var metadataValues = _.values(metadataObject)
+          //console.log(metadataValues);
+          var metadataKeys = _.keys(metadataObject)
+          //console.log(metadataKeys);
+          if(_.isNumber(metadataValues[i])) {
+            this.numericalMetadataKeys.push(_.capitalize(metadataKeys[i]))
+          }
+        }
+        console.log("Sum fields for dropdown: " + this.numericalMetadataKeys)
         this.showStringAggregations = true;
       }
 
