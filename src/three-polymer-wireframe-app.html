@@ -189,16 +189,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <div hidden$="[[!showStringAggregations]]">
     <!-- sum group by stuff here -->
     <paper-item>Sum by group</paper-item>
-      <template is="dom-repeat" items="{{groupSumData}}">
+    <paper-dropdown-menu label="Sum Fields">
+      <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
+        <template is="dom-repeat" items="[[numericalMetadataKeys]]">
+          <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+        </template>
+      </paper-listbox>
+    </paper-dropdown-menu>
+    <template is="dom-repeat" items="{{groupSumData}}">
               <paper-input label="{{item.group}}" value="{{item.sum}}" readonly></paper-input>
           </template>
-          <paper-dropdown-menu label="Sum Fields">
-            <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
-              <template is="dom-repeat" items="[[numericalMetadataKeys]]">
-                        <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
-                      </template>
-            </paper-listbox>
-          </paper-dropdown-menu>
   </div>
   </div>
   </div>
@@ -352,7 +352,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_getModelData(selectedModel)',
           '_aggregations(_modelData,selectedContourBy)',
           '_getAggregationLabels(_modelData, selectedContourBy)',
-          '_getGroupSumLabels(_modelData, selectedContourBy)',
+          //'_getGroupSumLabels(_modelData, selectedContourBy)',
           '_getSumByForSelectedSumField(selectedSumField)'
         ]
       }
@@ -361,7 +361,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         super();
       }
 
-      _isWithinBounds(val,min,max) {
+      _isWithinBounds(val, min, max) {
         return val >= min && val <= max
       }
 
@@ -370,16 +370,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var that = this;
         var resultFilterInput = _.filter(that._modelData, function(o) {
           return _.every(o.vertices, function(j) {
-            return  that._isWithinBounds(j[0],that.geometryFilter.xMin,that.geometryFilter.xMax) &&
-            that._isWithinBounds(j[1],that.geometryFilter.yMin,that.geometryFilter.yMax) &&
-            that._isWithinBounds(j[2],that.geometryFilter.zMin,that.geometryFilter.zMax)
+            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+              that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
+              that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
           })
         })
         console.log(resultFilterInput)
-        this.meanResult = _.meanBy(resultFilterInput, function(o) {return o.metadata[that.selectedContourBy]});
+        this.meanResult = _.meanBy(resultFilterInput, function(o) {
+          return o.metadata[that.selectedContourBy]
+        });
         this.minResult = _.minBy(resultFilterInput, function(o) {
-           return o.metadata[that.selectedContourBy]
-         }).metadata[this.selectedContourBy]
+          return o.metadata[that.selectedContourBy]
+        }).metadata[this.selectedContourBy]
         this.maxResult = _.maxBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
         }).metadata[this.selectedContourBy]
@@ -388,6 +390,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _getSumByForSelectedSumField(_selectedSumField) {
         //get the selected sum field, and redo _stringAggregations
+        this.selectedSumField
+        {
+          this._stringAggregations();
+          return
+        }
+
       }
 
       _stringAggregations() {
@@ -397,16 +405,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var resultGroupByName = _.groupBy(that._modelData, function(o) {
           return o.metadata[that.selectedContourBy]
         })
-        this.groupKeys =  _.keys(resultGroupByName)
+        this.groupKeys = _.keys(resultGroupByName)
         this.groupSumData = []
         this.totalGroupObjects = []
-        var selectedSumFieldPlaceholder = (this.metadataFields.indexOf('axial') !== -1) ? "axial" : "meta_mass";
-        for (var i=0; i < this.groupKeys.length; i++) {
+        //var selectedSumFieldPlaceholder = (this.metadataFields.indexOf('axial') !== -1) ? "axial" : "meta_mass";
+        for (var i = 0; i < this.groupKeys.length; i++) {
           var groupObjects = resultGroupByName[this.groupKeys[i]]
-          var sumByGroup =  _.sumBy(groupObjects, function(o) {
-            return o.metadata[selectedSumFieldPlaceholder]
+          var sumByGroup = _.sumBy(groupObjects, function(o) {
+            return o.metadata[that.selectedSumField]
           })
-          var groupSumDataSetup = {'group': _.capitalize(selectedSumFieldPlaceholder) + " sum for " + this.groupKeys[i], 'sum': sumByGroup}
+          var groupSumDataSetup = {
+            'group': _.capitalize(that.selectedSumField) + " sum for " + this.groupKeys[i],
+            'sum': sumByGroup
+          }
           this.groupSumData.push(groupSumDataSetup)
           this.totalGroupObjects.push(groupObjects)
         }
@@ -416,7 +427,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var metadataObject = flatTotalGroupObjects[i].metadata
           var metadataValues = _.values(metadataObject)
           var metadataKeys = _.keys(metadataObject)
-          if(_.isNumber(metadataValues[i])) {
+          if (_.isNumber(metadataValues[i])) {
             this.numericalMetadataKeys.push(metadataKeys[i])
           }
         }
@@ -425,26 +436,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _aggregations(_modelData, selectedContourBy) {
-        if (this._isNumberField(_modelData,selectedContourBy)) {this._numericalAggregations(); return}
-        if (this._isStringField(_modelData,selectedContourBy)) {
+        if (this._isNumberField(_modelData, selectedContourBy)) {
+          this._numericalAggregations();
+          return
+        }
+        if (this._isStringField(_modelData, selectedContourBy)) {
           //set a default selectedSumField
           this._stringAggregations();
+          this.selectedSumField = this.numericalMetadataKeys[0]
           return
         }
         this.showStringAggregations = false;
         this.showNumericalAggregations = false;
       }
 
-      _getGroupSumLabels() {
-        //does something need to be added to the line below?
-        if (typeof this.selectedContourBy === 'undefined' || typeof this.selectedModel === 'undefined') {
-          this.getSumByGroupLabels = "No sum available"
-        } else {
-          for (var i in this.groupKeys) {
-            this.getSumByGroupLabels = "Axial sum for " + this.groupKeys[i]
-          }
-        }
-      }
+      // _getGroupSumLabels() {
+      //   //does something need to be added to the line below?
+      //   if (typeof this.selectedContourBy === 'undefined' || typeof this.selectedModel === 'undefined') {
+      //     this.getSumByGroupLabels = "No sum available"
+      //   } else {
+      //     for (var i in this.groupKeys) {
+      //       this.getSumByGroupLabels = "Axial sum for " + this.groupKeys[i]
+      //     }
+      //   }
+      // }
 
       _getAggregationLabels() {
         if (typeof this.selectedContourBy === 'undefined' || typeof this.selectedModel === 'undefined') {
@@ -504,7 +519,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return !_.isEmpty(_modelData) && this.selectedContourBy && !_.isNumber(_modelData[0].metadata[this.selectedContourBy])
       }
 
-      isLoadingState(modelLoading,appLoading) {
+      isLoadingState(modelLoading, appLoading) {
         return modelLoading || appLoading
       }
 
@@ -528,7 +543,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       resetFilters() {
         this.geometryFilter = _.cloneDeep(this.boundaries);
         this.checkValidInput();
-        this._aggregations(this._modelData,this.selectedContourBy);
+        this._aggregations(this._modelData, this.selectedContourBy);
         //reset filter selection to the model boundaries
         //console.log(this.geometryFilter)
         //console.log(this.boundaries)
@@ -545,7 +560,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'zMin': parseFloat(this.geometryFilter.zMin),
           'zMax': parseFloat(this.geometryFilter.zMax)
         }
-        this._aggregations(this._modelData,this.selectedContourBy);
+        this._aggregations(this._modelData, this.selectedContourBy);
       }
 
       _initData(dataOptions_) {
@@ -577,10 +592,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // console.log("data received")
         if (resp && resp.modelInformation.name === this.selectedModel && "payload" in resp) {
           this.appLoading = false;
-          this.set('_modelData',resp.payload);
+          this.set('_modelData', resp.payload);
           console.log(this._modelData)
-        }
-        else {
+        } else {
           this.handleDataError()
         }
       }
@@ -592,7 +606,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _getModelData(_selectedModel) {
         this._modelData = [];
-        this.$['model-request'].url = this.baseUrl + "get-model-data/"+this.selectedModel
+        this.$['model-request'].url = this.baseUrl + "get-model-data/" + this.selectedModel
         this.$['model-request'].generateRequest();
         this.appLoading = true;
       }
