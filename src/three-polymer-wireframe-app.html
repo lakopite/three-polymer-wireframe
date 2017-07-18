@@ -188,18 +188,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </div>
   <div hidden$="[[!showStringAggregations]]">
     <!-- sum group by stuff here -->
-    <paper-dropdown-menu label="Sum Fields">
-      <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumVar}}">
-        <template is="dom-repeat" items="[[numericalMetadataKeys]]">
-                  <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
-                </template>
-      </paper-listbox>
-    </paper-dropdown-menu>
-
     <paper-item>Sum by group</paper-item>
       <template is="dom-repeat" items="{{groupSumData}}">
               <paper-input label="{{item.group}}" value="{{item.sum}}" readonly></paper-input>
           </template>
+          <paper-dropdown-menu label="Sum Fields">
+            <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
+              <template is="dom-repeat" items="[[numericalMetadataKeys]]">
+                        <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+                      </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
   </div>
   </div>
   </div>
@@ -233,7 +232,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <div name="aggregations-view">
         <paper-item>Hello, World!</paper-item>
         <!--
-          <iron-list></iron-list> stuff here
+          <iron-list></iron-list> stuff here for moving aggregations
         -->
       </div>
     </iron-pages>
@@ -331,6 +330,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: String,
             value: 'model-view'
           },
+          selectedSumField: {
+            type: String
+          },
           showNumericalAggregations: {
             type: Boolean,
             value: false
@@ -350,7 +352,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_getModelData(selectedModel)',
           '_aggregations(_modelData,selectedContourBy)',
           '_getAggregationLabels(_modelData, selectedContourBy)',
-          '_getGroupSumLabels(_modelData, selectedContourBy)'
+          '_getGroupSumLabels(_modelData, selectedContourBy)',
+          '_getSumByForSelectedSumField(selectedSumField)'
         ]
       }
 
@@ -383,7 +386,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.showNumericalAggregations = true;
       }
 
+      _getSumByForSelectedSumField(_selectedSumField) {
+        //get the selected sum field, and redo _stringAggregations
+      }
+
       _stringAggregations() {
+        //this should refer to this.selectedSumField instead of selectedSumFieldPlaceholder
         this.showNumericalAggregations = false;
         var that = this
         var resultGroupByName = _.groupBy(that._modelData, function(o) {
@@ -398,7 +406,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var sumByGroup =  _.sumBy(groupObjects, function(o) {
             return o.metadata[selectedSumFieldPlaceholder]
           })
-          var groupSumDataSetup = {'group': selectedSumFieldPlaceholder + " sum for " + this.groupKeys[i], 'sum': sumByGroup}
+          var groupSumDataSetup = {'group': _.capitalize(selectedSumFieldPlaceholder) + " sum for " + this.groupKeys[i], 'sum': sumByGroup}
           this.groupSumData.push(groupSumDataSetup)
           this.totalGroupObjects.push(groupObjects)
         }
@@ -409,15 +417,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var metadataValues = _.values(metadataObject)
           var metadataKeys = _.keys(metadataObject)
           if(_.isNumber(metadataValues[i])) {
-            this.numericalMetadataKeys.push(_.capitalize(metadataKeys[i]))
+            this.numericalMetadataKeys.push(metadataKeys[i])
           }
         }
+        console.log(this.numericalMetadataKeys)
         this.showStringAggregations = true;
       }
 
       _aggregations(_modelData, selectedContourBy) {
         if (this._isNumberField(_modelData,selectedContourBy)) {this._numericalAggregations(); return}
-        if (this._isStringField(_modelData,selectedContourBy)) {this._stringAggregations(); return}
+        if (this._isStringField(_modelData,selectedContourBy)) {
+          //set a default selectedSumField
+          this._stringAggregations();
+          return
+        }
         this.showStringAggregations = false;
         this.showNumericalAggregations = false;
       }
