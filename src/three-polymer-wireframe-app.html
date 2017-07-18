@@ -186,8 +186,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <div hidden$="[[!showStringAggregations]]">
     <!-- sum group by stuff here -->
     <paper-dropdown-menu label="Sum Fields">
-      <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedSumVar}}">
-        <template is="dom-repeat" items="{{numericalMetadataKeys}}">
+      <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumVar}}">
+        <template is="dom-repeat" items="[[numericalMetadataKeys]]">
                   <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
                 </template>
       </paper-listbox>
@@ -369,22 +369,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return o.metadata[that.selectedContourBy]
         })
         this.groupKeys =  _.keys(resultGroupByName)
-        this.groupSumData = _.castArray([])
+        this.groupSumData = []
         this.totalGroupObjects = []
-
         for (var i in this.groupKeys) {
           var groupObjects = resultGroupByName[this.groupKeys[i]]
+          console.log(this.groupKeys[i]);
           var sumByGroup =  _.sumBy(groupObjects, function(o) {
             return o.metadata.axial
           })
           var groupSumDataSetup = {'group': this.groupKeys[i], 'sum': sumByGroup}
           this.groupSumData.push(groupSumDataSetup)
           this.totalGroupObjects.push(groupObjects)
-          console.log(this.totalGroupObjects)
         }
         console.log(this.totalGroupObjects)
         this.numericalMetadataKeys = []
         var flatTotalGroupObjects = _.flatten(this.totalGroupObjects)
+        // currently set to stop at .length -1 because the last value for some reason is undefined. Must remove -1 once that is fixed
         for (var i = 0; i < flatTotalGroupObjects.length -1; i++) {
           var metadataObject = flatTotalGroupObjects[i].metadata
           //console.log(metadataObject);
@@ -396,7 +396,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.numericalMetadataKeys.push(_.capitalize(metadataKeys[i]))
           }
         }
-        console.log("Sum fields for dropdown: " + this.numericalMetadataKeys)
+        //console.log("Sum fields for dropdown: " + this.numericalMetadataKeys)
         this.showStringAggregations = true;
       }
 
