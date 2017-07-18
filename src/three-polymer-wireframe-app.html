@@ -21,6 +21,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../bower_components/neon-animation/neon-animation.html">
 <link rel="import" href="../bower_components/neon-animation/web-animations.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
@@ -32,6 +33,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../bower_components/three-polymer/three-view/three-view.html">
 <link rel="import" href="../bower_components/three-polymer/three-model/three-model.html">
 <link rel="import" href="my-icons.html">
@@ -205,7 +208,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <!-- Main content -->
   <app-header-layout has-scrolling-region>
 
-    <app-header slot="header" condenses reveals effects="waterfall">
+    <app-header slot="header" medium-tall condenses reveals effects="waterfall">
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView</div>
@@ -213,13 +216,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
       </app-toolbar>
+      <app-toolbar>
+        <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedView}}">
+          <paper-tab name="model-view">Model</paper-tab>
+          <paper-tab name="aggregations-view">Quantities</paper-tab>
+        </paper-tabs>
+      </app-toolbar>
     </app-header>
-    <div class="three-container">
-      <three-view id="view" scene-background-color="#F5F5F5">
-        <three-model id="model" slot="model" metadata-fields="{{metadataFields}}" is-loading="{{modelLoading}}" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[_modelData]]">
-        </three-model>
-      </three-view>
-    </div>
+    <iron-pages style="height:100%;" attr-for-selected="name" selected="{{selectedView}}">
+      <div name="model-view" class="three-container">
+        <three-view id="view" scene-background-color="#F5F5F5">
+          <three-model id="model" slot="model" metadata-fields="{{metadataFields}}" is-loading="{{modelLoading}}" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[_modelData]]">
+          </three-model>
+        </three-view>
+      </div>
+      <div name="aggregations-view">
+        <paper-item>Hello, World!</paper-item>
+        <!--
+          <iron-list></iron-list> stuff here
+        -->
+      </div>
+    </iron-pages>
   </app-header-layout>
   </app-drawer-layout>
   </template>
@@ -310,6 +327,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Array,
             value: []
           },
+          selectedView: {
+            type: String,
+            value: 'model-view'
+          },
           showNumericalAggregations: {
             type: Boolean,
             value: false
@@ -371,12 +392,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.groupKeys =  _.keys(resultGroupByName)
         this.groupSumData = []
         this.totalGroupObjects = []
+        var selectedSumFieldPlaceholder = (this.metadataFields.indexOf('axial') !== -1) ? "axial" : "meta_mass";
         for (var i=0; i < this.groupKeys.length; i++) {
           var groupObjects = resultGroupByName[this.groupKeys[i]]
           var sumByGroup =  _.sumBy(groupObjects, function(o) {
-            return o.metadata.axial
+            return o.metadata[selectedSumFieldPlaceholder]
           })
-          var groupSumDataSetup = {'group': this.groupKeys[i], 'sum': sumByGroup}
+          var groupSumDataSetup = {'group': selectedSumFieldPlaceholder + " sum for " + this.groupKeys[i], 'sum': sumByGroup}
           this.groupSumData.push(groupSumDataSetup)
           this.totalGroupObjects.push(groupObjects)
         }
