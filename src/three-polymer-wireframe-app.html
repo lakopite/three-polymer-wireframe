@@ -180,26 +180,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-button class="filterBtn" raised disabled$="{{modelLoading}}" id="resetBtn" on-tap="resetFilters">Reset</paper-button>
     </div>
   </div>
-  <div hidden$="[[!showNumericalAggregations]]">
-    <paper-item>Aggregations</paper-item>
-    <paper-input label="[[getMeanLabel]]" value="[[meanResult]]" readonly></paper-input>
-    <paper-input label="[[getMinLabel]]" value="[[minResult]]" readonly></paper-input>
-    <paper-input label="[[getMaxLabel]]" value="[[maxResult]]" readonly></paper-input>
-  </div>
-  <div hidden$="[[!showStringAggregations]]">
-    <!-- sum group by stuff here -->
-    <paper-item>Sum by group</paper-item>
-    <paper-dropdown-menu label="Sum Fields">
-      <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
-        <template is="dom-repeat" items="[[numericalMetadataKeys]]">
-          <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
-        </template>
-      </paper-listbox>
-    </paper-dropdown-menu>
-    <template is="dom-repeat" items="{{groupSumData}}">
-              <paper-input label="{{item.group}}" value="{{item.sum}}" readonly></paper-input>
-          </template>
-  </div>
   </div>
   </div>
   </app-drawer>
@@ -230,10 +210,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </three-view>
       </div>
       <div name="aggregations-view">
-        <paper-item>Hello, World!</paper-item>
+        <!-- <paper-item>Hello, World!</paper-item> -->
         <!--
           <iron-list></iron-list> stuff here for moving aggregations
         -->
+        <div hidden$="[[!showNumericalAggregations]]">
+          <paper-item>Aggregations</paper-item>
+          <paper-input label="[[getMeanLabel]]" value="[[meanResult]]" readonly></paper-input>
+          <paper-input label="[[getMinLabel]]" value="[[minResult]]" readonly></paper-input>
+          <paper-input label="[[getMaxLabel]]" value="[[maxResult]]" readonly></paper-input>
+        </div>
+        
+        <div hidden$="[[!showStringAggregations]]">
+          <paper-item>Sum by group</paper-item>
+          <paper-dropdown-menu label="Sum Fields">
+            <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
+              <template is="dom-repeat" items="[[numericalMetadataKeys]]">
+                <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
+          <template is="dom-repeat" items="{{groupSumData}}">
+                    <paper-input label="{{item.group}}" value="{{item.sum}}" readonly></paper-input>
+                </template>
+        </div>
+        <!-- =====================================end ================================================================== -->
       </div>
     </iron-pages>
   </app-header-layout>
@@ -431,7 +432,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.numericalMetadataKeys.push(metadataKeys[i])
           }
         }
-        console.log(this.numericalMetadataKeys)
+        //console.log(this.numericalMetadataKeys)
         this.showStringAggregations = true;
       }
 
