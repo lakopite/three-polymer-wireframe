@@ -368,13 +368,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var resultGroupByName = _.groupBy(that._modelData, function(o) {
           return o.metadata[that.selectedContourBy]
         })
-        console.log(resultGroupByName);
         this.groupKeys =  _.keys(resultGroupByName)
         this.groupSumData = []
         this.totalGroupObjects = []
         for (var i=0; i < this.groupKeys.length; i++) {
           var groupObjects = resultGroupByName[this.groupKeys[i]]
-          console.log(this.groupKeys[i]);
           var sumByGroup =  _.sumBy(groupObjects, function(o) {
             return o.metadata.axial
           })
@@ -382,22 +380,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.groupSumData.push(groupSumDataSetup)
           this.totalGroupObjects.push(groupObjects)
         }
-        console.log(this.totalGroupObjects)
         this.numericalMetadataKeys = []
         var flatTotalGroupObjects = _.flatten(this.totalGroupObjects)
-        // currently set to stop at .length -1 because the last value for some reason is undefined. Must remove -1 once that is fixed
         for (var i = 0; i < flatTotalGroupObjects.length; i++) {
           var metadataObject = flatTotalGroupObjects[i].metadata
-          //console.log(metadataObject);
           var metadataValues = _.values(metadataObject)
-          //console.log(metadataValues);
           var metadataKeys = _.keys(metadataObject)
-          //console.log(metadataKeys);
           if(_.isNumber(metadataValues[i])) {
             this.numericalMetadataKeys.push(_.capitalize(metadataKeys[i]))
           }
         }
-        //console.log("Sum fields for dropdown: " + this.numericalMetadataKeys)
         this.showStringAggregations = true;
       }
 
