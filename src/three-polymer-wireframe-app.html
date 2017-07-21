@@ -127,6 +127,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         --paper-spinner-layer-3-color: #FFF;
         --paper-spinner-layer-4-color: #FFF;
       }
+
+      .aggregation-toolbar {
+        background: var(--paper-grey-600);
+        color: white;
+      }
+
+      .aggregation-items {
+        @apply --layout-vertical;
+        border-bottom: 1px solid #DDD;
+        padding: 0px 22px;
+      }
+
+      iron-list {
+        @apply --layout-flex;
+      }
+
     </style>
     <iron-ajax auto url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax id="model-request" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
@@ -172,12 +188,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max y" class="inline-input" type="number" value="{{geometryFilter.yMax}}" max="[[boundaries.yMax]]" min="[[_computeMin(boundaries.yMin,geometryFilter.yMin)]]"></paper-input>
     </div>
     <div class="horizontal">
-      <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min z" class="inline-input" type="number" value="{{geometryFilter.zMin}}" max="[[_computeMax(boundaries.zMax,geometryFilter.zMax)]]" min="[[boundaries.zMin]]"></paper-input>
+      <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min z"  class="inline-input" type="number" value="{{geometryFilter.zMin}}" max="[[_computeMax(boundaries.zMax,geometryFilter.zMax)]]" min="[[boundaries.zMin]]"></paper-input>
       <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max z" class="inline-input" type="number" value="{{geometryFilter.zMax}}" max="[[boundaries.zMax]]" min="[[_computeMin(boundaries.zMin,geometryFilter.zMin)]]"></paper-input>
     </div>
+    <!-- for force filter -->
+    <div hidden$="[[!showNumericalAggregations]]">
+      <div class="horizontal">
+        <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min [[selectedContourBy]]" class="inline-input" type="number" value="[[minResult]]" min="#"></paper-input>
+        <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max [[selectedContourBy]]" class="inline-input" type="number" value="[[maxResult]]" max="#"></paper-input>
+      </div>
+    </div>
+    <!-- force filter end -->
     <div class="horizontal">
-      <paper-button class="filterBtn" raised disabled$="{{_filtersDisabled}}" id="applyBtn" on-tap="applyFilters">Apply</paper-button>
-      <paper-button class="filterBtn" raised disabled$="{{modelLoading}}" id="resetBtn" on-tap="resetFilters">Reset</paper-button>
+      <paper-button class="filterBtn" raised disabled$="{{_filtersDisabled}}" id="applyBtn" on-tap="applyFilters" type="number">Apply</paper-button>
+      <paper-button class="filterBtn" raised disabled$="{{modelLoading}}" id="resetBtn" on-tap="resetFilters" type="number">Reset</paper-button>
+    </div>
+    <div hidden$="[[!showStringAggregations]]">
+      <paper-dropdown-menu label="Sum Fields">
+        <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
+          <template is="dom-repeat" items="[[numericalMetadataKeys]]">
+            <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+          </template>
+        </paper-listbox>
+      </paper-dropdown-menu>
     </div>
   </div>
   </div>
@@ -186,7 +219,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <!-- Main content -->
   <app-header-layout has-scrolling-region>
-
     <app-header slot="header" medium-tall condenses reveals effects="waterfall">
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
@@ -214,27 +246,44 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <!--
           <iron-list></iron-list> stuff here for moving aggregations
         -->
+        <!-- ===================================== start ================================================================== -->
         <div hidden$="[[!showNumericalAggregations]]">
-          <paper-item>Aggregations</paper-item>
-          <paper-input label="[[getMeanLabel]]" value="[[meanResult]]" readonly></paper-input>
-          <paper-input label="[[getMinLabel]]" value="[[minResult]]" readonly></paper-input>
-          <paper-input label="[[getMaxLabel]]" value="[[maxResult]]" readonly></paper-input>
+          <app-toolbar class="aggregation-toolbar">
+            <div main-title>Aggregations</div>
+          </app-toolbar>
+            <div class="aggregation-items">
+              <paper-input label="[[getMeanLabel]]" value="[[meanResult]]" readonly></paper-input>
+              <paper-input label="[[getMinLabel]]" value="[[minResult]]" readonly></paper-input>
+              <paper-input label="[[getMaxLabel]]" value="[[maxResult]]" readonly></paper-input>
+            </div>
         </div>
-        
         <div hidden$="[[!showStringAggregations]]">
-          <paper-item>Sum by group</paper-item>
-          <paper-dropdown-menu label="Sum Fields">
-            <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
-              <template is="dom-repeat" items="[[numericalMetadataKeys]]">
-                <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
-              </template>
-            </paper-listbox>
-          </paper-dropdown-menu>
+          <app-toolbar class="aggregation-toolbar">
+          <div main-title>Sum by group</div>
+          </app-toolbar>
+
           <template is="dom-repeat" items="{{groupSumData}}">
-                    <paper-input label="{{item.group}}" value="{{item.sum}}" readonly></paper-input>
-                </template>
+            <div class="aggregation-items">
+          <paper-input label="{{item.group}}" value="{{item.sum}}" readonly></paper-input>
+            </div>
+          </template>
         </div>
-        <!-- =====================================end ================================================================== -->
+
+  </div>
+        <!-- test start -->
+          <!-- <iron-list items="{{groupSumData}}" as="item">
+            <template is="dom-repeat" items="{{groupSumData}}">
+              <div class="group-sum-data-group">
+                Group: <span>{{item.group}}</span>
+              </div>
+              <div class="group-sum-data-sum">
+                Sum: <span>{{item.sum}}</span>
+              </div>
+            </template>
+          </iron-list> -->
+        <!-- test end -->
+
+        <!-- ===================================== end ================================================================== -->
       </div>
     </iron-pages>
   </app-header-layout>
@@ -390,17 +439,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _getSumByForSelectedSumField(_selectedSumField) {
-        //get the selected sum field, and redo _stringAggregations
         this.selectedSumField
         {
           this._stringAggregations();
           return
         }
-
       }
 
       _stringAggregations() {
-        //this should refer to this.selectedSumField instead of selectedSumFieldPlaceholder
         this.showNumericalAggregations = false;
         var that = this
         var resultGroupByName = _.groupBy(that._modelData, function(o) {
@@ -409,14 +455,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.groupKeys = _.keys(resultGroupByName)
         this.groupSumData = []
         this.totalGroupObjects = []
-        //var selectedSumFieldPlaceholder = (this.metadataFields.indexOf('axial') !== -1) ? "axial" : "meta_mass";
         for (var i = 0; i < this.groupKeys.length; i++) {
           var groupObjects = resultGroupByName[this.groupKeys[i]]
           var sumByGroup = _.sumBy(groupObjects, function(o) {
             return o.metadata[that.selectedSumField]
           })
           var groupSumDataSetup = {
-            'group': _.capitalize(that.selectedSumField) + " sum for " + this.groupKeys[i],
+            'group': _.capitalize(that.selectedSumField) + " Sum for " + this.groupKeys[i],
             'sum': sumByGroup
           }
           this.groupSumData.push(groupSumDataSetup)
