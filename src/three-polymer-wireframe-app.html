@@ -21,7 +21,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../bower_components/neon-animation/neon-animation.html">
 <link rel="import" href="../bower_components/neon-animation/web-animations.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
@@ -35,6 +34,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="../bower_components/three-polymer/three-view/three-view.html">
 <link rel="import" href="../bower_components/three-polymer/three-model/three-model.html">
 <link rel="import" href="my-icons.html">
@@ -139,10 +139,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         padding: 0px 22px;
       }
 
-      iron-list {
-        @apply --layout-flex;
-      }
-
     </style>
     <iron-ajax auto url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax id="model-request" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
@@ -244,7 +240,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <div name="aggregations-view">
         <!-- <paper-item>Hello, World!</paper-item> -->
         <!--
-          <iron-list></iron-list> stuff here for moving aggregations
+          <vaadin-grid></vaadin-grid> stuff here for moving aggregations
         -->
         <!-- ===================================== start ================================================================== -->
         <div hidden$="[[!showNumericalAggregations]]">
@@ -271,16 +267,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   </div>
         <!-- test start -->
-          <!-- <iron-list items="{{groupSumData}}" as="item">
-            <template is="dom-repeat" items="{{groupSumData}}">
-              <div class="group-sum-data-group">
-                Group: <span>{{item.group}}</span>
-              </div>
-              <div class="group-sum-data-sum">
-                Sum: <span>{{item.sum}}</span>
-              </div>
-            </template>
-          </iron-list> -->
+          <!-- vaadin grid here -->
         <!-- test end -->
 
         <!-- ===================================== end ================================================================== -->

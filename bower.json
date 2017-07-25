@@ -28,7 +28,8 @@
     "paper-spinner": "PolymerElements/paper-spinner#^2.0.0",
     "lodash": "^4.17.4",
     "iron-list": "PolymerElements/iron-list#~2.0.4",
-    "paper-tabs": "PolymerElements/paper-tabs#~2.0.0"
+    "paper-tabs": "PolymerElements/paper-tabs#~2.0.0",
+    "vaadin-grid": "^3.0.0"
   },
   "resolutions": {
     "polymer": "^2.0.0-rc.3",
