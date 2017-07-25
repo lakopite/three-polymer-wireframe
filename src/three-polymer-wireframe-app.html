@@ -129,7 +129,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .aggregation-toolbar {
-        background: var(--paper-grey-600);
+        background: var(--paper-grey-400);
         color: white;
       }
 
@@ -137,6 +137,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         @apply --layout-vertical;
         border-bottom: 1px solid #DDD;
         padding: 0px 22px;
+      }
+
+      vaadin-grid {
+      height: 100vh;
       }
 
     </style>
@@ -199,15 +203,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-button class="filterBtn" raised disabled$="{{_filtersDisabled}}" id="applyBtn" on-tap="applyFilters" type="number">Apply</paper-button>
       <paper-button class="filterBtn" raised disabled$="{{modelLoading}}" id="resetBtn" on-tap="resetFilters" type="number">Reset</paper-button>
     </div>
-    <div hidden$="[[!showStringAggregations]]">
-      <paper-dropdown-menu label="Sum Fields">
-        <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
-          <template is="dom-repeat" items="[[numericalMetadataKeys]]">
-            <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
-          </template>
-        </paper-listbox>
-      </paper-dropdown-menu>
-    </div>
   </div>
   </div>
   </div>
@@ -239,9 +234,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </div>
       <div name="aggregations-view">
         <!-- <paper-item>Hello, World!</paper-item> -->
-        <!--
-          <vaadin-grid></vaadin-grid> stuff here for moving aggregations
-        -->
         <!-- ===================================== start ================================================================== -->
         <div hidden$="[[!showNumericalAggregations]]">
           <app-toolbar class="aggregation-toolbar">
@@ -253,24 +245,32 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <paper-input label="[[getMaxLabel]]" value="[[maxResult]]" readonly></paper-input>
             </div>
         </div>
+
         <div hidden$="[[!showStringAggregations]]">
+
           <app-toolbar class="aggregation-toolbar">
           <div main-title>Sum by group</div>
+          <paper-dropdown-menu label="Select Sum Field">
+            <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
+              <template is="dom-repeat" items="[[numericalMetadataKeys]]">
+                <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
           </app-toolbar>
 
-          <template is="dom-repeat" items="{{groupSumData}}">
-            <div class="aggregation-items">
-          <paper-input label="{{item.group}}" value="{{item.sum}}" readonly></paper-input>
-            </div>
-          </template>
+                <vaadin-grid aria-label="sum-by-group-table" items="[[groupSumData]]">
+                  <vaadin-grid-column>
+                    <template class="header">[[selectedContourBy]]</template>
+                    <template>[[item.group]]</template>
+                  </vaadin-grid-column>
+                  <vaadin-grid-column>
+                    <template class="header">[[selectedSumField]]</template>
+                    <template>[[item.sum]]</template>
+                  </vaadin-grid-column>
+                </vaadin-grid>
+
         </div>
-
-  </div>
-        <!-- test start -->
-          <!-- vaadin grid here -->
-        <!-- test end -->
-
-        <!-- ===================================== end ================================================================== -->
       </div>
     </iron-pages>
   </app-header-layout>
@@ -448,10 +448,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return o.metadata[that.selectedSumField]
           })
           var groupSumDataSetup = {
-            'group': _.capitalize(that.selectedSumField) + " Sum for " + this.groupKeys[i],
+            'group': this.groupKeys[i],
             'sum': sumByGroup
           }
-          this.groupSumData.push(groupSumDataSetup)
+          this.push('groupSumData', groupSumDataSetup)
           this.totalGroupObjects.push(groupObjects)
         }
         this.numericalMetadataKeys = []
