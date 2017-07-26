@@ -129,8 +129,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .aggregation-toolbar {
-        background: var(--paper-grey-400);
+        background: var(--paper-grey-600);
         color: white;
+        justify-content: center;
       }
 
       .aggregation-items {
@@ -139,8 +140,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         padding: 0px 22px;
       }
 
+      #sum-field-dropdown {
+        background-color: var(--paper-grey-200);;
+      }
+
       vaadin-grid {
-      height: 100vh;
+        height: 80vh;
+        --vaadin-grid-body-row-odd-cell: {
+          background-color: #f5f5f5;
+        };
+      }
+
+      .wrapper {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-column-gap: 6px;
       }
 
     </style>
@@ -207,7 +221,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </div>
   </div>
   </app-drawer>
-
   <!-- Main content -->
   <app-header-layout has-scrolling-region>
     <app-header slot="header" medium-tall condenses reveals effects="waterfall">
@@ -232,9 +245,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </three-model>
         </three-view>
       </div>
+      <!-- Quantities tab -->
+      <!-- For numerical aggregations -->
       <div name="aggregations-view">
-        <!-- <paper-item>Hello, World!</paper-item> -->
-        <!-- ===================================== start ================================================================== -->
         <div hidden$="[[!showNumericalAggregations]]">
           <app-toolbar class="aggregation-toolbar">
             <div main-title>Aggregations</div>
@@ -245,31 +258,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <paper-input label="[[getMaxLabel]]" value="[[maxResult]]" readonly></paper-input>
             </div>
         </div>
-
+        <!-- For string aggregations -->
         <div hidden$="[[!showStringAggregations]]">
-
-          <app-toolbar class="aggregation-toolbar">
-          <div main-title>Sum by group</div>
-          <paper-dropdown-menu label="Select Sum Field">
-            <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
-              <template is="dom-repeat" items="[[numericalMetadataKeys]]">
-                <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
-              </template>
-            </paper-listbox>
-          </paper-dropdown-menu>
-          </app-toolbar>
-
-                <vaadin-grid aria-label="sum-by-group-table" items="[[groupSumData]]">
-                  <vaadin-grid-column>
-                    <template class="header">[[selectedContourBy]]</template>
-                    <template>[[item.group]]</template>
-                  </vaadin-grid-column>
-                  <vaadin-grid-column>
-                    <template class="header">[[selectedSumField]]</template>
-                    <template>[[item.sum]]</template>
-                  </vaadin-grid-column>
-                </vaadin-grid>
-
+          <div class="wrapper">
+            <app-toolbar class="aggregation-toolbar">
+              <div main-title>Sum by group</div>
+            </app-toolbar>
+            <paper-dropdown-menu class="aggregation-toolbar" id="sum-field-dropdown" label="Select Sum Field">
+              <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
+                <template is="dom-repeat" items="[[numericalMetadataKeys]]">
+                  <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+                </template>
+              </paper-listbox>
+            </paper-dropdown-menu>
+        </div>
+          <vaadin-grid aria-label="sum-by-group-table" items="[[groupSumData]]">
+            <vaadin-grid-column>
+              <template class="header">[[selectedContourBy]]</template>
+              <template>[[item.group]]</template>
+            </vaadin-grid-column>
+            <vaadin-grid-column>
+              <template class="header">[[selectedSumField]]</template>
+              <template>[[item.sum]]</template>
+            </vaadin-grid-column>
+          </vaadin-grid>
         </div>
       </div>
     </iron-pages>
