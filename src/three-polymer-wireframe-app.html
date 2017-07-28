@@ -445,7 +445,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _stringAggregations() {
         this.showNumericalAggregations = false;
         var that = this
-        // this function exists within numerical aggregations as well so refactor ====================
+        // ================ repeated function start ==========================================
         var resultFilterInput = _.filter(that._modelData, function(o) {
           return _.every(o.vertices, function(j) {
             return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
@@ -453,7 +453,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
           })
         })
-        // end of repeated function ===================================================================
+        // ================ repeated function end ==========================================
         var resultGroupByName = _.groupBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
         })
@@ -461,8 +461,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.groupKeys = _.keys(resultGroupByName)
         //console.log(resultGroupByName);
         this.groupSumData = []
-        console.log('GROUP SUM DATA: ');
-        console.log(this.groupSumData);
+        //console.log('GROUP SUM DATA: ');
+        //console.log(this.groupSumData);
         // ============================= start ===================================
         this.totalGroupObjects = []
         for (var i = 0; i < this.groupKeys.length; i++) {
