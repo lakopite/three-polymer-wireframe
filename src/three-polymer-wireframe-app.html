@@ -129,7 +129,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .aggregation-toolbar {
-        background: var(--paper-grey-300);
+        background: var(--paper-grey-400);
       }
 
       .aggregation-items {
@@ -139,7 +139,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       #sum-field-dropdown {
-        background-color: var(--paper-grey-300);;
+        background-color: var(--paper-grey-400);
+        --paper-input-container-label: {
+          font-size:20px;
+        };
       }
 
       vaadin-grid {
@@ -499,7 +502,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         })
         this.groupKeys = _.keys(resultGroupByName)
         this.groupSumData = []
-        console.log(this.groupSumData);
+        //console.log(this.groupSumData);
         this.totalGroupObjects = []
         for (var i = 0; i < this.groupKeys.length; i++) {
           var groupObjects = resultGroupByName[this.groupKeys[i]]
