@@ -203,12 +203,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max z" class="inline-input" type="number" value="{{geometryFilter.zMax}}" max="[[boundaries.zMax]]" min="[[_computeMin(boundaries.zMin,geometryFilter.zMin)]]"></paper-input>
     </div>
     <!-- for force filter -->
-    <div hidden$="[[!showNumericalAggregations]]">
+    <!-- <div hidden$="[[!showNumericalAggregations]]">
       <div class="horizontal">
         <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min [[selectedContourBy]]" class="inline-input" type="number" value="[[minResult]]" min="#"></paper-input>
         <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max [[selectedContourBy]]" class="inline-input" type="number" value="[[maxResult]]" max="#"></paper-input>
       </div>
-    </div>
+    </div> -->
     <!-- force filter end -->
     <div class="horizontal">
       <paper-button class="filterBtn" raised disabled$="{{_filtersDisabled}}" id="applyBtn" on-tap="applyFilters" type="number">Apply</paper-button>
