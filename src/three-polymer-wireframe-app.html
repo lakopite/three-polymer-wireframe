@@ -442,94 +442,65 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      _numericalAggregations() {
-              this.showStringAggregations = false;
-              var that = this;
-              var resultFilterInput = _.filter(that._modelData, function(o) {
-                return _.every(o.vertices, function(j) {
-                  return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-                    that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-                    that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-                })
-              })
-              this.meanResult = _.meanBy(resultFilterInput, function(o) {
-                return o.metadata[that.selectedContourBy]
-              });
-              this.minResult = _.minBy(resultFilterInput, function(o) {
-                return o.metadata[that.selectedContourBy]
-              }).metadata[this.selectedContourBy]
-              this.maxResult = _.maxBy(resultFilterInput, function(o) {
-                return o.metadata[that.selectedContourBy]
-              }).metadata[this.selectedContourBy]
-              this.showNumericalAggregations = true;
-            }
-
-            _getSumByForSelectedSumField(_selectedSumField) {
-              this.selectedSumField
-              {
-                this._stringAggregations();
-                return
-              }
-            }
-
-            _stringAggregations() {
-              this.showNumericalAggregations = false;
-              var that = this
-              // this function exists within numerical aggregations as well so refactor ====================
-              var resultFilterInput = _.filter(that._modelData, function(o) {
-                return _.every(o.vertices, function(j) {
-                  return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-                    that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-                    that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-                })
-              })
-              // end of repeated function ===================================================================
-              var resultGroupByName = _.groupBy(resultFilterInput, function(o) {
-                return o.metadata[that.selectedContourBy]
-              })
-              //console.log(resultGroupByName);
-              this.groupKeys = _.keys(resultGroupByName)
-              //console.log(resultGroupByName);
-              this.groupSumData = []
-              console.log('GROUP SUM DATA: ');
-              console.log(this.groupSumData);
-              // ============================= start ===================================
-              this.totalGroupObjects = []
-              for (var i = 0; i < this.groupKeys.length; i++) {
-                var groupObjects = resultGroupByName[this.groupKeys[i]]
-                for (var j = 0; j < groupObjects.length; j++) {
-                  var sumByGroup = _.sumBy(groupObjects, function(o) {
-                    return o.metadata[that.selectedSumField]
-                  })
-                }
-                var groupSumDataSetup = {
-                  'group': this.groupKeys[i],
-                  'sum': sumByGroup
-                }
-                this.push('groupSumData', groupSumDataSetup)
-                this.push('totalGroupObjects', groupObjects)
-              }
-              // ============================= end ===================================
-              // to find keys with numeric values for dropdown options
-              this.uniqueNumericKeys = _.uniq(this.numericalMetadataKeys)
-              this.numericalMetadataKeys = []
-              var flatTotalGroupObjects = _.flatten(this.totalGroupObjects)
-              //console.log(flatTotalGroupObjects);
-              for (var i = 0; i < flatTotalGroupObjects.length; i++) {
-                var metadataObject = flatTotalGroupObjects[i].metadata
-                var metadataValues = _.values(metadataObject)
-                var metadataKeys = _.keys(metadataObject)
-      	         for (var j = 0; j < metadataKeys.length; j++) {
-                   if(_.isNumber(metadataValues[j])) {
-                     //console.log("logging metadataKeys[j]:   " + metadataKeys[j])
-                     //console.log("logging metadataValues[j]   " + metadataValues[j])
-                     this.push('numericalMetadataKeys', metadataKeys[j])
-                   }
-                 }
-               }
-               //console.log(this.uniqueNumericKeys)
-               this.showStringAggregations = true;
-            }
+      _stringAggregations() {
+        this.showNumericalAggregations = false;
+        var that = this
+        // this function exists within numerical aggregations as well so refactor ====================
+        var resultFilterInput = _.filter(that._modelData, function(o) {
+          return _.every(o.vertices, function(j) {
+            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+              that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
+              that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
+          })
+        })
+        // end of repeated function ===================================================================
+        var resultGroupByName = _.groupBy(resultFilterInput, function(o) {
+          return o.metadata[that.selectedContourBy]
+        })
+        //console.log(resultGroupByName);
+        this.groupKeys = _.keys(resultGroupByName)
+        //console.log(resultGroupByName);
+        this.groupSumData = []
+        console.log('GROUP SUM DATA: ');
+        console.log(this.groupSumData);
+        // ============================= start ===================================
+        this.totalGroupObjects = []
+        for (var i = 0; i < this.groupKeys.length; i++) {
+          var groupObjects = resultGroupByName[this.groupKeys[i]]
+          for (var j = 0; j < groupObjects.length; j++) {
+            var sumByGroup = _.sumBy(groupObjects, function(o) {
+              return o.metadata[that.selectedSumField]
+            })
+          }
+          var groupSumDataSetup = {
+            'group': this.groupKeys[i],
+            'sum': sumByGroup,
+            'sum field': this.selectedSumField
+          }
+          this.push('groupSumData', groupSumDataSetup)
+          this.push('totalGroupObjects', groupObjects)
+        }
+        // ============================= end ===================================
+        // to find keys with numeric values for dropdown options
+        this.uniqueNumericKeys = _.uniq(this.numericalMetadataKeys)
+        this.numericalMetadataKeys = []
+        var flatTotalGroupObjects = _.flatten(this.totalGroupObjects)
+        //console.log(flatTotalGroupObjects);
+        for (var i = 0; i < flatTotalGroupObjects.length; i++) {
+          var metadataObject = flatTotalGroupObjects[i].metadata
+          var metadataValues = _.values(metadataObject)
+          var metadataKeys = _.keys(metadataObject)
+	         for (var j = 0; j < metadataKeys.length; j++) {
+             if(_.isNumber(metadataValues[j])) {
+               //console.log("logging metadataKeys[j]:   " + metadataKeys[j])
+               //console.log("logging metadataValues[j]   " + metadataValues[j])
+               this.push('numericalMetadataKeys', metadataKeys[j])
+             }
+           }
+         }
+         //console.log(this.uniqueNumericKeys)
+         this.showStringAggregations = true;
+      }
 
       _aggregations(_modelData, selectedContourBy) {
         if (this._isNumberField(_modelData, selectedContourBy)) {
