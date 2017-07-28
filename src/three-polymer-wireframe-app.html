@@ -154,6 +154,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         grid-template-columns: 1fr 1fr;
       }
 
+      table {
+        margin: 15px 0px;
+        border-collapse: collapse;
+        width: 100%;
+        height: 50px;
+      }
+
+      table, th, td {
+        border: 1px solid black;
+      }
+      th, td {
+        padding: 15px;
+      } th {
+        text-align: left;
+      }
+
+      h3 {
+        display: inline;
+      }
+
     </style>
     <iron-ajax auto url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax id="model-request" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
@@ -251,29 +271,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </app-toolbar>
             <div class="aggregation-items">
 
-              <!-- <vaadin-grid>
-                <vaadin-grid-column>
-                  <template class="header">[[getMeanLabel]]</template>
-                  <template>[[meanResult]]</template>
-                </vaadin-grid-column>
-                <vaadin-grid-column>
-                  <template class="header">[[getMinLabel]]</template>
-                  <template>[[minResult]]</template>
-                </vaadin-grid-column>
-              <vaadin-grid-column>
-                <template class="header">[[getMaxLabel]]</template>
-                <template>[[maxResult]]</template>
-              </vaadin-grid-column>
-              <vaadin-grid-column>
-                <template class="header">[[getTotalResultLabel]]</template>
-                <template>[[totalResult]]</template>
-              </vaadin-grid-column>
-            </vaadin-grid> -->
+              <table id="numerical-aggregations-table">
+                <tr>
+                  <th>[[getMeanLabel]]</th>
+                  <th>[[getMinLabel]]</td>
+                  <th>[[getMaxLabel]]</td>
+                </tr>
+                <tr>
+                  <td>[[meanResult]]</td>
+                  <td>[[minResult]]</td>
+                  <td>[[meanResult]]</td>
+                </tr>
+                <tr>
+              </table>
+              <div><h3>[[getTotalResultLabel]]</h3>: [[maxResult]]</div>
 
-              <paper-input label="[[getMeanLabel]]" value="[[meanResult]]" readonly></paper-input>
+              <!-- <paper-input label="[[getMeanLabel]]" value="[[meanResult]]" readonly></paper-input>
               <paper-input label="[[getMinLabel]]" value="[[minResult]]" readonly></paper-input>
               <paper-input label="[[getMaxLabel]]" value="[[maxResult]]" readonly></paper-input>
-              <paper-input label="[[getTotalResultLabel]]" value="[[totalResult]]" readonly></paper-input>
+              <paper-input label="[[getTotalResultLabel]]" value="[[totalResult]]" readonly></paper-input> -->
             </div>
         </div>
         <!-- For string aggregations -->
@@ -300,12 +316,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template>[[item.sum]]</template>
             </vaadin-grid-column>
           </vaadin-grid>
-          <table>
-            <tr>
-              <th>Grand Total</th>
-              <td>[[grandTotalSum]]</td>
-            </tr>
-          </table>
+          <div><h3>Grand Total</h3>: [[grandTotalSum]]</div>
         </div>
       </div>
     </iron-pages>
