@@ -250,9 +250,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <div main-title>Aggregations</div>
           </app-toolbar>
             <div class="aggregation-items">
+
+              <!-- <vaadin-grid>
+                <vaadin-grid-column>
+                  <template class="header">[[getMeanLabel]]</template>
+                  <template>[[meanResult]]</template>
+                </vaadin-grid-column>
+                <vaadin-grid-column>
+                  <template class="header">[[getMinLabel]]</template>
+                  <template>[[minResult]]</template>
+                </vaadin-grid-column>
+              <vaadin-grid-column>
+                <template class="header">[[getMaxLabel]]</template>
+                <template>[[maxResult]]</template>
+              </vaadin-grid-column>
+              <vaadin-grid-column>
+                <template class="header">[[getTotalResultLabel]]</template>
+                <template>[[totalResult]]</template>
+              </vaadin-grid-column>
+            </vaadin-grid> -->
+
               <paper-input label="[[getMeanLabel]]" value="[[meanResult]]" readonly></paper-input>
               <paper-input label="[[getMinLabel]]" value="[[minResult]]" readonly></paper-input>
               <paper-input label="[[getMaxLabel]]" value="[[maxResult]]" readonly></paper-input>
+              <paper-input label="[[getTotalResultLabel]]" value="[[totalResult]]" readonly></paper-input>
             </div>
         </div>
         <!-- For string aggregations -->
@@ -279,6 +300,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template>[[item.sum]]</template>
             </vaadin-grid-column>
           </vaadin-grid>
+          <table>
+            <tr>
+              <th>Grand Total</th>
+              <td>***NOTE: place this.totalResult of selectedSumField here!!!</td>
+            </tr>
+          </table>
         </div>
       </div>
     </iron-pages>
@@ -364,6 +391,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: String,
             value: "max value"
           },
+          getTotalResultLabel: {
+            type: String,
+            value: "total"
+          },
           groupSumData: {
             type: Array,
             value: []
@@ -426,6 +457,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.maxResult = _.maxBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
         }).metadata[this.selectedContourBy]
+        this.totalResult = _.sumBy(resultFilterInput, function(o) {
+          return o.metadata[that.selectedContourBy]
+        });
         this.showNumericalAggregations = true;
       }
 
@@ -454,7 +488,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         })
         this.groupKeys = _.keys(resultGroupByName)
         this.groupSumData = []
-        this.flatTotalGroupObjects = _.flatten(this.totalGroupObjects)
+        console.log(this.groupSumData);
         this.totalGroupObjects = []
         for (var i = 0; i < this.groupKeys.length; i++) {
           var groupObjects = resultGroupByName[this.groupKeys[i]]
@@ -474,8 +508,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // to find keys with numeric values for dropdown options
         this.uniqueNumericKeys = _.uniq(this.numericalMetadataKeys)
         this.numericalMetadataKeys = []
-        for (var i = 0; i < this.flatTotalGroupObjects.length; i++) {
-          var metadataObject = this.flatTotalGroupObjects[i].metadata
+        var flatTotalGroupObjects = _.flatten(this.totalGroupObjects)
+        for (var i = 0; i < flatTotalGroupObjects.length; i++) {
+          var metadataObject = flatTotalGroupObjects[i].metadata
           var metadataValues = _.values(metadataObject)
           var metadataKeys = _.keys(metadataObject)
 	         for (var j = 0; j < metadataKeys.length; j++) {
@@ -509,10 +544,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.getMeanLabel = "Avg unavailable"
           this.getMinLabel = "Min unavailable"
           this.getMaxLabel = "Max unavailable"
+          this.getTotalResultLabel = "Total unavailable"
         } else {
           this.getMeanLabel = "Avg " + _.capitalize(this.selectedContourBy)
           this.getMinLabel = "Min " + _.capitalize(this.selectedContourBy)
           this.getMaxLabel = "Max " + _.capitalize(this.selectedContourBy)
+          this.getTotalResultLabel = "Total " + _.capitalize(this.selectedContourBy)
         }
       }
       //Ensure that the geometry input is within boundaries and is compatible with its input sibling
