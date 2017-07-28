@@ -364,10 +364,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: String,
             value: "max value"
           },
-          getSumByGroupLabels: {
-            type: String,
-            value: "Sum by group"
-          },
           groupSumData: {
             type: Array,
             value: []
@@ -398,7 +394,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_getModelData(selectedModel)',
           '_aggregations(_modelData,selectedContourBy)',
           '_getAggregationLabels(_modelData, selectedContourBy)',
-          //'_getGroupSumLabels(_modelData, selectedContourBy)',
           '_getSumByForSelectedSumField(selectedSumField)'
         ]
       }
@@ -457,13 +452,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var resultGroupByName = _.groupBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
         })
-        //console.log(resultGroupByName);
         this.groupKeys = _.keys(resultGroupByName)
-        //console.log(resultGroupByName);
         this.groupSumData = []
-        //console.log('GROUP SUM DATA: ');
-        //console.log(this.groupSumData);
-        // ============================= start ===================================
+        this.flatTotalGroupObjects = _.flatten(this.totalGroupObjects)
         this.totalGroupObjects = []
         for (var i = 0; i < this.groupKeys.length; i++) {
           var groupObjects = resultGroupByName[this.groupKeys[i]]
@@ -480,14 +471,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.push('groupSumData', groupSumDataSetup)
           this.push('totalGroupObjects', groupObjects)
         }
-        // ============================= end ===================================
         // to find keys with numeric values for dropdown options
         this.uniqueNumericKeys = _.uniq(this.numericalMetadataKeys)
         this.numericalMetadataKeys = []
-        var flatTotalGroupObjects = _.flatten(this.totalGroupObjects)
-        //console.log(flatTotalGroupObjects);
-        for (var i = 0; i < flatTotalGroupObjects.length; i++) {
-          var metadataObject = flatTotalGroupObjects[i].metadata
+        for (var i = 0; i < this.flatTotalGroupObjects.length; i++) {
+          var metadataObject = this.flatTotalGroupObjects[i].metadata
           var metadataValues = _.values(metadataObject)
           var metadataKeys = _.keys(metadataObject)
 	         for (var j = 0; j < metadataKeys.length; j++) {
@@ -498,7 +486,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
              }
            }
          }
-         //console.log(this.uniqueNumericKeys)
          this.showStringAggregations = true;
       }
 
@@ -516,17 +503,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.showStringAggregations = false;
         this.showNumericalAggregations = false;
       }
-
-      // _getGroupSumLabels() {
-      //   //does something need to be added to the line below?
-      //   if (typeof this.selectedContourBy === 'undefined' || typeof this.selectedModel === 'undefined') {
-      //     this.getSumByGroupLabels = "No sum available"
-      //   } else {
-      //     for (var i in this.groupKeys) {
-      //       this.getSumByGroupLabels = "Axial sum for " + this.groupKeys[i]
-      //     }
-      //   }
-      // }
 
       _getAggregationLabels() {
         if (typeof this.selectedContourBy === 'undefined' || typeof this.selectedModel === 'undefined') {
