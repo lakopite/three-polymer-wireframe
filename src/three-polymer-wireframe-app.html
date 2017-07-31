@@ -289,6 +289,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               </table>
               <div><h3>[[getTotalResultLabel]]</h3>: [[totalResult]]</div>
 
+              <!-- won't render data, only headers -->
+              <!-- <vaadin-grid aria-label="numerical-aggregations-table">
+                <vaadin-grid-column>
+                  <template class="header">[[getMinLabel]]</template>
+                  <template>[[minResult]]</template>
+                </vaadin-grid-column>
+                <vaadin-grid-column>
+                  <template class="header">[[getMaxLabel]]</template>
+                  <template>[[maxResult]]</template>
+                </vaadin-grid-column>
+                <vaadin-grid-column>
+                  <template class="header">[[getMeanLabel]]</template>
+                  <template>[[meanResult]]</template>
+                </vaadin-grid-column>
+              </vaadin-grid> -->
+
               <!-- <paper-input label="[[getMeanLabel]]" value="[[meanResult]]" readonly></paper-input>
               <paper-input label="[[getMinLabel]]" value="[[minResult]]" readonly></paper-input>
               <paper-input label="[[getMaxLabel]]" value="[[maxResult]]" readonly></paper-input>
@@ -317,6 +333,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <vaadin-grid-column>
               <template class="header">[[selectedSumField]]</template>
               <template>[[item.sum]]</template>
+            </vaadin-grid-column>
+            <vaadin-grid-column>
+              <template class="header">$</template>
+              <template>test</template>
             </vaadin-grid-column>
           </vaadin-grid>
           <div><h3>Grand Total</h3>: [[grandTotalSum]]</div>
@@ -462,18 +482,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           })
         })
         console.log(resultFilterInput)
-        this.meanResult = _.meanBy(resultFilterInput, function(o) {
+        this.meanResult = _.round(_.meanBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        });
-        this.minResult = _.minBy(resultFilterInput, function(o) {
+        }), 6);
+        this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        }).metadata[this.selectedContourBy]
-        this.maxResult = _.maxBy(resultFilterInput, function(o) {
+        }).metadata[this.selectedContourBy], 6)
+        this.maxResult = _.round(_.maxBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        }).metadata[this.selectedContourBy]
-        this.totalResult = _.sumBy(resultFilterInput, function(o) {
+        }).metadata[this.selectedContourBy], 6)
+        this.totalResult = _.round(_.sumBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        });
+        }), 6);
         this.showNumericalAggregations = true;
       }
 
@@ -507,9 +527,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         for (var i = 0; i < this.groupKeys.length; i++) {
           var groupObjects = resultGroupByName[this.groupKeys[i]]
           for (var j = 0; j < groupObjects.length; j++) {
-            var sumByGroup = _.sumBy(groupObjects, function(o) {
+            var sumByGroup = _.round(_.sumBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
-            })
+            }), 6)
           }
           var groupSumDataSetup = {
             'group': this.groupKeys[i],
@@ -519,9 +539,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.push('groupSumData', groupSumDataSetup)
           this.push('totalGroupObjects', groupObjects)
         }
-        this.grandTotalSum = _.sumBy(resultFilterInput, function(o) {
+        this.grandTotalSum = _.round(_.sumBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedSumField]
-        })
+        }), 6)
         // to find keys with numeric values for dropdown options
         this.uniqueNumericKeys = _.uniq(this.numericalMetadataKeys)
         this.numericalMetadataKeys = []
