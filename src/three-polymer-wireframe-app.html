@@ -177,6 +177,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: inline;
       }
 
+      .sum-wrapper {
+        font-size: 16px;
+      }
+
     </style>
     <iron-ajax auto url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax id="model-request" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
@@ -287,7 +291,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </tr>
                 <tr>
               </table>
-              <div><h3>[[getTotalResultLabel]]</h3>: [[totalResult]]</div>
+              <div class="sum-wrapper"><h3>[[getTotalResultLabel]]</h3>: [[totalResult]]</div>
 
               <!-- won't render data, only headers -->
               <!-- <vaadin-grid aria-label="numerical-aggregations-table">
@@ -339,7 +343,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template>test</template>
             </vaadin-grid-column>
           </vaadin-grid>
-          <div><h3>Grand Total</h3>: [[grandTotalSum]]</div>
+          <div class="sum-wrapper"><h3>Grand Total</h3>: [[grandTotalSum]]</div>
         </div>
       </div>
     </iron-pages>
@@ -424,6 +428,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           getMaxLabel: {
             type: String,
             value: "max value"
+          },
+          totalResult : {
+            type: Number,
+            value: 0
+          },
+          grandTotalSum : {
+            type: Number,
+            value: 0
           },
           getTotalResultLabel: {
             type: String,
