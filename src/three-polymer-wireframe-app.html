@@ -532,7 +532,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var resultGroupByName = _.groupBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
         })
-        this.groupKeys = _.keys(resultGroupByName)
+        this.groupKeys = _.without(_.keys(resultGroupByName), 'undefined')
+        console.log(JSON.stringify(this.groupKeys));
         this.groupSumData = []
         //console.log(this.groupSumData);
         this.totalGroupObjects = []
