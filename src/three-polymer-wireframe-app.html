@@ -291,7 +291,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </tr>
                 <tr>
               </table>
-              <div class="sum-wrapper"><h3>[[getTotalResultLabel]]</h3>: [[totalResult]]</div>
+              <vaadin-grid aria-label="total-sum">
+                <vaadin-grid-column>
+                  <template class="header">Total</template>
+                </vaadin-grid-column>
+                <vaadin-grid-column>
+                  <template class="header">[[totalResult]]</template>
+                  </vaadin-grid-column>
+              </vaadin-grid>
 
               <!-- won't render data, only headers -->
               <!-- <vaadin-grid aria-label="numerical-aggregations-table">
@@ -343,8 +350,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template>test</template>
             </vaadin-grid-column>
           </vaadin-grid>
-          <div class="sum-wrapper"><h3>Grand Total</h3>: [[grandTotalSum]]</div>
-        </div>
+
+          <!-- <vaadin-grid aria-label="total-sum">
+            <vaadin-grid-column>
+              <template class="header">Total</template>
+            </vaadin-grid-column>
+            <vaadin-grid-column>
+              <template class="header">[[grandTotalSum]]</template>
+              </vaadin-grid-column>
+          </vaadin-grid> -->
       </div>
     </iron-pages>
   </app-header-layout>
@@ -533,7 +547,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return o.metadata[that.selectedContourBy]
         })
         this.groupKeys = _.without(_.keys(resultGroupByName), 'undefined')
-        console.log(JSON.stringify(this.groupKeys));
+        // console.log(JSON.stringify(this.groupKeys));
         this.groupSumData = []
         //console.log(this.groupSumData);
         this.totalGroupObjects = []
@@ -564,7 +578,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var metadataValues = _.values(metadataObject)
           var metadataKeys = _.keys(metadataObject)
 	         for (var j = 0; j < metadataKeys.length; j++) {
-             if(_.isNumber(metadataValues[j])) {
+             ivar ignoreSumGroups = ['meta_st7id', 'meta_groupid', 'meta_propnum', 'beamnum']
+             if(_.isNumber(metadataValues[j]) && ignoreSumGroups.indexOf(metadataKeys[j]) === -1) {
                //console.log("logging metadataKeys[j]:   " + metadataKeys[j])
                //console.log("logging metadataValues[j]   " + metadataValues[j])
                this.push('numericalMetadataKeys', metadataKeys[j])
