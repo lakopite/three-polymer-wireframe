@@ -578,7 +578,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var metadataValues = _.values(metadataObject)
           var metadataKeys = _.keys(metadataObject)
 	         for (var j = 0; j < metadataKeys.length; j++) {
-             ivar ignoreSumGroups = ['meta_st7id', 'meta_groupid', 'meta_propnum', 'beamnum']
+             var ignoreSumGroups = ['meta_st7id', 'meta_groupid', 'meta_propnum', 'beamnum']
              if(_.isNumber(metadataValues[j]) && ignoreSumGroups.indexOf(metadataKeys[j]) === -1) {
                //console.log("logging metadataKeys[j]:   " + metadataKeys[j])
                //console.log("logging metadataValues[j]   " + metadataValues[j])
