@@ -496,16 +496,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         console.log(resultFilterInput)
         this.meanResult = _.round(_.meanBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        }), 6);
+        }), 6).toLocaleString();
         this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        }).metadata[this.selectedContourBy], 6)
+        }).metadata[this.selectedContourBy], 6).toLocaleString()
         this.maxResult = _.round(_.maxBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        }).metadata[this.selectedContourBy], 6)
+        }).metadata[this.selectedContourBy], 6).toLocaleString()
         this.totalResult = _.round(_.sumBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        }), 6);
+        }), 6).toLocaleString();
         this.showNumericalAggregations = true;
       }
 
@@ -541,7 +541,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           for (var j = 0; j < groupObjects.length; j++) {
             var sumByGroup = _.round(_.sumBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
-            }), 6)
+            }), 6).toLocaleString()
           }
           var groupSumDataSetup = {
             'group': this.groupKeys[i],
@@ -553,7 +553,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         this.grandTotalSum = _.round(_.sumBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedSumField]
-        }), 6)
+        }), 6).toLocaleString()
         // to find keys with numeric values for dropdown options
         this.uniqueNumericKeys = _.uniq(this.numericalMetadataKeys)
         this.numericalMetadataKeys = []
