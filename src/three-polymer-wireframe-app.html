@@ -139,12 +139,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         };
       }
 
-      .numerical-aggregations-table {
+      /*.numerical-aggregations-table {
         height: 10vh;
       }
-
-      .sum-by-group-table {
-        height: 50vh;
+      */
+      .sum-by-group-table, .numerical-aggregations-table {
+        height: calc(100vh - 192px);
         --vaadin-grid-body-row-odd-cell: {
           background-color: #f5f5f5;
         };
@@ -227,7 +227,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </app-drawer>
   <!-- Main content -->
   <app-header-layout has-scrolling-region>
-    <app-header slot="header" medium-tall condenses reveals effects="waterfall">
+    <app-header slot="header" medium-tall>
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView</div>
@@ -258,27 +258,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </app-toolbar>
 
               <!-- ************* won't render data, only headers!!! -->
-              <vaadin-grid class="numerical-aggregations-table">
+              <vaadin-grid class="numerical-aggregations-table" items="[[numericalAggregationsTableData]]">
                 <vaadin-grid-column>
-                  <template class="header">[[getMinLabel]]</template>
-                  <template>[[minResult]]</template>
+                  <template class="header">Name</template>
+                  <template>[[item.name]]</template>
+                  <template class="footer">Total</template>
                 </vaadin-grid-column>
                 <vaadin-grid-column>
-                  <template class="header">[[getMaxLabel]]</template>
-                  <template>[[maxResult]]</template>
+                  <template class="header">Result</template>
+                  <template>[[item.result]]</template>
+                  <template class="footer">[[totalResult]]</template>
                 </vaadin-grid-column>
-                <vaadin-grid-column>
-                  <template class="header">[[getMeanLabel]]</template>
-                  <template>[[meanResult]]</template>
-                </vaadin-grid-column>
-              </vaadin-grid>
-              <vaadin-grid class="total-sum">
-                <vaadin-grid-column>
-                  <template class="header">Total</template>
-                </vaadin-grid-column>
-                <vaadin-grid-column>
-                  <template class="header">[[totalResult]]</template>
-                  </vaadin-grid-column>
               </vaadin-grid>
 
         </div>
@@ -300,24 +290,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <vaadin-grid-column>
               <template class="header">[[selectedContourBy]]</template>
               <template>[[item.group]]</template>
+              <template class="footer">Total</template>
             </vaadin-grid-column>
             <vaadin-grid-column>
               <template class="header">[[selectedSumField]]</template>
               <template>[[item.sum]]</template>
+              <template class="footer">[[grandTotalSum]]</template>
             </vaadin-grid-column>
             <vaadin-grid-column>
               <template class="header">$</template>
               <template>test</template>
             </vaadin-grid-column>
-          </vaadin-grid>
-
-          <vaadin-grid class="total-sum">
-            <vaadin-grid-column>
-              <template class="header">Total</template>
-            </vaadin-grid-column>
-            <vaadin-grid-column>
-              <template class="header">[[grandTotalSum]]</template>
-              </vaadin-grid-column>
           </vaadin-grid>
       </div>
     </iron-pages>
@@ -407,6 +390,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Number,
             value: 0
           },
+          numericalAggregationsTableData: {
+            type: Array,
+            value: []
+          },
           grandTotalSum : {
             type: Number,
             value: 0
@@ -468,15 +455,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           })
         })
         console.log(resultFilterInput)
-        this.meanResult = _.round(_.meanBy(resultFilterInput, function(o) {
-          return o.metadata[that.selectedContourBy]
-        }), 6).toLocaleString();
+        this.numericalAggregationsTableData = []
         this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
         }).metadata[this.selectedContourBy], 6).toLocaleString()
         this.maxResult = _.round(_.maxBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
         }).metadata[this.selectedContourBy], 6).toLocaleString()
+        this.meanResult = _.round(_.meanBy(resultFilterInput, function(o) {
+          return o.metadata[that.selectedContourBy]
+        }), 6).toLocaleString();
+        // ==================================== START ========================================
+        var name = [this.getMinLabel, this.getMaxLabel, this.getMeanLabel];
+        var result = [this.minResult, this.maxResult, this.meanResult];
+        for (var i=0; i < name.length; i++) {
+          var setup = {
+            'name': name[i],
+            'result': result[i]
+          }
+        	this.push('numericalAggregationsTableData', setup)
+        }
+        // ==================================== END ===========================================
         this.totalResult = _.round(_.sumBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
         }), 6).toLocaleString();
