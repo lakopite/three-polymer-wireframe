@@ -132,12 +132,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         background: var(--paper-grey-400);
       }
 
-      .aggregation-items {
-        @apply --layout-vertical;
-        border-bottom: 1px solid #DDD;
-        padding: 0px 22px;
-      }
-
       #sum-field-dropdown {
         background-color: var(--paper-grey-400);
         --paper-input-container-label: {
@@ -145,11 +139,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         };
       }
 
-      vaadin-grid {
+      .numerical-aggregations-table {
+        height: 10vh;
+      }
+
+      .sum-by-group-table {
         height: 50vh;
         --vaadin-grid-body-row-odd-cell: {
           background-color: #f5f5f5;
         };
+      }
+
+      .total-sum {
+          height: 4.4vh;
       }
 
       .wrapper {
@@ -157,29 +159,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         grid-template-columns: 1fr 1fr;
       }
 
-      table {
-        margin: 15px 0px;
-        border-collapse: collapse;
-        width: 100%;
-        height: 50px;
-      }
 
-      table, th, td {
-        border: 1px solid black;
-      }
-      th, td {
-        padding: 15px;
-      } th {
-        text-align: left;
-      }
-
-      h3 {
-        display: inline;
-      }
-
-      .sum-wrapper {
-        font-size: 16px;
-      }
 
     </style>
     <iron-ajax auto url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
@@ -276,32 +256,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <app-toolbar class="aggregation-toolbar">
             <div main-title>Aggregations</div>
           </app-toolbar>
-            <div class="aggregation-items">
 
-              <table id="numerical-aggregations-table">
-                <tr>
-                  <th>[[getMinLabel]]</td>
-                    <th>[[getMaxLabel]]</td>
-                  <th>[[getMeanLabel]]</th>
-                </tr>
-                <tr>
-                  <td>[[minResult]]</td>
-                  <td>[[maxResult]]</td>
-                  <td>[[meanResult]]</td>
-                </tr>
-                <tr>
-              </table>
-              <vaadin-grid aria-label="total-sum">
-                <vaadin-grid-column>
-                  <template class="header">Total</template>
-                </vaadin-grid-column>
-                <vaadin-grid-column>
-                  <template class="header">[[totalResult]]</template>
-                  </vaadin-grid-column>
-              </vaadin-grid>
-
-              <!-- won't render data, only headers -->
-              <!-- <vaadin-grid aria-label="numerical-aggregations-table">
+              <!-- ************* won't render data, only headers!!! -->
+              <vaadin-grid class="numerical-aggregations-table">
                 <vaadin-grid-column>
                   <template class="header">[[getMinLabel]]</template>
                   <template>[[minResult]]</template>
@@ -314,13 +271,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                   <template class="header">[[getMeanLabel]]</template>
                   <template>[[meanResult]]</template>
                 </vaadin-grid-column>
-              </vaadin-grid> -->
-
-              <!-- <paper-input label="[[getMeanLabel]]" value="[[meanResult]]" readonly></paper-input>
-              <paper-input label="[[getMinLabel]]" value="[[minResult]]" readonly></paper-input>
-              <paper-input label="[[getMaxLabel]]" value="[[maxResult]]" readonly></paper-input>
-              <paper-input label="[[getTotalResultLabel]]" value="[[totalResult]]" readonly></paper-input> -->
-            </div>
+              </vaadin-grid>
+              <vaadin-grid class="total-sum">
+                <vaadin-grid-column>
+                  <template class="header">Total</template>
+                </vaadin-grid-column>
+                <vaadin-grid-column>
+                  <template class="header">[[totalResult]]</template>
+                  </vaadin-grid-column>
+              </vaadin-grid>
         </div>
         <!-- For string aggregations -->
         <div hidden$="[[!showStringAggregations]]">
@@ -336,7 +295,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               </paper-listbox>
             </paper-dropdown-menu>
         </div>
-          <vaadin-grid aria-label="sum-by-group-table" items="[[groupSumData]]">
+          <vaadin-grid class="sum-by-group-table" items="[[groupSumData]]">
             <vaadin-grid-column>
               <template class="header">[[selectedContourBy]]</template>
               <template>[[item.group]]</template>
@@ -351,14 +310,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </vaadin-grid-column>
           </vaadin-grid>
 
-          <!-- <vaadin-grid aria-label="total-sum">
+          <vaadin-grid class="total-sum">
             <vaadin-grid-column>
               <template class="header">Total</template>
             </vaadin-grid-column>
             <vaadin-grid-column>
               <template class="header">[[grandTotalSum]]</template>
               </vaadin-grid-column>
-          </vaadin-grid> -->
+          </vaadin-grid>
       </div>
     </iron-pages>
   </app-header-layout>
@@ -578,6 +537,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var metadataValues = _.values(metadataObject)
           var metadataKeys = _.keys(metadataObject)
 	         for (var j = 0; j < metadataKeys.length; j++) {
+             //to exclude these from the dropdown items
              var ignoreSumGroups = ['meta_st7id', 'meta_groupid', 'meta_propnum', 'beamnum']
              if(_.isNumber(metadataValues[j]) && ignoreSumGroups.indexOf(metadataKeys[j]) === -1) {
                //console.log("logging metadataKeys[j]:   " + metadataKeys[j])
