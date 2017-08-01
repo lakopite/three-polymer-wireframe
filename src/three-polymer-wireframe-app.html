@@ -139,10 +139,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         };
       }
 
-      /*.numerical-aggregations-table {
-        height: 10vh;
-      }
-      */
       .sum-by-group-table, .numerical-aggregations-table {
         height: calc(100vh - 192px);
         --vaadin-grid-body-row-odd-cell: {
@@ -455,7 +451,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           })
         })
         console.log(resultFilterInput)
-        this.numericalAggregationsTableData = []
         this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
         }).metadata[this.selectedContourBy], 6).toLocaleString()
@@ -466,6 +461,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return o.metadata[that.selectedContourBy]
         }), 6).toLocaleString();
         // ==================================== START ========================================
+        this.numericalAggregationsTableData = []
         var name = [this.getMinLabel, this.getMaxLabel, this.getMeanLabel];
         var result = [this.minResult, this.maxResult, this.meanResult];
         for (var i=0; i < name.length; i++) {
@@ -473,7 +469,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             'name': name[i],
             'result': result[i]
           }
-        	this.push('numericalAggregationsTableData', setup)
+          this.push('numericalAggregationsTableData', setup)
         }
         // ==================================== END ===========================================
         this.totalResult = _.round(_.sumBy(resultFilterInput, function(o) {
