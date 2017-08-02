@@ -184,13 +184,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               </template>
   </paper-listbox>
   </paper-dropdown-menu>
-  <paper-dropdown-menu label="Contour">
-    <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-      <template is="dom-repeat" items="[[metadataFields]]">
-                <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
-              </template>
-    </paper-listbox>
-  </paper-dropdown-menu>
+  <div hidden$="{{_hideMainDropdown(selectedView)}}">
+    <paper-dropdown-menu label="Contour">
+      <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
+        <template is="dom-repeat" items="[[metadataFields]]">
+                  <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+                </template>
+      </paper-listbox>
+    </paper-dropdown-menu>
+  </div>
   <div id="filter-container">
     <paper-item>Model Filters</paper-item>
     <div class="horizontal">
@@ -227,6 +229,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView</div>
+        <paper-item>Build Date: 8/2/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -249,11 +252,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <!-- For numerical aggregations -->
       <div name="aggregations-view">
         <div hidden$="[[!showNumericalAggregations]]">
+          <div class="wrapper">
+
           <app-toolbar class="aggregation-toolbar">
             <div main-title>Aggregations</div>
           </app-toolbar>
+          <paper-dropdown-menu id="num-contour-dropdown" label="Contour">
+            <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
+              <template is="dom-repeat" items="[[metadataFields]]">
+                        <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+                      </template>
+            </paper-listbox>
+            </paper-dropdown-menu>
+          </div>
 
-              <!-- ************* won't render data, only headers!!! -->
               <vaadin-grid class="numerical-aggregations-table" items="[[numericalAggregationsTableData]]">
                 <vaadin-grid-column>
                   <template class="header">Name</template>
@@ -274,6 +286,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <app-toolbar class="aggregation-toolbar">
               <div main-title>Sum by group</div>
             </app-toolbar>
+            <paper-dropdown-menu id="str-contour-dropdown" label="Contour">
+              <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
+                <template is="dom-repeat" items="[[metadataFields]]">
+                          <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+                        </template>
+              </paper-listbox>
+              </paper-dropdown-menu>
             <paper-dropdown-menu class="aggregation-toolbar" id="sum-field-dropdown" label="Select Sum Field">
               <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
                 <template is="dom-repeat" items="[[uniqueNumericKeys]]">
@@ -460,7 +479,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.meanResult = _.round(_.meanBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
         }), 6).toLocaleString();
-        // ==================================== START ========================================
         this._getAggregationLabels()
         this.numericalAggregationsTableData = []
         var name = [this.getMinLabel, this.getMaxLabel, this.getMeanLabel];
@@ -472,7 +490,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
           this.push('numericalAggregationsTableData', setup)
         }
-        // ==================================== END ===========================================
         this.totalResult = _.round(_.sumBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
         }), 6).toLocaleString();
@@ -573,6 +590,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.getMaxLabel = "Max " + _.capitalize(this.selectedContourBy)
           this.getTotalResultLabel = "Total " + _.capitalize(this.selectedContourBy)
         }
+      }
+
+      _hideMainDropdown(currentPage) {
+        return this.selectedView == 'aggregations-view'
       }
       //Ensure that the geometry input is within boundaries and is compatible with its input sibling
       _computeMin(_b, _g) {
