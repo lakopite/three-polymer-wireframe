@@ -461,6 +461,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return o.metadata[that.selectedContourBy]
         }), 6).toLocaleString();
         // ==================================== START ========================================
+        this._getAggregationLabels()
         this.numericalAggregationsTableData = []
         var name = [this.getMinLabel, this.getMaxLabel, this.getMeanLabel];
         var result = [this.minResult, this.maxResult, this.meanResult];
