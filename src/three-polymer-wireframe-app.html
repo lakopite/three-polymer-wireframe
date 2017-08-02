@@ -128,12 +128,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         --paper-spinner-layer-4-color: #FFF;
       }
 
-      .aggregation-toolbar {
-        background: var(--paper-grey-400);
-      }
-
       #sum-field-dropdown {
-        background-color: var(--paper-grey-400);
         --paper-input-container-label: {
           font-size:20px;
         };
@@ -150,9 +145,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         height: 4.4vh;
       }
 
-      .wrapper {
+      .num-wrapper {
+        background-color: var(--paper-grey-400);
         display: grid;
         grid-template-columns: 1fr 1fr;
+      }
+
+      .str-wrapper {
+        background-color: var(--paper-grey-400);
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
       }
 
 
@@ -185,7 +187,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </paper-listbox>
   </paper-dropdown-menu>
   <div hidden$="{{_hideMainDropdown(selectedView)}}">
-    <paper-dropdown-menu label="Contour">
+    <paper-dropdown-menu id="main-contour-dropdown" label="Contour">
       <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
         <template is="dom-repeat" items="[[metadataFields]]">
                   <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
@@ -252,8 +254,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <!-- For numerical aggregations -->
       <div name="aggregations-view">
         <div hidden$="[[!showNumericalAggregations]]">
-          <div class="wrapper">
-
+          <div class="num-wrapper">
           <app-toolbar class="aggregation-toolbar">
             <div main-title>Aggregations</div>
           </app-toolbar>
@@ -282,7 +283,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
         <!-- For string aggregations -->
         <div hidden$="[[!showStringAggregations]]">
-          <div class="wrapper">
+          <div class="str-wrapper">
             <app-toolbar class="aggregation-toolbar">
               <div main-title>Sum by group</div>
             </app-toolbar>
