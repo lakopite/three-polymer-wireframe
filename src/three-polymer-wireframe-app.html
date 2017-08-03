@@ -161,6 +161,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
       }
 
+      .chart-container {
+
+      }
+
     </style>
     <iron-ajax auto url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax id="model-request" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
@@ -323,6 +327,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </vaadin-grid-column>
           </vaadin-grid>
           <!-- Pie chart -->
+          <div class="chart-container">
           <vaadin-pie-chart id="sum-by-group-pie-chart">
             <chart-title>Sum by Group</chart-title>
             <!-- <subtitle></subtitle> -->
@@ -332,7 +337,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <pie allow-point-select="true" show-in-legend="true"
                    cursor="pointer">
               <data-labels enabled="true"
-                   format="{point.name}: {point.percentage:.3f} %">
+                   format="{point.name}: {point.percentage:.2f} %">
               </data-labels>
             </pie>
             </plot-options>
@@ -340,6 +345,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </data-series>
           </vaadin-pie-chart>
           <my-data-source data="{{pieData}}"></my-data-source>
+        </div>
       </div>
     </iron-pages>
   </app-header-layout>
@@ -496,15 +502,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           })
         })
         console.log(resultFilterInput)
-        this.minResult = parseFloat(_.round(_.minBy(resultFilterInput, function(o) {
+        this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        }).metadata[this.selectedContourBy], 6).toLocaleString())
-        this.maxResult = parseFloat(_.round(_.maxBy(resultFilterInput, function(o) {
+        }).metadata[this.selectedContourBy], 6).toLocaleString()
+        this.maxResult = _.round(_.maxBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        }).metadata[this.selectedContourBy], 6).toLocaleString())
-        this.meanResult = parseFloat(_.round(_.meanBy(resultFilterInput, function(o) {
+        }).metadata[this.selectedContourBy], 6).toLocaleString()
+        this.meanResult = _.round(_.meanBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        }), 6).toLocaleString());
+        }), 6).toLocaleString();
         this._getAggregationLabels()
         this.numericalAggregationsTableData = []
         var name = [this.getMinLabel, this.getMaxLabel, this.getMeanLabel];
@@ -516,9 +522,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
           this.push('numericalAggregationsTableData', setup)
         }
-        this.totalResult = parseFloat(_.round(_.sumBy(resultFilterInput, function(o) {
+        this.totalResult = _.round(_.sumBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        }), 6).toLocaleString());
+        }), 6).toLocaleString();
         this.showNumericalAggregations = true;
       }
 
@@ -554,6 +560,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var sumByGroup = parseFloat(_.round(_.sumBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
             }), 6).toLocaleString())
+            console.log(sumByGroup)
           }
           var groupSumDataSetup = {
             'group': this.groupKeys[i],
@@ -569,7 +576,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var item = this.groupSumData[i]
           this.push('pieData', [item.group, item.sum])
         }
-        // for grand total sum
+        // for grand total sum --- THIS LOOKS ODD UNDER META_STEELORCONC
         this.grandTotalSum = parseFloat(_.round(_.sumBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedSumField]
         }), 6).toLocaleString())
