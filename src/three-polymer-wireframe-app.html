@@ -546,9 +546,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return o.metadata[that.selectedContourBy]
         })
         this.groupKeys = _.without(_.keys(resultGroupByName), 'undefined')
-        // console.log(JSON.stringify(this.groupKeys));
         this.groupSumData = []
-        console.log(this.groupSumData);
         this.totalGroupObjects = []
         for (var i = 0; i < this.groupKeys.length; i++) {
           var groupObjects = resultGroupByName[this.groupKeys[i]]
@@ -565,13 +563,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.push('groupSumData', groupSumDataSetup)
           this.push('totalGroupObjects', groupObjects)
         }
-        // ========================== PIE DATA START ==========================
+        // for pie chart
         this.pieData = []
         for (var i=0; i < this.groupSumData.length; i++) {
           var item = this.groupSumData[i]
           this.push('pieData', [item.group, item.sum])
         }
-        // ========================== PIE DATA END ============================
+        // for grand total sum
         this.grandTotalSum = parseFloat(_.round(_.sumBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedSumField]
         }), 6).toLocaleString())
@@ -587,8 +585,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
              //to exclude these from the dropdown items
              var ignoreSumGroups = ['meta_st7id', 'meta_groupid', 'meta_propnum', 'beamnum']
              if(_.isNumber(metadataValues[j]) && ignoreSumGroups.indexOf(metadataKeys[j]) === -1) {
-               //console.log("logging metadataKeys[j]:   " + metadataKeys[j])
-               //console.log("logging metadataValues[j]   " + metadataValues[j])
                this.push('numericalMetadataKeys', metadataKeys[j])
              }
            }
