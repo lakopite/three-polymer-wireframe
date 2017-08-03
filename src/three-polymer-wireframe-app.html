@@ -142,29 +142,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         };
       }
 
-      .total-sum {
-        height: 4.4vh;
-      }
-
       .num-wrapper {
-        background-color: var(--paper-grey-400);
+        background-color: var(--paper-grey-300);
         display: grid;
         grid-template-columns: 1fr 1fr;
       }
 
       .str-wrapper {
-        background-color: var(--paper-grey-400);
+        background-color: var(--paper-grey-300);
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
       }
 
       #num-contour-dropdown, #str-contour-dropdown {
+        padding: 0 0.5em;
           --paper-input-container-label: {
             font-size:20px;
           }
       }
-
-
 
     </style>
     <iron-ajax auto url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
@@ -309,6 +304,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               </paper-listbox>
             </paper-dropdown-menu>
         </div>
+        <div>
           <vaadin-grid class="sum-by-group-table" items="[[groupSumData]]">
             <vaadin-grid-column>
               <template class="header">[[selectedContourBy]]</template>
@@ -325,6 +321,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template>test</template>
             </vaadin-grid-column>
           </vaadin-grid>
+          <!-- ================================ PIE CHART ===================================================== -->
+          <vaadin-pie-chart id="sum-by-group-pie-chart">
+            <chart-title>Sum by Group</chart-title>
+            <!-- <subtitle></subtitle> -->
+            <tooltip point-format="<b>{point.percentage:.6f}%</b>">
+            </tooltip>
+            <plot-options>
+            <pie allow-point-select="true" show-in-legend="true"
+                   cursor="pointer">
+              <data-labels enabled="true"
+                   format="{point.name}: {point.percentage:.3f} %">
+              </data-labels>
+            </pie>
+            </plot-options>
+            <data-series name="Sum Data" data="[[pieData]]">
+          </data-series>
+          </vaadin-pie-chart>
+          <my-data-source data="{{pieData}}"></my-data-source>
+          <!-- ================================ PIE CHART ===================================================== -->
       </div>
     </iron-pages>
   </app-header-layout>
@@ -429,6 +444,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Array,
             value: []
           },
+          pieData : {
+            type: Array
+          },
           selectedView: {
             type: String,
             value: 'model-view'
@@ -478,15 +496,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           })
         })
         console.log(resultFilterInput)
-        this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
+        this.minResult = parseFloat(_.round(_.minBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        }).metadata[this.selectedContourBy], 6).toLocaleString()
-        this.maxResult = _.round(_.maxBy(resultFilterInput, function(o) {
+        }).metadata[this.selectedContourBy], 6).toLocaleString())
+        this.maxResult = parseFloat(_.round(_.maxBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        }).metadata[this.selectedContourBy], 6).toLocaleString()
-        this.meanResult = _.round(_.meanBy(resultFilterInput, function(o) {
+        }).metadata[this.selectedContourBy], 6).toLocaleString())
+        this.meanResult = parseFloat(_.round(_.meanBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        }), 6).toLocaleString();
+        }), 6).toLocaleString());
         this._getAggregationLabels()
         this.numericalAggregationsTableData = []
         var name = [this.getMinLabel, this.getMaxLabel, this.getMeanLabel];
@@ -498,9 +516,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
           this.push('numericalAggregationsTableData', setup)
         }
-        this.totalResult = _.round(_.sumBy(resultFilterInput, function(o) {
+        this.totalResult = parseFloat(_.round(_.sumBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        }), 6).toLocaleString();
+        }), 6).toLocaleString());
         this.showNumericalAggregations = true;
       }
 
@@ -530,14 +548,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.groupKeys = _.without(_.keys(resultGroupByName), 'undefined')
         // console.log(JSON.stringify(this.groupKeys));
         this.groupSumData = []
-        //console.log(this.groupSumData);
+        console.log(this.groupSumData);
         this.totalGroupObjects = []
         for (var i = 0; i < this.groupKeys.length; i++) {
           var groupObjects = resultGroupByName[this.groupKeys[i]]
           for (var j = 0; j < groupObjects.length; j++) {
-            var sumByGroup = _.round(_.sumBy(groupObjects, function(o) {
+            var sumByGroup = parseFloat(_.round(_.sumBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
-            }), 6).toLocaleString()
+            }), 6).toLocaleString())
           }
           var groupSumDataSetup = {
             'group': this.groupKeys[i],
@@ -547,9 +565,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.push('groupSumData', groupSumDataSetup)
           this.push('totalGroupObjects', groupObjects)
         }
-        this.grandTotalSum = _.round(_.sumBy(resultFilterInput, function(o) {
+        // ========================== PIE DATA START ==========================
+        this.pieData = []
+        for (var i=0; i < this.groupSumData.length; i++) {
+          var item = this.groupSumData[i]
+          this.push('pieData', [item.group, item.sum])
+        }
+        // ========================== PIE DATA END ============================
+        this.grandTotalSum = parseFloat(_.round(_.sumBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedSumField]
-        }), 6).toLocaleString()
+        }), 6).toLocaleString())
         // to find keys with numeric values for dropdown options
         this.uniqueNumericKeys = _.uniq(this.numericalMetadataKeys)
         this.numericalMetadataKeys = []
