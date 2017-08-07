@@ -161,7 +161,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
       }
 
-      .chart-container {
+      #wrap-str-info {
+        @apply --layout-horizontal;
+      }
+
+      #sum-table-section {
+        width: 50%;
+      }
+
+      #chart-container {
+        height: calc(100vh - 192px);
+        width: 50%;
 
       }
 
@@ -307,8 +317,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               </paper-listbox>
             </paper-dropdown-menu>
         </div>
-          <!-- sum by group table -->
-          <div class="sum-table-section">
+        <!-- wrap all string aggregation info -->
+          <div id="wrap-str-info" class="flex-ratio">
+            <!-- sum by group table -->
+          <div id="sum-table-section" class="flex-ratio">
           <vaadin-grid class="sum-by-group-table" items="[[groupSumData]]">
             <vaadin-grid-column>
               <template class="header">[[selectedContourBy]]</template>
@@ -327,7 +339,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </vaadin-grid>
         </div>
           <!-- Pie chart -->
-          <div class="chart-container">
+          <div id="chart-container">
           <vaadin-pie-chart id="sum-by-group-pie-chart">
             <chart-title>Sum by Group</chart-title>
             <!-- <subtitle></subtitle> -->
@@ -345,6 +357,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </data-series>
           </vaadin-pie-chart>
           <my-data-source data="{{pieData}}"></my-data-source>
+        </div>
         </div>
     </iron-pages>
   </app-header-layout>
