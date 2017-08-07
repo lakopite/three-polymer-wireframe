@@ -36,7 +36,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="../bower_components/vaadin-grid/vaadin-grid-sorter.html">
-<link rel="import" href="../bower_components/vaadin-charts/vaadin-pie-chart.html">
 <link rel="import" href="../bower_components/three-polymer/three-view/three-view.html">
 <link rel="import" href="../bower_components/three-polymer/three-model/three-model.html">
 <link rel="import" href="my-icons.html">
@@ -442,9 +441,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Array,
             value: []
           },
-          pieData : {
-            type: Array
-          },
           selectedView: {
             type: String,
             value: 'model-view'
@@ -561,15 +557,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.push('groupSumData', groupSumDataSetup)
           this.push('totalGroupObjects', groupObjects)
         }
-        // for pie chart
-        this.pieData = []
-        for (var i=0; i < this.groupSumData.length; i++) {
-          var item = this.groupSumData[i]
-          this.push('pieData', [item.group, item.sum])
-        }
-        this.grandTotalSum = _.sumBy(this.groupSumData, function(o) {
-          return o.sum
-        })
         // to find keys with numeric values for dropdown options
         this.uniqueNumericKeys = _.uniq(this.numericalMetadataKeys)
         this.numericalMetadataKeys = []
