@@ -35,6 +35,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid-sorter.html">
 <link rel="import" href="../bower_components/vaadin-charts/vaadin-pie-chart.html">
 <link rel="import" href="../bower_components/three-polymer/three-view/three-view.html">
 <link rel="import" href="../bower_components/three-polymer/three-model/three-model.html">
@@ -337,26 +338,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </vaadin-grid-column>
           </vaadin-grid>
         </div>
-          <!-- Pie chart -->
-          <div id="chart-container">
-          <vaadin-pie-chart id="sum-by-group-pie-chart">
-            <chart-title>Sum by Group</chart-title>
-            <!-- <subtitle></subtitle> -->
-            <tooltip point-format="<b>{point.percentage:.6f}%</b>">
-            </tooltip>
-            <plot-options>
-            <pie allow-point-select="true" show-in-legend="true"
-                   cursor="pointer">
-              <data-labels enabled="true"
-                   format="{point.name}: {point.percentage:.2f} %">
-              </data-labels>
-            </pie>
-            </plot-options>
-            <data-series name="Sum Data" data="[[pieData]]">
-          </data-series>
-          </vaadin-pie-chart>
-          <my-data-source data="{{pieData}}"></my-data-source>
-        </div>
         </div>
     </iron-pages>
   </app-header-layout>
@@ -466,8 +447,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           },
           selectedView: {
             type: String,
-            value: 'model-view',
-            observer: '_delayChartResize'
+            value: 'model-view'
           },
           selectedSumField: {
             type: String
@@ -491,20 +471,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_getModelData(selectedModel)',
           '_aggregations(_modelData,selectedContourBy)',
           '_getAggregationLabels(_modelData, selectedContourBy)',
-          '_getSumByForSelectedSumField(selectedSumField)',
-          '_delayChartResize(selectedView,selectedContourBy)'
+          '_getSumByForSelectedSumField(selectedSumField)'
         ]
       }
 
       constructor() {
         super();
-      }
-
-      _delayChartResize() {
-        var that = this;
-        setTimeout(function() {
-          that.$['sum-by-group-pie-chart'].notifyResize();
-        },0);
       }
 
       _isWithinBounds(val, min, max) {
