@@ -162,7 +162,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       #wrap-str-info {
-        @apply --layout-horizontal;
+        @apply(--layout-horizontal);
+        height: calc(100vh - 192px);
       }
 
       #sum-table-section {
@@ -170,9 +171,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       #chart-container {
-        height: calc(100vh - 192px);
         width: 50%;
-
       }
 
     </style>
@@ -318,9 +317,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </paper-dropdown-menu>
         </div>
         <!-- wrap all string aggregation info -->
-          <div id="wrap-str-info" class="flex-ratio">
+          <div id="wrap-str-info">
             <!-- sum by group table -->
-          <div id="sum-table-section" class="flex-ratio">
+          <div id="sum-table-section">
           <vaadin-grid class="sum-by-group-table" items="[[groupSumData]]">
             <vaadin-grid-column>
               <template class="header">[[selectedContourBy]]</template>
@@ -467,7 +466,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           },
           selectedView: {
             type: String,
-            value: 'model-view'
+            value: 'model-view',
+            observer: '_delayChartResize'
           },
           selectedSumField: {
             type: String
@@ -491,12 +491,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_getModelData(selectedModel)',
           '_aggregations(_modelData,selectedContourBy)',
           '_getAggregationLabels(_modelData, selectedContourBy)',
-          '_getSumByForSelectedSumField(selectedSumField)'
+          '_getSumByForSelectedSumField(selectedSumField)',
+          '_delayChartResize(selectedView,selectedContourBy)'
         ]
       }
 
       constructor() {
         super();
+      }
+
+      _delayChartResize() {
+        var that = this;
+        setTimeout(function() {
+          that.$['sum-by-group-pie-chart'].notifyResize();
+        },0);
       }
 
       _isWithinBounds(val, min, max) {
