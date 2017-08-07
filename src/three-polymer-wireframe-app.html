@@ -500,6 +500,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
           })
         })
+        console.log("RESULT FILTER INPUT");
         console.log(resultFilterInput)
         this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
@@ -552,14 +553,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         })
         this.groupKeys = _.without(_.keys(resultGroupByName), 'undefined')
         this.groupSumData = []
+        console.log("GROUP SUM DATA:");
         console.log(this.groupSumData);
         this.totalGroupObjects = []
         for (var i = 0; i < this.groupKeys.length; i++) {
           var groupObjects = resultGroupByName[this.groupKeys[i]]
+          console.log(groupObjects);
           for (var j = 0; j < groupObjects.length; j++) {
             var sumByGroup = parseFloat(_.round(_.sumBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
             }), 6).toLocaleString())
+            console.log("SUM BY GROUP");
+            console.log(sumByGroup);
           }
           var groupSumDataSetup = {
             'group': this.groupKeys[i],
@@ -575,11 +580,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var item = this.groupSumData[i]
           this.push('pieData', [item.group, item.sum])
         }
-        // this looks odd for meta_propname_2
-        this.grandTotalSum = parseFloat(_.round(_.sumBy(resultFilterInput, function(o) {
-          return o.metadata[that.selectedSumField]
-        }), 6).toLocaleString())
-        console.log(this.grandTotalSum);
+        this.grandTotalSum = _.sumBy(this.groupSumData, function(o) {
+          return o.sum
+        })
         // to find keys with numeric values for dropdown options
         this.uniqueNumericKeys = _.uniq(this.numericalMetadataKeys)
         this.numericalMetadataKeys = []
