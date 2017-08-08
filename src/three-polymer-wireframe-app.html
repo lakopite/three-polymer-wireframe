@@ -321,16 +321,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <!-- sum by group table -->
           <div id="sum-table-section">
           <vaadin-grid class="sum-by-group-table" items="[[groupSumData]]">
+
             <vaadin-grid-column>
-              <template class="header">[[selectedContourBy]]</template>
+              <template class="header">
+                <vaadin-grid-sorter path="group">[[selectedContourBy]]</vaadin-grid-sorter>
+              </template>
               <template>[[item.group]]</template>
               <template class="footer">Total</template>
             </vaadin-grid-column>
             <vaadin-grid-column>
-              <template class="header">[[selectedSumField]]</template>
+              <template class="header">
+                <vaadin-grid-sorter path="sum">[[selectedSumField]]</vaadin-grid-sorter>
+              </template>
               <template>[[item.sum]]</template>
               <template class="footer">[[grandTotalSum]]</template>
             </vaadin-grid-column>
+
+
             <vaadin-grid-column>
               <template class="header">$</template>
               <template>test</template>
@@ -557,6 +564,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.push('groupSumData', groupSumDataSetup)
           this.push('totalGroupObjects', groupObjects)
         }
+        // for pie chart
+        // this.pieData = []
+        // for (var i=0; i < this.groupSumData.length; i++) {
+        //   var item = this.groupSumData[i]
+        //   this.push('pieData', [item.group, item.sum])
+        // }
+        this.grandTotalSum = _.sumBy(this.groupSumData, function(o) {
+          return o.sum
+        })
         // to find keys with numeric values for dropdown options
         this.uniqueNumericKeys = _.uniq(this.numericalMetadataKeys)
         this.numericalMetadataKeys = []
