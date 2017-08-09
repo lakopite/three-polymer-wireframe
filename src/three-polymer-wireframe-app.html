@@ -7,7 +7,6 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
-
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
@@ -38,6 +37,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/vaadin-grid/vaadin-grid-sorter.html">
 <link rel="import" href="../bower_components/three-polymer/three-view/three-view.html">
 <link rel="import" href="../bower_components/three-polymer/three-model/three-model.html">
+<link rel="import" href="shared-styles.html">
 <link rel="import" href="my-icons.html">
 
 <dom-module id="three-polymer-wireframe-app">
@@ -246,7 +246,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView</div>
-        <paper-item>Build Date: 8/7/17</paper-item>
+        <paper-item>Build Date: 8/9/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -321,7 +321,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <!-- sum by group table -->
           <div id="sum-table-section">
           <vaadin-grid class="sum-by-group-table" items="[[groupSumData]]">
-
             <vaadin-grid-column>
               <template class="header">
                 <vaadin-grid-sorter path="group">[[selectedContourBy]]</vaadin-grid-sorter>
@@ -336,21 +335,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template>[[item.sum]]</template>
               <template class="footer">[[grandTotalSum]]</template>
             </vaadin-grid-column>
-
-
             <vaadin-grid-column>
               <template class="header">$</template>
               <template>test</template>
             </vaadin-grid-column>
           </vaadin-grid>
         </div>
-        </div>
+      </div>
+      <div id="chart-container"></div>
+      </div>
     </iron-pages>
   </app-header-layout>
   </app-drawer-layout>
   </template>
 
   <script>
+
     class ThreePolymerWireframe extends Polymer.Element {
 
       static get is() {
@@ -448,6 +448,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Array,
             value: []
           },
+          pieChart: {
+            type: Object
+          },
+          pieData: {
+            type: Array
+          },
           selectedView: {
             type: String,
             value: 'model-view'
@@ -474,7 +480,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_getModelData(selectedModel)',
           '_aggregations(_modelData,selectedContourBy)',
           '_getAggregationLabels(_modelData, selectedContourBy)',
-          '_getSumByForSelectedSumField(selectedSumField)'
+          '_getSumByForSelectedSumField(selectedSumField)',
+          '_drawChart(pieData)'
         ]
       }
 
@@ -565,11 +572,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.push('totalGroupObjects', groupObjects)
         }
         // for pie chart
-        // this.pieData = []
-        // for (var i=0; i < this.groupSumData.length; i++) {
-        //   var item = this.groupSumData[i]
-        //   this.push('pieData', [item.group, item.sum])
-        // }
+        var _pieData = []
+        for (var i=0; i < this.groupSumData.length; i++) {
+          var item = this.groupSumData[i]
+          _pieData.push([item.group, item.sum])
+        }
+        this.pieData = _pieData;
         this.grandTotalSum = _.sumBy(this.groupSumData, function(o) {
           return o.sum
         })
@@ -619,6 +627,47 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.getMaxLabel = "Max " + _.capitalize(this.selectedContourBy)
           this.getTotalResultLabel = "Total " + _.capitalize(this.selectedContourBy)
         }
+      }
+
+      _drawChart() {
+        var chartdiv = Polymer.dom(this.root).querySelector("#chart-container")
+        console.log(this.pieData)
+        this.pieChart = Highcharts.chart(chartdiv, {
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: 'Sum by Group'
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.3f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: false
+                },
+                showInLegend: true
+            }
+        },
+        series: [{
+            name: 'Sum',
+            colorByPoint: true,
+            data: this.pieData
+          }]
+        });
+        console.log(this.pieChart.series[0].userOptions.data);
+        console.log(this.pieData);
+      }
+
+      ready() {
+        super.ready();
+        //this._drawChart();
       }
 
       _hideMainDropdown(currentPage) {
