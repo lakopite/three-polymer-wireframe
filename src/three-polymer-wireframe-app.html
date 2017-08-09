@@ -151,7 +151,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       .str-header {
         background-color: var(--paper-grey-300);
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr 2fr;
       }
 
       #num-contour-dropdown, #str-contour-dropdown {
@@ -481,7 +481,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_aggregations(_modelData,selectedContourBy)',
           '_getAggregationLabels(_modelData, selectedContourBy)',
           '_getSumByForSelectedSumField(selectedSumField)',
-          '_drawChart(pieData)'
+          '_drawChart(pieData)',
+          '_delayChartResize(selectedView, selectedContourBy)'
         ]
       }
 
@@ -699,6 +700,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }]
         });
         //console.log(this.pieChart.series[0].userOptions.data);
+      }
+
+      _delayChartResize() {
+        var that = this;
+        setTimeout(function() {
+          that.pieChart.reflow()
+        }, 0)
       }
 
       ready() {
