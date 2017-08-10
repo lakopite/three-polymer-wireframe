@@ -164,6 +164,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       #wrap-str-info {
         @apply(--layout-horizontal);
         height: calc(100vh - 192px);
+        overflow-x:hidden;
       }
 
       #sum-table-section {
@@ -172,6 +173,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       #chart-container {
         width: 50%;
+      }
+
+      #csv-button {
+        background: var(--app-primary-color);
+        color: #FFF;
       }
 
     </style>
@@ -246,7 +252,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView</div>
-        <paper-item>Build Date: 8/9/17</paper-item>
+        <paper-item>Build Date: 8/10/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -286,7 +292,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <vaadin-grid-column>
                   <template class="header">Name</template>
                   <template>[[item.name]]</template>
-                  <template class="footer">Total</template>
+                  <template class="footer">Grand Total</template>
                 </vaadin-grid-column>
                 <vaadin-grid-column>
                   <template class="header">Result</template>
@@ -326,7 +332,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <vaadin-grid-sorter path="group">[[selectedContourBy]]</vaadin-grid-sorter>
               </template>
               <template>[[item.group]]</template>
-              <template class="footer">Total</template>
+              <template class="footer">Grand Total</template>
             </vaadin-grid-column>
             <vaadin-grid-column>
               <template class="header">
@@ -338,6 +344,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <vaadin-grid-column>
               <template class="header">$</template>
               <template>test</template>
+              <template class="footer"><paper-button id="csv-button" on-tap="createCsv">Export Table to CSV</paper-button></template>
             </vaadin-grid-column>
           </vaadin-grid>
         </div>
@@ -572,6 +579,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.push('groupSumData', groupSumDataSetup)
           this.push('totalGroupObjects', groupObjects)
         }
+        console.log(this.groupSumData);
         // for pie chart
         var _pieData = []
         for (var i=0; i < this.groupSumData.length; i++) {
@@ -712,6 +720,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       ready() {
         super.ready();
         this._initChart();
+      }
+
+      createCsv() {
+        var data = []
+        for (var i=0; i < this.groupSumData.length; i++) {
+          var group = this.groupSumData[i].group
+          var sum = this.groupSumData[i].sum
+          var newLine = "\r\n"
+          var arr = [group, sum]
+          data.push(arr + newLine)
+        }
+        var uri = 'data:text/csv;charset=utf-8,' + escape(data);
+        var link = document.createElement("a");
+        link.href = uri;
+        link.style = "visibility:hidden";
+        link.download = "group_sum_export.csv";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        alert(data)
       }
 
       _hideMainDropdown(currentPage) {
