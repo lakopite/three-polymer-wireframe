@@ -252,7 +252,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView</div>
-        <paper-item>Build Date: 8/10/17</paper-item>
+        <paper-item>Build Date: 8/11/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -528,7 +528,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         for (var i=0; i < name.length; i++) {
           var setup = {
             'name': name[i],
-            'result': result[i]
+            'result': result[i].toLocaleString()
           }
           this.push('numericalAggregationsTableData', setup)
         }
@@ -589,7 +589,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.pieData = _pieData;
         this.grandTotalSum = _.sumBy(this.groupSumData, function(o) {
           return o.sum
-        })
+        }).toLocaleString()
         // to find keys with numeric values for dropdown options
         this.uniqueNumericKeys = _.uniq(this.numericalMetadataKeys)
         this.numericalMetadataKeys = []
@@ -729,7 +729,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         arr.push(el)
         }
         var str = arr.toString()
-        var data = str.replace(/([^,]+,[^,]+),/g,'$1\r\n')
+        var headers = this.selectedContourBy + " group," + this.selectedSumField + " sum\r\n"
+        var totalFooters = "\r\n\ Grand Total Sum," + this.grandTotalSum
+        //this grabs every other comma and removes it (replaces it with a new line, if ever we generate spreadsheets with more than just two columns per row, this regex will have to change)
+        var rowData = str.replace(/([^,]+,[^,]+),/g,'$1\r\n')
+        var data = headers + str.replace(/([^,]+,[^,]+),/g,'$1\r\n') + totalFooters
         alert(data)
         var uri = 'data:text/csv;charset=utf-8,' + escape(data);
         var link = document.createElement("a");
