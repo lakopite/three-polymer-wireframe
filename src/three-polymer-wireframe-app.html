@@ -725,16 +725,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       createCsv() {
         var arr = []
         for (var i=0; i < this.groupSumData.length; i++) {
-        var el = [this.groupSumData[i].group, this.groupSumData[i].sum]
+          //assure sums are numbers so they are not separated by columns due to comma 
+        var el = [this.groupSumData[i].group, parseFloat(this.groupSumData[i].sum)]
         arr.push(el)
+        console.log(typeof parseFloat(this.groupSumData[i].sum));
+        }
+        function removeCommasFromNums(localeStringNum) {
+	         return parseFloat(localeStringNum.replace(/\s/g, "").replace(",", ""))
         }
         var str = arr.toString()
         var headers = this.selectedContourBy + " group," + this.selectedSumField + " sum\r\n"
-        var totalFooters = "\r\n\ Grand Total Sum," + this.grandTotalSum
+        var totalSumFooter = "\r\n\ Grand Total Sum," + removeCommasFromNums(this.grandTotalSum)
         //this grabs every other comma and removes it (replaces it with a new line, if ever we generate spreadsheets with more than just two columns per row, this regex will have to change)
         var rowData = str.replace(/([^,]+,[^,]+),/g,'$1\r\n')
-        var data = headers + str.replace(/([^,]+,[^,]+),/g,'$1\r\n') + totalFooters
+        var data = headers + rowData + totalSumFooter
         alert(data)
+        console.log(JSON.stringify(data));
         var uri = 'data:text/csv;charset=utf-8,' + escape(data);
         var link = document.createElement("a");
         link.href = uri;
