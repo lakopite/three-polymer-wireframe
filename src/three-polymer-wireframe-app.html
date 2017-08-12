@@ -175,7 +175,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         width: 50%;
       }
 
-      #csv-button {
+      .csv-button {
         background: var(--app-primary-color);
         color: #FFF;
       }
@@ -292,12 +292,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <vaadin-grid-column>
                   <template class="header">Name</template>
                   <template>[[item.name]]</template>
-                  <template class="footer">Grand Total</template>
+                  <template class="footer">Grand Total: [[totalResult]]</template>
                 </vaadin-grid-column>
                 <vaadin-grid-column>
                   <template class="header">Result</template>
                   <template>[[item.result]]</template>
-                  <template class="footer">[[totalResult]]</template>
+                  <template class="footer"><paper-button class="csv-button" on-tap="createNumCsv">Export Table to CSV</paper-button></template>
                 </vaadin-grid-column>
               </vaadin-grid>
         </div>
@@ -344,7 +344,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <vaadin-grid-column>
               <template class="header">$</template>
               <template>test</template>
-              <template class="footer"><paper-button id="csv-button" on-tap="createCsv">Export Table to CSV</paper-button></template>
+              <template class="footer"><paper-button class="csv-button" on-tap="createSumCsv">Export Table to CSV</paper-button></template>
             </vaadin-grid-column>
           </vaadin-grid>
         </div>
@@ -722,19 +722,44 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this._initChart();
       }
 
-      createCsv() {
+      createNumCsv() {
         var arr = []
-        for (var i=0; i < this.groupSumData.length; i++) {
-          //assure sums are numbers so they are not separated by columns due to comma
-          var el = [this.groupSumData[i].group, parseFloat(this.groupSumData[i].sum)]
+        for (var i=0; i < this.numericalAggregationsTableData.length; i++) {
+          var el = [this.numericalAggregationsTableData[i].name, removeCommasFromNums(this.numericalAggregationsTableData[i].result)]
           arr.push(el)
         }
         function removeCommasFromNums(localeStringNum) {
-	         return parseFloat(localeStringNum.replace(/\s/g, "").replace(",", ""))
+	          return parseFloat(localeStringNum.replace(/,/g, ''))
+        }
+        var str = arr.toString()
+        //this grabs every other comma and removes it (replaces it with a new line, if ever we generate spreadsheets with more than just two columns per row, this regex will have to change)
+        var rowdata = str.replace(/([^,]+,[^,]+),/g,'$1\r\n')
+        var totalSumFooter = "\r\n\Grand Total " + _.capitalize(this.selectedContourBy) + "," + removeCommasFromNums(this.totalResult)
+        var csvData = rowdata + totalSumFooter
+        //alert(csvData)
+        var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
+        var link = document.createElement("a");
+        link.href = uri;
+        link.style = "visibility:hidden";
+        link.download = "min_max_avg_export.csv";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      createSumCsv() {
+        var arr = []
+        for (var i=0; i < this.groupSumData.length; i++) {
+          //assure sums are numbers so they are not separated by columns due to comma
+          var el = [(this.groupSumData[i].group), parseFloat(this.groupSumData[i].sum)]
+          arr.push(el)
+        }
+        function removeCommasFromNums(localeStringNum) {
+	          return parseFloat(localeStringNum.replace(/,/g, ''))
         }
         var str = arr.toString()
         var headers = _.capitalize(this.selectedContourBy) + " Group," +  _.capitalize(this.selectedSumField) + " Sum\r\n"
-        var totalSumFooter = "\r\n\ Grand Total Sum," + removeCommasFromNums(this.grandTotalSum)
+        var totalSumFooter = "\r\n\Grand Total Sum," + removeCommasFromNums(this.grandTotalSum)
         //this grabs every other comma and removes it (replaces it with a new line, if ever we generate spreadsheets with more than just two columns per row, this regex will have to change)
         var rowData = str.replace(/([^,]+,[^,]+),/g,'$1\r\n')
         var csvData = headers + rowData + totalSumFooter
