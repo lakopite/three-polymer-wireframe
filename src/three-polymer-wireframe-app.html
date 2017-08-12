@@ -579,7 +579,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.push('groupSumData', groupSumDataSetup)
           this.push('totalGroupObjects', groupObjects)
         }
-        console.log(this.groupSumData);
         // for pie chart
         var _pieData = []
         for (var i=0; i < this.groupSumData.length; i++) {
@@ -751,7 +750,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var arr = []
         for (var i=0; i < this.groupSumData.length; i++) {
           //assure sums are numbers so they are not separated by columns due to comma
-          var el = [(this.groupSumData[i].group), parseFloat(this.groupSumData[i].sum)]
+          var el = [(this.groupSumData[i].group), this.groupSumData[i].sum]
           arr.push(el)
         }
         function removeCommasFromNums(localeStringNum) {
