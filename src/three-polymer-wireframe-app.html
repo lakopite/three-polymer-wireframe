@@ -292,11 +292,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <vaadin-grid-column>
                   <template class="header">Name</template>
                   <template>[[item.name]]</template>
-                  <template class="footer">Grand Total: [[totalResult]]</template>
+                  <template class="footer">Grand Total: [[_prettify(totalResult)]]</template>
                 </vaadin-grid-column>
                 <vaadin-grid-column>
                   <template class="header">Result</template>
-                  <template>[[item.result]]</template>
+                  <template>[[_prettify(item.result)]]</template>
                   <template class="footer"><paper-button class="csv-button" on-tap="createNumCsv">Export Table to CSV</paper-button></template>
                 </vaadin-grid-column>
               </vaadin-grid>
@@ -338,8 +338,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template class="header">
                 <vaadin-grid-sorter path="sum">[[selectedSumField]]</vaadin-grid-sorter>
               </template>
-              <template>[[item.sum]]</template>
-              <template class="footer">[[grandTotalSum]]</template>
+              <template>[[_prettify(item.sum)]]</template>
+              <template class="footer">[[_prettify(grandTotalSum)]]</template>
             </vaadin-grid-column>
             <vaadin-grid-column>
               <template class="header">$</template>
@@ -348,15 +348,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <!-- NUMERICAL AGGREGATIONS -->
             <vaadin-grid-column>
               <template class="header">min [[selectedSumField]]</template>
-              <template>[[item.min]]</template>
+              <template>[[_prettify(item.min)]]</template>
             </vaadin-grid-column>
             <vaadin-grid-column>
               <template class="header">max [[selectedSumField]]</template>
-              <template>[[item.max]]</template>
+              <template>[[_prettify(item.max)]]</template>
             </vaadin-grid-column>
             <vaadin-grid-column>
               <template class="header">avg [[selectedSumField]]</template>
-              <template>[[item.avg]]</template>
+              <template>[[_prettify(item.avg)]]</template>
             </vaadin-grid-column>
             <paper-button class="csv-button" on-tap="createSumCsv">Export Table to CSV</paper-button>
           </vaadin-grid>
@@ -515,6 +515,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return val >= min && val <= max
       }
 
+      _prettify(n) {
+        return (n) ? parseFloat(n).toLocaleString() : ""
+      }
+
       _numericalAggregations() {
         this.showStringAggregations = false;
         var that = this;
@@ -541,13 +545,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         for (var i=0; i < name.length; i++) {
           var setup = {
             'name': name[i],
-            'result': result[i].toLocaleString()
+            'result': result[i]
           }
           this.push('numericalAggregationsTableData', setup)
         }
         this.totalResult = _.round(_.sumBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        }), 6).toLocaleString();
+        }), 6);
         this.showNumericalAggregations = true;
       }
 
@@ -576,10 +580,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var resultGroupByName = _.groupBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
         })
-        //console.log(JSON.stringify(resultGroupByName));
+        console.log("RESULTGROUPBYNAME");
+        console.log(resultGroupByName);
         this.groupKeys = _.without(_.keys(resultGroupByName), 'undefined')
         if(typeof this.selectedSumField === 'undefined') {
           this.allObjectsByGroup = []
+          console.log("ALL OBJECTS BY GROUP ONCE");
+          console.log(this.allObjectsByGroup);
           for (var i = 0; i < this.groupKeys.length; i++) {
             var groupObjects = resultGroupByName[this.groupKeys[i]]
             this.push('allObjectsByGroup', groupObjects)
@@ -602,21 +609,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
          this.selectedSumField = this.numericalMetadataKeys[0]
        } else {
         this.groupSumData = []
+        this.allObjectsByGroupDupe = []
+        console.log("ALL OBJECTS BY GROUP SECOND");
+        console.log(this.allObjectsByGroupDupe);
         for (var i = 0; i < this.groupKeys.length; i++) {
           //reusing var groupObjects below (was local variable in previous loop for numericalMetadataKeys)
           var groupObjects = resultGroupByName[this.groupKeys[i]]
-            var sumByGroup = parseFloat(_.round(_.sumBy(groupObjects, function(o) {
+            var sumByGroup = _.round(_.sumBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
-            }), 6).toLocaleString())
+            }), 6)
             var minByGroup = _.round(_.minBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
-            }).metadata[that.selectedSumField], 6).toLocaleString()
+            }).metadata[that.selectedSumField], 6)
             var maxByGroup = _.round(_.maxBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
-            }).metadata[that.selectedSumField], 6).toLocaleString()
+            }).metadata[that.selectedSumField], 6)
             var avgByGroup = _.round(_.meanBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
-            }), 6).toLocaleString();
+            }), 6);
 
             var groupSumDataSetup = {
               'group': this.groupKeys[i],
@@ -626,17 +636,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               'avg' : avgByGroup
             }
             this.push('groupSumData', groupSumDataSetup)
+            this.push('allObjectsByGroupDupe', groupObjects)
           }
+          // for chart total sum by group
+          this.grandTotalSum = _.round(_.sumBy(this.groupSumData, function(o) {
+            return o.sum
+          }), 6)
           // for pie chart
           var _pieData = []
           for (var i=0; i < this.groupSumData.length; i++) {
             var item = this.groupSumData[i]
-            _pieData.push([item.group, item.sum])
+            _pieData.push([item.group, parseFloat(item.sum)])
             }
           this.pieData = _pieData;
-          this.grandTotalSum = _.sumBy(this.groupSumData, function(o) {
-            return o.sum
-          }).toLocaleString()
         }
         this.showStringAggregations = true;
       }
@@ -756,16 +768,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       createNumCsv() {
         var arr = []
         for (var i=0; i < this.numericalAggregationsTableData.length; i++) {
-          var el = [this.numericalAggregationsTableData[i].name, removeCommasFromNums(this.numericalAggregationsTableData[i].result)]
+          var el = [this.numericalAggregationsTableData[i].name, this.numericalAggregationsTableData[i].result]
           arr.push(el)
-        }
-        function removeCommasFromNums(localeStringNum) {
-	          return parseFloat(localeStringNum.replace(/,/g, ''))
         }
         var str = arr.toString()
         //this grabs every other comma and removes it (replaces it with a new line, if ever we generate spreadsheets with more than just two columns per row, this regex will have to change)
         var rowdata = str.replace(/([^,]+,[^,]+),/g,'$1\r\n')
-        var totalSumFooter = "\r\n\Grand Total " + _.capitalize(this.selectedContourBy) + "," + removeCommasFromNums(this.totalResult)
+        var totalSumFooter = "\r\n\Grand Total " + _.capitalize(this.selectedContourBy) + "," + this.totalResult
         var csvData = rowdata + totalSumFooter
         alert(csvData)
         var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
@@ -781,15 +790,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       createSumCsv() {
         var arr = []
         for (var i=0; i < this.groupSumData.length; i++) {
+          // var colInfo = 
           var el = [(this.groupSumData[i].group), this.groupSumData[i].sum]
           arr.push(el)
         }
-        function removeCommasFromNums(localeStringNum) {
-	          return parseFloat(localeStringNum.replace(/,/g, ''))
-        }
         var str = arr.toString()
         var headers = _.capitalize(this.selectedContourBy) + " Group," +  _.capitalize(this.selectedSumField) + " Sum\r\n"
-        var totalSumFooter = "\r\n\Grand Total Sum," + removeCommasFromNums(this.grandTotalSum)
+        var totalSumFooter = "\r\n\Grand Total Sum," + this.grandTotalSum
         //this grabs every other comma and removes it (replaces it with a new line, if ever we generate spreadsheets with more than just two columns per row, this regex will have to change)
         var rowData = str.replace(/([^,]+,[^,]+),/g,'$1\r\n')
         var csvData = headers + rowData + totalSumFooter
