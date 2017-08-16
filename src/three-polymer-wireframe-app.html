@@ -605,23 +605,38 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         for (var i = 0; i < this.groupKeys.length; i++) {
           //reusing var groupObjects below (was local variable in previous loop for numericalMetadataKeys)
           var groupObjects = resultGroupByName[this.groupKeys[i]]
-          for (var j=0; j < groupObjects.length; j++) {
             var sumByGroup = parseFloat(_.round(_.sumBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
             }), 6).toLocaleString())
-            var minByGroup = _.minBy(groupObjects, function(o) {
+            var minByGroup = _.round(_.minBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
-            }).metadata[that.selectedSumField]
-            var maxByGroup = _.maxBy(groupObjects, function(o) {
+            }).metadata[that.selectedSumField], 6).toLocaleString()
+            var maxByGroup = _.round(_.maxBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
-            }).metadata[that.selectedSumField]
+            }).metadata[that.selectedSumField], 6).toLocaleString()
             var avgByGroup = _.round(_.meanBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
             }), 6).toLocaleString();
 
+            var groupSumDataSetup = {
+              'group': this.groupKeys[i],
+              'sum': sumByGroup,
+              'min' : minByGroup,
+              'max' : maxByGroup,
+              'avg' : avgByGroup
             }
+            this.push('groupSumData', groupSumDataSetup)
           }
-
+          // for pie chart
+          var _pieData = []
+          for (var i=0; i < this.groupSumData.length; i++) {
+            var item = this.groupSumData[i]
+            _pieData.push([item.group, item.sum])
+            }
+          this.pieData = _pieData;
+          this.grandTotalSum = _.sumBy(this.groupSumData, function(o) {
+            return o.sum
+          }).toLocaleString()
         }
         this.showStringAggregations = true;
       }
@@ -633,9 +648,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return
         }
         if (this._isStringField(_modelData, selectedContourBy)) {
-          //set a default selectedSumField
           this._stringAggregations();
-          //this.selectedSumField = this.numericalMetadataKeys[0]
           return
         }
         this.showStringAggregations = false;
@@ -915,6 +928,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (resp && resp.modelInformation.name === this.selectedModel && "payload" in resp) {
           this.appLoading = false;
           this.set('_modelData', resp.payload);
+          //set selectedSumField to undefined in order to trigger stringAggregtions initialization
+          this.selectedSumField = undefined
           console.log(this._modelData)
         } else {
           this.handleDataError()
