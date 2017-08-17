@@ -297,7 +297,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <vaadin-grid-column>
                   <template class="header">Result</template>
                   <template>[[_prettify(item.result)]]</template>
-                  <template class="footer"><paper-button class="csv-button" on-tap="createNumCsv">Export Table to CSV</paper-button></template>
                 </vaadin-grid-column>
               </vaadin-grid>
         </div>
@@ -763,28 +762,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       ready() {
         super.ready();
         this._initChart();
-      }
-
-      createNumCsv() {
-        var arr = []
-        for (var i=0; i < this.numericalAggregationsTableData.length; i++) {
-          var el = [_.values(this.numericalAggregationsTableData[i])]
-          arr.push(el)
-        }
-        var str = arr.toString()
-        //this grabs every other comma and removes it (replaces it with a new line, if ever we generate spreadsheets with more than just two columns per row, this regex will have to change)
-        var rowdata = str.replace(/([^,]+,[^,]+),/g,'$1\r\n')
-        var totalSumFooter = "\r\n\Grand Total " + _.capitalize(this.selectedContourBy) + "," + this.totalResult
-        var csvData = rowdata + totalSumFooter
-        alert(csvData)
-        var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
-        var link = document.createElement("a");
-        link.href = uri;
-        link.style = "visibility:hidden";
-        link.download = "min_max_avg_export.csv";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
       }
 
       createSumCsv() {
