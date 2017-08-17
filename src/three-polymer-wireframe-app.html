@@ -358,7 +358,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template class="header">avg [[selectedSumField]]</template>
               <template>[[_prettify(item.avg)]]</template>
             </vaadin-grid-column>
-            <!-- <paper-button class="csv-button" on-tap="createSumCsv">Export Table to CSV</paper-button> -->
+            <paper-button class="csv-button" on-tap="createSumCsv">Export Table to CSV</paper-button>
           </vaadin-grid>
         </div>
         <div id="chart-container"></div>
@@ -787,33 +787,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         document.body.removeChild(link);
       }
 
-      // createSumCsv() {
-      //   var arr = []
-      //   console.log(arr);
-      //   for (var i=0; i < this.groupSumData.length; i++) {
-      //     var headers = [_.keys(this.groupSumData[i])] + "\r\n"
-      //     var el = [_.values(this.groupSumData[i])]
-      //     for (var j=1; j < el.length; j++) {
-      //       var str = el.toString()
-      //       str.splice(-1, ",").toArray
-      //
-      //     }
-      //     arr.push(el)
-      //   }
-      //   var totalSumFooter = "\r\n\Grand Total Sum," + this.grandTotalSum
-      //   //this grabs every other comma and removes it (replaces it with a new line, if ever we generate spreadsheets with more than just two columns per row, this regex will have to change)
-      //   var rowData = str.replace(/([^,]+,[^,]+),/g,'$1\r\n')
-      //   var csvData = headers + rowData + totalSumFooter
-      //   alert(csvData)
-      //   // var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
-      //   // var link = document.createElement("a");
-      //   // link.href = uri;
-      //   // link.style = "visibility:hidden";
-      //   // link.download = "group_sum_export.csv";
-      //   // document.body.appendChild(link);
-      //   // link.click();
-      //   // document.body.removeChild(link);
-      // }
+      createSumCsv() {
+        var rowData = ''
+        console.log(rowData)
+        for (var i=0; i < this.groupSumData.length; i++) {
+          this.headers = [_.keys(this.groupSumData[i])] + '\r\n'
+          var el = [_.values(this.groupSumData[i])] + '\r\n'
+        	rowData += el
+        }
+        var totalSumFooter = "\r\n\Grand Total Sum," + this.grandTotalSum
+        var csvData = this.headers + rowData + totalSumFooter
+        alert(csvData)
+        var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
+        var link = document.createElement("a");
+        link.href = uri;
+        link.style = "visibility:hidden";
+        link.download = "group_sum_export.csv";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
 
       _hideMainDropdown(currentPage) {
         return this.selectedView == 'aggregations-view'
