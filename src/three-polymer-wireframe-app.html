@@ -788,7 +788,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         var totalSumFooter = "\r\n\Grand Total Sum," + this.grandTotalSum
         var csvData = this.headers + rowData + totalSumFooter
-        alert(csvData)
+        //alert(csvData)
         var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
         var link = document.createElement("a");
         link.href = uri;
