@@ -135,8 +135,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      .sum-by-group-table, .numerical-aggregations-table {
+      .numerical-aggregations-table {
         height: calc(100vh - 192px);
+      }
+
+      .sum-by-group-table, .numerical-aggregations-table {
         --vaadin-grid-body-row-odd-cell: {
           background-color: #f5f5f5;
         };
@@ -163,16 +166,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       #wrap-str-info {
         @apply(--layout-vertical);
-        height: calc(100vh - 192px);
         overflow-x:hidden;
       }
 
       #sum-table-section {
         /*height: 50%;*/
+
       }
 
       #chart-container {
-        /*height: 50%;*/
+        height: 500px;
       }
 
       #csv-button {
@@ -329,6 +332,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
         <!-- wrap all string aggregation info -->
           <div id="wrap-str-info">
+          <!-- div holds pie chart -->
+          <div id="chart-container"></div>
             <!-- data by group table -->
           <div id="sum-table-section">
           <vaadin-grid class="sum-by-group-table" items="[[groupSumData]]">
@@ -350,7 +355,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template class="header">$</template>
               <template>test</template>
             </vaadin-grid-column>
-            <!-- NUMERICAL AGGREGATIONS -->
+            <!-- NUMERICAL AGGREGATIONS WITHIN STRING AGGREGATION TABLE-->
             <vaadin-grid-column>
               <template class="header">min [[selectedSumField]]</template>
               <template>[[_prettify(item.min)]]</template>
@@ -365,7 +370,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </vaadin-grid-column>
           </vaadin-grid>
         </div>
-        <div id="chart-container"></div>
       </div>
       </div>
     </iron-pages>
