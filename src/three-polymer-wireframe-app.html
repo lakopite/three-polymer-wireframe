@@ -742,7 +742,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: 'pie'
         },
         title: {
-            text: 'Sum by Group'
+            text: 'Sum by Group',
+            align: 'right'
         },
         tooltip: {
             pointFormat: '{series.name}: <b>{point.percentage:.6f}%</b>'
@@ -760,7 +761,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         legend: {
           layout: 'vertical',
           align: 'right',
-          verticalAlign: 'top'
+          verticalAlign: 'top',
+          y: 40,
         },
         series: [{
             name: 'Sum',
