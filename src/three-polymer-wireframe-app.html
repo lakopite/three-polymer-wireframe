@@ -246,7 +246,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-button class="filterBtn" raised disabled$="{{modelLoading}}" id="resetBtn" on-tap="resetFilters" type="number">Reset</paper-button>
     </div>
   </div>
-    <div hidden$="[[!showStringAggregations]]">
+    <div hidden$="{{_hideCsvButton(selectedView)}}">
       <div class="csv-button">
         <paper-button id="csv-button" on-tap="createCsv">Export Table to CSV</paper-button>
     </div>
@@ -808,8 +808,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _hideMainDropdown(currentPage) {
-        return this.selectedView == 'aggregations-view'
+        return this.selectedView == 'aggregations-view';
       }
+
+      _hideCsvButton(currentPage) {
+        return this.selectedView == 'model-view';
+      }
+
       //Ensure that the geometry input is within boundaries and is compatible with its input sibling
       _computeMin(_b, _g) {
         _g = parseFloat(_g)
