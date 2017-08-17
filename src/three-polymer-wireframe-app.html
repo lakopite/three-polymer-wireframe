@@ -190,7 +190,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
       <paper-input label="JSON file" type="file"></paper-input>
-      <paper-input label="meta val" type="text"></paper-input>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>
         <paper-button dialog-confirm autofocus>Accept</paper-button>
@@ -531,8 +530,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _prettifyDollar(n) {
-        // is .toFixed methos accurate enough for cents? _.round(), 2 would not necessarily give us two decimal digits
-        return (n) ? '$' + parseFloat(n).toFixed(2) : ""
+        return (n) ? n.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : ""
       }
 
       _numericalAggregations() {
@@ -790,6 +788,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       createCsv() {
+        // **** NOTE: csv currently does not have cost included in the table ***
         var rowData = ''
         console.log(rowData)
         for (var i=0; i < this.groupSumData.length; i++) {
@@ -797,14 +796,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var el = [_.values(this.groupSumData[i])] + '\r\n'
         	rowData += el
         }
-        var totalSumFooter = "\r\n\Grand Total Sum," + this.grandTotalSum
-        var csvData = this.headers + rowData + totalSumFooter
-        //alert(csvData)
+        var csvData = this.headers + rowData
         var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
         var link = document.createElement("a");
         link.href = uri;
         link.style = "visibility:hidden";
-        link.download = this.selectedModel + ': ' + this.selectedSumField + ' data for ' + this.selectedContourBy + ".csv";
+        link.download = this.selectedModel + ' ' + new Date() + ".csv";
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
