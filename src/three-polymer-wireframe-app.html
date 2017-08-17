@@ -358,7 +358,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template class="header">avg [[selectedSumField]]</template>
               <template>[[_prettify(item.avg)]]</template>
             </vaadin-grid-column>
-            <paper-button class="csv-button" on-tap="createSumCsv">Export Table to CSV</paper-button>
+            <!-- <paper-button class="csv-button" on-tap="createSumCsv">Export Table to CSV</paper-button> -->
           </vaadin-grid>
         </div>
         <div id="chart-container"></div>
@@ -580,13 +580,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var resultGroupByName = _.groupBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
         })
-        console.log("RESULTGROUPBYNAME");
-        console.log(resultGroupByName);
+        // console.log("RESULTGROUPBYNAME");
+        // console.log(resultGroupByName);
         this.groupKeys = _.without(_.keys(resultGroupByName), 'undefined')
         if(typeof this.selectedSumField === 'undefined') {
           this.allObjectsByGroup = []
-          console.log("ALL OBJECTS BY GROUP ONCE");
-          console.log(this.allObjectsByGroup);
+          // console.log("ALL OBJECTS BY GROUP ONCE");
+          // console.log(this.allObjectsByGroup);
           for (var i = 0; i < this.groupKeys.length; i++) {
             var groupObjects = resultGroupByName[this.groupKeys[i]]
             this.push('allObjectsByGroup', groupObjects)
@@ -610,8 +610,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        } else {
         this.groupSumData = []
         this.allObjectsByGroupDupe = []
-        console.log("ALL OBJECTS BY GROUP SECOND");
-        console.log(this.allObjectsByGroupDupe);
+        // console.log("ALL OBJECTS BY GROUP SECOND");
+        // console.log(this.allObjectsByGroupDupe);
         for (var i = 0; i < this.groupKeys.length; i++) {
           //reusing var groupObjects below (was local variable in previous loop for numericalMetadataKeys)
           var groupObjects = resultGroupByName[this.groupKeys[i]]
@@ -768,7 +768,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       createNumCsv() {
         var arr = []
         for (var i=0; i < this.numericalAggregationsTableData.length; i++) {
-          var el = [this.numericalAggregationsTableData[i].name, this.numericalAggregationsTableData[i].result]
+          var el = [_.values(this.numericalAggregationsTableData[i])]
           arr.push(el)
         }
         var str = arr.toString()
@@ -787,29 +787,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         document.body.removeChild(link);
       }
 
-      createSumCsv() {
-        var arr = []
-        for (var i=0; i < this.groupSumData.length; i++) {
-          // var colInfo = 
-          var el = [(this.groupSumData[i].group), this.groupSumData[i].sum]
-          arr.push(el)
-        }
-        var str = arr.toString()
-        var headers = _.capitalize(this.selectedContourBy) + " Group," +  _.capitalize(this.selectedSumField) + " Sum\r\n"
-        var totalSumFooter = "\r\n\Grand Total Sum," + this.grandTotalSum
-        //this grabs every other comma and removes it (replaces it with a new line, if ever we generate spreadsheets with more than just two columns per row, this regex will have to change)
-        var rowData = str.replace(/([^,]+,[^,]+),/g,'$1\r\n')
-        var csvData = headers + rowData + totalSumFooter
-        alert(csvData)
-        var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
-        var link = document.createElement("a");
-        link.href = uri;
-        link.style = "visibility:hidden";
-        link.download = "group_sum_export.csv";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
+      // createSumCsv() {
+      //   var arr = []
+      //   console.log(arr);
+      //   for (var i=0; i < this.groupSumData.length; i++) {
+      //     var headers = [_.keys(this.groupSumData[i])] + "\r\n"
+      //     var el = [_.values(this.groupSumData[i])]
+      //     for (var j=1; j < el.length; j++) {
+      //       var str = el.toString()
+      //       str.splice(-1, ",").toArray
+      //
+      //     }
+      //     arr.push(el)
+      //   }
+      //   var totalSumFooter = "\r\n\Grand Total Sum," + this.grandTotalSum
+      //   //this grabs every other comma and removes it (replaces it with a new line, if ever we generate spreadsheets with more than just two columns per row, this regex will have to change)
+      //   var rowData = str.replace(/([^,]+,[^,]+),/g,'$1\r\n')
+      //   var csvData = headers + rowData + totalSumFooter
+      //   alert(csvData)
+      //   // var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
+      //   // var link = document.createElement("a");
+      //   // link.href = uri;
+      //   // link.style = "visibility:hidden";
+      //   // link.download = "group_sum_export.csv";
+      //   // document.body.appendChild(link);
+      //   // link.click();
+      //   // document.body.removeChild(link);
+      // }
 
       _hideMainDropdown(currentPage) {
         return this.selectedView == 'aggregations-view'
