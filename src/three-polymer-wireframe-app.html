@@ -175,7 +175,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         width: 50%;
       }
 
-      .csv-button {
+      #csv-button {
+        margin: 25em 0 0 0;
         background: var(--app-primary-color);
         color: #FFF;
       }
@@ -243,6 +244,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-button class="filterBtn" raised disabled$="{{modelLoading}}" id="resetBtn" on-tap="resetFilters" type="number">Reset</paper-button>
     </div>
   </div>
+    <div hidden$="[[!showStringAggregations]]">
+      <div class="csv-button">
+        <paper-button id="csv-button" on-tap="createCsv">Export Table to CSV</paper-button>
+    </div>
+  </div>
   </div>
   </div>
   </app-drawer>
@@ -252,7 +258,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView</div>
-        <paper-item>Build Date: 8/16/17</paper-item>
+        <paper-item>Build Date: 8/17/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -304,7 +310,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <div hidden$="[[!showStringAggregations]]">
           <div class="str-header">
             <app-toolbar class="aggregation-toolbar">
-              <div main-title>Sum by group</div>
+              <div main-title>Data by Group</div>
             </app-toolbar>
             <paper-dropdown-menu id="str-contour-dropdown" label="Contour">
               <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
@@ -323,7 +329,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
         <!-- wrap all string aggregation info -->
           <div id="wrap-str-info">
-            <!-- sum by group table -->
+            <!-- data by group table -->
           <div id="sum-table-section">
           <vaadin-grid class="sum-by-group-table" items="[[groupSumData]]">
             <vaadin-grid-column>
@@ -357,7 +363,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template class="header">avg [[selectedSumField]]</template>
               <template>[[_prettify(item.avg)]]</template>
             </vaadin-grid-column>
-            <paper-button class="csv-button" on-tap="createSumCsv">Export Table to CSV</paper-button>
           </vaadin-grid>
         </div>
         <div id="chart-container"></div>
@@ -764,7 +769,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this._initChart();
       }
 
-      createSumCsv() {
+      createCsv() {
         var rowData = ''
         console.log(rowData)
         for (var i=0; i < this.groupSumData.length; i++) {
