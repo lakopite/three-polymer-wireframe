@@ -352,8 +352,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template class="footer">[[_prettify(grandTotalSum)]]</template>
             </vaadin-grid-column>
             <vaadin-grid-column>
-              <template class="header">$</template>
-              <template>test</template>
+              <template class="header">cost</template>
+              <template>[[_prettifyDollar(item.cost)]]</template>
             </vaadin-grid-column>
             <!-- NUMERICAL AGGREGATIONS WITHIN STRING AGGREGATION TABLE-->
             <vaadin-grid-column>
@@ -483,6 +483,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           pieData: {
             type: Array
           },
+          costCoefficient: {
+            type: Number
+          },
           selectedView: {
             type: String,
             value: 'model-view'
@@ -525,6 +528,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _prettify(n) {
         return (n) ? parseFloat(n).toLocaleString() : ""
+      }
+
+      _prettifyDollar(n) {
+        // is .toFixed methos accurate enough for cents? _.round(), 2 would not necessarily give us two decimal digits
+        return (n) ? '$' + parseFloat(n).toFixed(2) : ""
       }
 
       _numericalAggregations() {
@@ -635,10 +643,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var avgByGroup = _.round(_.meanBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
             }), 6);
+            //.2 is a temp placeholder, we will later place a cost costCoefficient in there
+            var cost = _.multiply(.2, sumByGroup);
 
             var groupSumDataSetup = {
               'group': this.groupKeys[i],
               'sum': sumByGroup,
+              'cost' : cost,
               'min' : minByGroup,
               'max' : maxByGroup,
               'avg' : avgByGroup
