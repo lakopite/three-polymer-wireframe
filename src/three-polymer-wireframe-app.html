@@ -346,7 +346,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </vaadin-grid-column>
             <vaadin-grid-column>
               <template class="header">
-                <vaadin-grid-sorter path="sum">[[selectedSumField]]</vaadin-grid-sorter>
+                <vaadin-grid-sorter path="sum">[[selectedSumField]] sum</vaadin-grid-sorter>
               </template>
               <template>[[_prettify(item.sum)]]</template>
               <template class="footer">[[_prettify(grandTotalSum)]]</template>
@@ -793,7 +793,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var link = document.createElement("a");
         link.href = uri;
         link.style = "visibility:hidden";
-        link.download = "group_sum_export.csv";
+        link.download = this.selectedModel + ': ' + this.selectedSumField + ' data for ' + this.selectedContourBy + ".csv";
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
