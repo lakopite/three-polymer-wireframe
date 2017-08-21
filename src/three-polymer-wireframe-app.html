@@ -524,16 +524,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       // temp function before joining with validateModelInput
       gimmeFileName() {
         //var fileName = Polymer.dom(this.root).querySelector("#model-upload")
-        var inputFile = Polymer.dom(this.root).querySelector("#model-upload").innerHTML
-        var str = JSON.stringify(inputFile)
-
+        var inputFile = Polymer.dom(this.root).querySelector("#model-upload").value
+          alert('Selected file name ' + this.value)
         };
 
       validateModelInput() {
         // temp vars
         var str = JSON.stringify(inputFile)
         var obj = JSON.parse(str)
-        //var fileName = document.getElementById('model-upload')
+        //var fileName = Polymer.dom(this.root).querySelector("#model-upload")
 
         try {
         // check that file name matches name in doc
