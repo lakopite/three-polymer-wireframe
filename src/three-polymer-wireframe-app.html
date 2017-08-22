@@ -527,47 +527,47 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var fileName = inputFile.name
         console.log('Selected file name: ' + inputFile.name)
       	var reader = new FileReader()
-      		// Closure to capture the file information.
-      		reader.onload = (function (theFile) {
-      			return function (e) {
-      				console.log('e readAsText = ', e);
-      				console.log('e readAsText target = ', e.target);
-      					var json = JSON.parse(e.target.result);
-      					alert(JSON.stringify(json));
-                try {
-                  // check that file name matches name in doc
-                  if (json.modelInformation.name + ".json" !== fileName)
-                  throw "name of file does not match name within document"
-                  // check that modelInfo and payload keys exist
-                  if (_.has(json, 'modelInformation') === false ||
-                      _.has(json, 'payload') === false)
-                  throw "modelInformation and payload properties are required"
-                  // check that modelInfo has units and name keys
-                  if (_.has(json, 'modelInformation.units') === false ||
-                      _.has(json, 'modelInformation.name') === false)
-                  throw "modelInformation must contain units and name"
-                  // check that units are either metric or imperial only
-                  if (!(json.modelInformation.units === "metric" ||
-                  json.modelInformation.units === "imperial"))
-                  throw "units values must be either imperial or metric"
-                  var payloadElems = json.payload
-                  for (var i=0; i < payloadElems.length; i++) {
-                    // go through payload elements and ensure each has vertices and metadata keys
-                    if (payloadElems[i].hasOwnProperty('vertices') === false ||
-                    payloadElems[i].hasOwnProperty('metadata') === false) {
-                      throw "payload must include vertices and metadata for each element"
-                    }
+    		// Closure to capture the file information.
+    		reader.onload = (function (theFile) {
+    			return function (e) {
+    				console.log('e readAsText = ', e);
+    				console.log('e readAsText target = ', e.target);
+    					var json = JSON.parse(e.target.result);
+    					alert(JSON.stringify(json));
+              try {
+                // check that file name matches name in doc
+                if (json.modelInformation.name + ".json" !== fileName)
+                throw "name of file does not match name within document"
+                // check that modelInfo and payload keys exist
+                if (_.has(json, 'modelInformation') === false ||
+                    _.has(json, 'payload') === false)
+                throw "modelInformation and payload properties are required"
+                // check that modelInfo has units and name keys
+                if (_.has(json, 'modelInformation.units') === false ||
+                    _.has(json, 'modelInformation.name') === false)
+                throw "modelInformation must contain units and name"
+                // check that units are either metric or imperial only
+                if (!(json.modelInformation.units === "metric" ||
+                json.modelInformation.units === "imperial"))
+                throw "units values must be either imperial or metric"
+                var payloadElems = json.payload
+                for (var i=0; i < payloadElems.length; i++) {
+                  // go through payload elements and ensure each has vertices and metadata keys
+                  if (_.has(payloadElems[i], 'vertices') === false ||
+                      _.has(payloadElems[i], 'metadata') === false) {
+                    throw "payload must include vertices and metadata for each element"
                   }
-                } catch (err) {
-                  throw "--File could not be uploaded because " + err
-                } finally {
-                  console.log("tests completed")
                 }
+              } catch (err) {
+                throw "--File could not be uploaded because " + err
+              } finally {
+                console.log("tests completed")
+              }
       			}
       		})(inputFile);
     		reader.readAsText(inputFile);
       }
-    
+
       _isWithinBounds(val, min, max) {
         return val >= min && val <= max
       }
