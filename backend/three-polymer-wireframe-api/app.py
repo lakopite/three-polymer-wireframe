@@ -1,4 +1,5 @@
-from chalice import Chalice, NotFoundError, ChaliceViewError, UnauthorizedError, CognitoUserPoolAuthorizer
+# from chalice import Chalice, NotFoundError, ChaliceViewError, UnauthorizedError, CognitoUserPoolAuthorizer
+from chalice import Chalice, NotFoundError, ChaliceViewError
 import boto3
 import json
 
@@ -7,11 +8,9 @@ app = Chalice(app_name='three-polymer-wireframe-api')
 s3 = boto3.resource('s3')
 
 settings = {
-	'site-bucket': 'arup-model-data',
-	'data-folder': 'three-polymer-wireframe'
+	'site-bucket': '$BUCKET_NAME_HERE$',
+	'data-folder': '$DATA_FOLDER_HERE$'
 }
-
-authorizer = CognitoUserPoolAuthorizer('three-polymer-wireframe-pool', header='Authorization', provider_arns=['arn:aws:cognito-idp:us-west-2:702333098276:userpool/us-west-2_NzaCRimAo'])
 
 def getModelNames(_bucket,_prefix):
 	s3_objects_resp = s3.meta.client.list_objects(Bucket=_bucket, Prefix=_prefix)
@@ -21,7 +20,8 @@ def getModelNames(_bucket,_prefix):
 		s3_objects += s3_objects_resp.get('Contents', [])
 	return [i['Key'].replace(_prefix,"").replace(".json","") for i in s3_objects if not i['Key'] == _prefix]
 
-@app.route('/get-model-data/{modelname}', methods=['GET'], cors=True, authorizer=authorizer)
+# @app.route('/get-model-data/{modelname}', methods=['GET'], cors=True, authorizer=authorizer)
+@app.route('/get-model-data/{modelname}', methods=['GET'], cors=True)
 def getModelData(modelname):
 	try:
 		print "in get model data"
@@ -35,7 +35,8 @@ def getModelData(modelname):
 	except:
 		return ChaliceViewError()
 
-@app.route('/get-models', methods=['GET'], cors=True, authorizer=authorizer)
+# @app.route('/get-models', methods=['GET'], cors=True, authorizer=authorizer)
+@app.route('/get-models', methods=['GET'], cors=True)
 def getModels():
     try:
     	result = json.dumps(getModelNames(settings['site-bucket'],settings['data-folder']+"/"))

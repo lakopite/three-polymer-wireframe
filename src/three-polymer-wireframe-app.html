@@ -190,7 +190,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
       <!-- set on-change -->
-      <paper-input id="modelUpload" label="JSON file" type="file" on-change="handleModelInput"></paper-input>
+      <paper-input id="modelUpload" label="JSON file" type="file" on-change="handleJsonUpload"></paper-input>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>
         <paper-button dialog-confirm autofocus>Accept</paper-button>
@@ -522,10 +522,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         super();
       }
 
-      handleModelInput(evt) {
+      handleJsonUpload(evt) {
         var inputFile = this.$.modelUpload.inputElement.inputElement.files[0]
         var fileName = inputFile.name
-        console.log('Selected file name: ' + inputFile.name)
+        console.log('Selected file name: ' + fileName)
       	var reader = new FileReader()
     		// Closure to capture the file information.
     		reader.onload = (function (theFile) {
