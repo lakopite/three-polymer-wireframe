@@ -190,7 +190,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
       <!-- set on-change -->
-      <paper-input id="modelUpload" label="JSON file" type="file" on-change="handleModelInput"></paper-input>
+      <paper-input id="modelUpload" label="JSON file" type="file" on-change="handleJsonUpload"></paper-input>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>
         <paper-button dialog-confirm autofocus>Accept</paper-button>
@@ -415,8 +415,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             value: false
           },
           _modelData: {
-            type: Array,
-            value: []
+            type: Object,
+            value: {}
           },
           modelLoading: {
             type: Boolean
@@ -522,10 +522,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         super();
       }
 
-      handleModelInput(evt) {
+      handleJsonUpload(evt) {
         var inputFile = this.$.modelUpload.inputElement.inputElement.files[0]
         var fileName = inputFile.name
-        console.log('Selected file name: ' + inputFile.name)
+        console.log('Selected file name: ' + fileName)
       	var reader = new FileReader()
     		// Closure to capture the file information.
     		reader.onload = (function (theFile) {
@@ -583,7 +583,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _numericalAggregations() {
         this.showStringAggregations = false;
         var that = this;
-        var resultFilterInput = _.filter(that._modelData, function(o) {
+        var resultFilterInput = _.filter(that._modelData.linearElements, function(o) {
           return _.every(o.vertices, function(j) {
             return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
               that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
@@ -617,11 +617,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _getSumByForSelectedSumField(_selectedSumField) {
-        this.selectedSumField
-        {
+        if (typeof this.selectedSumField !== 'undefined') {
           this._stringAggregations();
-          return
         }
+        return
       }
 
 
@@ -629,7 +628,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.showNumericalAggregations = false;
         var that = this
         // ================ repeated function start ==========================================
-        var resultFilterInput = _.filter(that._modelData, function(o) {
+        var resultFilterInput = _.filter(that._modelData.linearElements, function(o) {
           return _.every(o.vertices, function(j) {
             return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
               that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
@@ -838,7 +837,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       createCsv() {
         var rowData = ''
-        console.log(rowData)
         for (var i=0; i < this.groupSumData.length; i++) {
           this.headers = [_.keys(this.groupSumData[i])] + '\r\n'
           var el = [_.values(this.groupSumData[i])] + '\r\n'
@@ -904,11 +902,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _isNumberField(_modelData, selectedContourBy) {
-        return !_.isEmpty(_modelData) && this.selectedContourBy && _.isNumber(_modelData[0].metadata[this.selectedContourBy])
+        return !_.isEmpty(_modelData.linearElements) && this.selectedContourBy && _.isNumber(_modelData.linearElements[0].metadata[this.selectedContourBy])
       }
 
       _isStringField(_modelData, selectedContourBy) {
-        return !_.isEmpty(_modelData) && this.selectedContourBy && !_.isNumber(_modelData[0].metadata[this.selectedContourBy])
+        return !_.isEmpty(_modelData.linearElements) && typeof this.selectedContourBy !== 'undefined' && !_.isNumber(_modelData.linearElements[0].metadata[this.selectedContourBy])
       }
 
       isLoadingState(modelLoading, appLoading) {
@@ -984,10 +982,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // console.log("data received")
         if (resp && resp.modelInformation.name === this.selectedModel && "payload" in resp) {
           this.appLoading = false;
-          this.set('_modelData', resp.payload);
+          this.set('_modelData', {
+            'linearElements': resp.payload,
+            'planarElements': []
+          });
           //set selectedSumField to undefined in order to trigger stringAggregtions initialization
           this.selectedSumField = undefined
-          console.log(this._modelData)
+          //console.log(this._modelData)
         } else {
           this.handleDataError()
         }
@@ -999,7 +1000,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _getModelData(_selectedModel) {
-        this._modelData = [];
+        this.viewData = {
+             "linearElements": [],
+             "planarElements": []
+        }
         this.$['model-request'].url = this.baseUrl + "get-model-data/" + this.selectedModel
         this.$['model-request'].generateRequest();
         this.appLoading = true;
