@@ -533,7 +533,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       //GRAB DATA
       readInput(evt) {
         var inputFile = this.$.modelUpload.inputElement.inputElement.files[0]
-      	var reader = new FileReader();
+      	var reader = new FileReader()
       		// Closure to capture the file information.
       		reader.onload = (function (theFile) {
       			return function (e) {
@@ -545,43 +545,43 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       		})(inputFile);
     		reader.readAsText(inputFile);
       }
+      //validate json from user input
+      validateModelInput() {
+        // temp vars
+        var str = JSON.stringify(inputFile)
+        var obj = JSON.parse(str)
+        //var fileName = Polymer.dom(this.root).querySelector("#modelUpload")
 
-      // validateModelInput() {
-      //   // temp vars
-      //   var str = JSON.stringify(inputFile)
-      //   var obj = JSON.parse(str)
-      //   //var fileName = Polymer.dom(this.root).querySelector("#modelUpload")
-      //
-      //   try {
-      //   // check that file name matches name in doc
-      //   if (obj.modelInformation.name !== fileName)
-      //   	throw "name of file does not match name within document"
-      //   // go through payload elements and ensure each has vertices and metadata keys
-      // 	// check that modelInfo and payload keys exist
-      // 	if (inputFile.hasOwnProperty('modelInformation') === false ||
-      // 			inputFile.hasOwnProperty('payload') === false)
-      //       	throw "modelInformation and payload properties are required"
-      //   // check that modelInfo has units and name keys
-      //   if (inputFile.modelInformation.hasOwnProperty('units') === false ||
-      //   			inputFile.modelInformation.hasOwnProperty('name') === false)
-      //     		throw "modelInformation must contain units and name"
-      //   // check that units are either metric or imperial only
-      //   if (!(obj.modelInformation.units === "metric" ||
-      // 		obj.modelInformation.units === "imperial"))
-      //     throw "units values must be either imperial or metric"
-      //   var payloadElems = inputFile.payload
-      //   for (var i=0; i < payloadElems.length; i++) {
-      //     if (payloadElems[i].hasOwnProperty('vertices') === false ||
-      //         payloadElems[i].hasOwnProperty('metadata') === false) {
-      //           throw "payload must include vertices and metadata for each element"
-      //     }
-      //   }
-      //   } catch (err) {
-      //   	throw "--File could not be uploaded because " + err
-      //   } finally {
-      // 	console.log("tests completed")
-      //   }
-      // }
+        try {
+        // check that file name matches name in doc
+        if (obj.modelInformation.name !== fileName)
+        	throw "name of file does not match name within document"
+        // go through payload elements and ensure each has vertices and metadata keys
+      	// check that modelInfo and payload keys exist
+      	if (inputFile.hasOwnProperty('modelInformation') === false ||
+      			inputFile.hasOwnProperty('payload') === false)
+            	throw "modelInformation and payload properties are required"
+        // check that modelInfo has units and name keys
+        if (inputFile.modelInformation.hasOwnProperty('units') === false ||
+        			inputFile.modelInformation.hasOwnProperty('name') === false)
+          		throw "modelInformation must contain units and name"
+        // check that units are either metric or imperial only
+        if (!(obj.modelInformation.units === "metric" ||
+      		obj.modelInformation.units === "imperial"))
+          throw "units values must be either imperial or metric"
+        var payloadElems = inputFile.payload
+        for (var i=0; i < payloadElems.length; i++) {
+          if (payloadElems[i].hasOwnProperty('vertices') === false ||
+              payloadElems[i].hasOwnProperty('metadata') === false) {
+                throw "payload must include vertices and metadata for each element"
+          }
+        }
+        } catch (err) {
+        	throw "--File could not be uploaded because " + err
+        } finally {
+      	console.log("tests completed")
+        }
+      }
 
       _isWithinBounds(val, min, max) {
         return val >= min && val <= max
