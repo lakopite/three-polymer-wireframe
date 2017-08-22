@@ -190,7 +190,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
       <!-- set on-change -->
-      <paper-input id="modelUpload" label="JSON file" type="file" on-change="readInput"></paper-input>
+      <paper-input id="modelUpload" label="JSON file" type="file" on-change="handleModelInput"></paper-input>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>
         <paper-button dialog-confirm autofocus>Accept</paper-button>
@@ -521,18 +521,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       constructor() {
         super();
       }
-      // temp function before joining with validateModelInput
-      gimmeFileName() {
+
+      handleModelInput(evt) {
         var inputFile = this.$.modelUpload.inputElement.inputElement.files[0]
         var fileName = inputFile.name
-        var fileSize = inputFile.size
-        var fileList = this.$.modelUpload.inputElement.inputElement.files
-        console.log('Selected file name: ' + fileName)
-        // must grab contents of file aka innerHTML
-      };
-      //GRAB DATA
-      readInput(evt) {
-        var inputFile = this.$.modelUpload.inputElement.inputElement.files[0]
+        console.log('Selected file name: ' + inputFile.name)
       	var reader = new FileReader()
       		// Closure to capture the file information.
       		reader.onload = (function (theFile) {
@@ -541,48 +534,40 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       				console.log('e readAsText target = ', e.target);
       					var json = JSON.parse(e.target.result);
       					alert(JSON.stringify(json));
+                try {
+                  // check that file name matches name in doc
+                  if (json.modelInformation.name + ".json" !== fileName)
+                  throw "name of file does not match name within document"
+                  // check that modelInfo and payload keys exist
+                  if (_.has(json, 'modelInformation') === false ||
+                      _.has(json, 'payload') === false)
+                  throw "modelInformation and payload properties are required"
+                  // check that modelInfo has units and name keys
+                  if (_.has(json, 'modelInformation.units') === false ||
+                      _.has(json, 'modelInformation.name') === false)
+                  throw "modelInformation must contain units and name"
+                  // check that units are either metric or imperial only
+                  if (!(json.modelInformation.units === "metric" ||
+                  json.modelInformation.units === "imperial"))
+                  throw "units values must be either imperial or metric"
+                  var payloadElems = json.payload
+                  for (var i=0; i < payloadElems.length; i++) {
+                    // go through payload elements and ensure each has vertices and metadata keys
+                    if (payloadElems[i].hasOwnProperty('vertices') === false ||
+                    payloadElems[i].hasOwnProperty('metadata') === false) {
+                      throw "payload must include vertices and metadata for each element"
+                    }
+                  }
+                } catch (err) {
+                  throw "--File could not be uploaded because " + err
+                } finally {
+                  console.log("tests completed")
+                }
       			}
       		})(inputFile);
     		reader.readAsText(inputFile);
       }
-      //validate json from user input
-      validateModelInput() {
-        // temp vars
-        var str = JSON.stringify(inputFile)
-        var obj = JSON.parse(str)
-        //var fileName = Polymer.dom(this.root).querySelector("#modelUpload")
-
-        try {
-        // check that file name matches name in doc
-        if (obj.modelInformation.name !== fileName)
-        	throw "name of file does not match name within document"
-        // go through payload elements and ensure each has vertices and metadata keys
-      	// check that modelInfo and payload keys exist
-      	if (inputFile.hasOwnProperty('modelInformation') === false ||
-      			inputFile.hasOwnProperty('payload') === false)
-            	throw "modelInformation and payload properties are required"
-        // check that modelInfo has units and name keys
-        if (inputFile.modelInformation.hasOwnProperty('units') === false ||
-        			inputFile.modelInformation.hasOwnProperty('name') === false)
-          		throw "modelInformation must contain units and name"
-        // check that units are either metric or imperial only
-        if (!(obj.modelInformation.units === "metric" ||
-      		obj.modelInformation.units === "imperial"))
-          throw "units values must be either imperial or metric"
-        var payloadElems = inputFile.payload
-        for (var i=0; i < payloadElems.length; i++) {
-          if (payloadElems[i].hasOwnProperty('vertices') === false ||
-              payloadElems[i].hasOwnProperty('metadata') === false) {
-                throw "payload must include vertices and metadata for each element"
-          }
-        }
-        } catch (err) {
-        	throw "--File could not be uploaded because " + err
-        } finally {
-      	console.log("tests completed")
-        }
-      }
-
+    
       _isWithinBounds(val, min, max) {
         return val >= min && val <= max
       }
