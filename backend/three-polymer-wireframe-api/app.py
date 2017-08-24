@@ -8,9 +8,11 @@ app = Chalice(app_name='three-polymer-wireframe-api')
 s3 = boto3.resource('s3')
 
 settings = {
-	'site-bucket': '$BUCKET_NAME_HERE$',
-	'data-folder': '$DATA_FOLDER_HERE$'
+	'site-bucket': 'arup-model-data',
+	'data-folder': 'three-polymer-wireframe'
 }
+
+#authorizer = CognitoUserPoolAuthorizer('three-polymer-wireframe-pool', header='Authorization', provider_arns=['arn:aws:cognito-idp:us-west-2:702333098276:userpool/us-west-2_NzaCRimAo'])
 
 def getModelNames(_bucket,_prefix):
 	s3_objects_resp = s3.meta.client.list_objects(Bucket=_bucket, Prefix=_prefix)
@@ -24,7 +26,7 @@ def getModelNames(_bucket,_prefix):
 @app.route('/get-model-data/{modelname}', methods=['GET'], cors=True)
 def getModelData(modelname):
 	try:
-		print "in get model data"
+		#print "in get model data"
 		json_object = s3.Object(settings['site-bucket'],settings['data-folder']+"/" + modelname+".json")
 		file_content = json_object.get()['Body'].read().decode('utf-8')
 	except:
@@ -43,3 +45,8 @@ def getModels():
     	return result
     except:
     	raise ChaliceViewError()
+
+@app.route('/echo-json', methods=['POST'], cors=True)
+def echoJson():
+	postData = app.current_request.json_body
+	return json.dumps(postData)
