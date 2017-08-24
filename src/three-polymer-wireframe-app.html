@@ -189,11 +189,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <iron-ajax id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="https://poxq4kkpy7.execute-api.us-west-2.amazonaws.com/api/echo-json"></iron-ajax>
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
-      <!-- set on-change -->
       <paper-input id="modelUpload" label="JSON file" type="file" on-change="handleJsonUpload"></paper-input>
       <div class="buttons">
-        <paper-button dialog-dismiss>Cancel</paper-button>
-        <paper-button dialog-confirm autofocus disabled$="{{_acceptUploadDisabled}}" on-tap="uploadJsonModel">Accept</paper-button>
+        <paper-button dialog-dismiss on-tap="_clearUploadInput">Cancel</paper-button>
+        <paper-button id="acceptUploadBtn" dialog-confirm autofocus disabled$="{{_acceptUploadDisabled}}" on-tap="uploadJsonModel">Accept</paper-button>
       </div>
     </paper-dialog>
     <app-drawer-layout fullbleed>
@@ -541,8 +540,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var fileName = inputFile.name
         console.log('Selected file name: ' + fileName)
       	var reader = new FileReader()
-    		// Closure to capture the file information.
         var that = this;
+        // Capture the file information.
         reader.onload = (function (theFile) {
     			return function (e) {
     				// console.log('e readAsText = ', e);
@@ -550,10 +549,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     					that.jsonUploadPayload = e.target.result;
               that.parsedJson = JSON.parse(that.jsonUploadPayload)
     					//alert(JSON.stringify(that.json));
+              //validation
               try {
                 // check that file name matches name in doc
                 if (that.parsedJson.modelInformation.name + ".json" !== fileName)
-                throw "name of file does not match name within document"
+                throw "it must be a .json -or- name of file does not match name within document"
                 // check that modelInfo and payload keys exist
                 if (_.has(that.parsedJson, 'modelInformation') === false ||
                     _.has(that.parsedJson, 'payload') === false)
@@ -584,6 +584,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       			}
       		})(inputFile);
     		reader.readAsText(inputFile);
+      }
+
+      _clearUploadInput() {
+        // clear input--but below only works after FIRST time clicking cancel button
+        Polymer.dom(this.root).querySelector('#modelUpload').value = ''
+        this._acceptUploadDisabled = true;
+        console.log(this._acceptUploadDisabled);
       }
 
       _isWithinBounds(val, min, max) {
