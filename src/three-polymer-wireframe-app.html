@@ -184,20 +184,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
     </style>
-<<<<<<< HEAD
     <iron-ajax auto method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax method="GET" id="model-request" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
     <iron-ajax id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="https://poxq4kkpy7.execute-api.us-west-2.amazonaws.com/api/echo-json"></iron-ajax>
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
-=======
-    <iron-ajax auto url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
-    <iron-ajax id="model-request" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
-    <iron-ajax id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="https://poxq4kkpy7.execute-api.us-west-2.amazonaws.com/api/echo-json"></iron-ajax>
-    <paper-dialog modal id="addModelDialog">
-      <h2>Add a Model</h2>
-      <!-- set on-change -->
->>>>>>> feat/quads
       <paper-input id="modelUpload" label="JSON file" type="file" on-change="handleJsonUpload"></paper-input>
       <div class="buttons">
         <paper-button dialog-dismiss on-tap="_clearUploadInput">Cancel</paper-button>
@@ -434,7 +425,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             value: true
           },
           _acceptUploadDisabled: {
-<<<<<<< HEAD
             type: Boolean,
             value: true
             //notify: true
@@ -443,16 +433,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Object,
             value: {}
           },
-=======
-           type: Boolean,
-           value: true
-           //notify: true
-         },
-         jsonUploadPayload: {
-           type: Object,
-           value: {}
-         },
->>>>>>> feat/quads
           metadataFields: {
             type: Array,
             value: []
