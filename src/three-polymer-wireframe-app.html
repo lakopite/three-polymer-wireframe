@@ -187,13 +187,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
     <iron-ajax auto url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax id="model-request" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
+    <iron-ajax id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="https://poxq4kkpy7.execute-api.us-west-2.amazonaws.com/api/echo-json"></iron-ajax>
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
       <!-- set on-change -->
       <paper-input id="modelUpload" label="JSON file" type="file" on-change="handleJsonUpload"></paper-input>
       <div class="buttons">
-        <paper-button dialog-dismiss>Cancel</paper-button>
-        <paper-button dialog-confirm autofocus>Accept</paper-button>
+        <paper-button dialog-dismiss on-tap="_clearUploadInput">Cancel</paper-button>
+        <paper-button id="acceptUploadBtn" dialog-confirm autofocus disabled$="{{_acceptUploadDisabled}}" on-tap="uploadJsonModel">Accept</paper-button>
       </div>
     </paper-dialog>
     <app-drawer-layout fullbleed>
@@ -425,6 +426,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Boolean,
             value: true
           },
+          _acceptUploadDisabled: {
+           type: Boolean,
+           value: true
+           //notify: true
+         },
+         jsonUploadPayload: {
+           type: Object,
+           value: {}
+         },
           metadataFields: {
             type: Array,
             value: []
@@ -522,50 +532,72 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         super();
       }
 
+      uploadJsonModel() {
+        this.$['json-upload-request'].generateRequest();
+        Polymer.dom(this.root).querySelector('#modelUpload').value = null
+        alert("Success! File has been uploaded.")
+      }
+
       handleJsonUpload(evt) {
         var inputFile = this.$.modelUpload.inputElement.inputElement.files[0]
         var fileName = inputFile.name
+        var fileNameNoExtension = fileName.slice(0, fileName.lastIndexOf('.json'))
         console.log('Selected file name: ' + fileName)
-      	var reader = new FileReader()
-    		// Closure to capture the file information.
-    		reader.onload = (function (theFile) {
-    			return function (e) {
-    				// console.log('e readAsText = ', e);
-    				// console.log('e readAsText target = ', e.target);
-    					var json = JSON.parse(e.target.result);
-    					//alert(JSON.stringify(json));
+          var reader = new FileReader()
+        var that = this;
+        // Capture the file information.
+        reader.onload = (function (theFile) {
+                return function (e) {
+                    // console.log('e readAsText = ', e);
+                    // console.log('e readAsText target = ', e.target);
+              //validation
               try {
+                that.jsonUploadPayload = JSON.parse(e.target.result)
+                // check that this json has not already been uplaoded
+                if (_.includes(that.dataOptions, fileNameNoExtension))
+                throw "it has already been uploaded."
                 // check that file name matches name in doc
-                if (json.modelInformation.name + ".json" !== fileName)
-                throw "name of file does not match name within document"
+                if (that.jsonUploadPayload.modelInformation.name + ".json"!== fileName)
+                throw "it must be a .json -or- name of file does not match name within document."
                 // check that modelInfo and payload keys exist
-                if (_.has(json, 'modelInformation') === false ||
-                    _.has(json, 'payload') === false)
-                throw "modelInformation and payload properties are required"
+                if (_.has(that.jsonUploadPayload, 'modelInformation') === false ||
+                    _.has(that.jsonUploadPayload, 'payload') === false)
+                throw "modelInformation and payload properties are required."
                 // check that modelInfo has units and name keys
-                if (_.has(json, 'modelInformation.units') === false ||
-                    _.has(json, 'modelInformation.name') === false)
-                throw "modelInformation must contain units and name"
+                if (_.has(that.jsonUploadPayload, 'modelInformation.units') === false ||
+                    _.has(that.jsonUploadPayload, 'modelInformation.name') === false)
+                throw "modelInformation must contain units and name."
                 // check that units are either metric or imperial only
-                if (!(json.modelInformation.units === "metric" ||
-                json.modelInformation.units === "imperial"))
-                throw "units values must be either imperial or metric"
-                var payloadElems = json.payload
+                if (!(that.jsonUploadPayload.modelInformation.units === "metric" ||
+                that.jsonUploadPayload.modelInformation.units === "imperial"))
+                throw "units values must be either imperial or metric."
+                var payloadElems = that.jsonUploadPayload.payload
                 for (var i=0; i < payloadElems.length; i++) {
                   // go through payload elements and ensure each has vertices and metadata keys
                   if (_.has(payloadElems[i], 'vertices') === false ||
                       _.has(payloadElems[i], 'metadata') === false) {
-                    throw "payload must include vertices and metadata for each element"
+                    throw "payload must include vertices and metadata for each element."
                   }
                 }
+                //if it does not get stuck on any errors above, it'll make it to the below
+                console.log(that.jsonUploadPayload);
+                that._acceptUploadDisabled = false;
               } catch (err) {
-                throw "--File could not be uploaded because " + err
+                  //same problem as _clearUploadInput
+                  Polymer.dom(that.root).querySelector('#modelUpload').value = ''
+                  throw "--File could not be uploaded because " + err
               } finally {
                 console.log("tests completed")
               }
-      			}
-      		})(inputFile);
-    		reader.readAsText(inputFile);
+                  }
+              })(inputFile);
+            reader.readAsText(inputFile);
+      }
+
+      _clearUploadInput() {
+        // clear input--but below only works after FIRST occasionlog
+        Polymer.dom(this.root).querySelector('#modelUpload').value = null
+        this._acceptUploadDisabled = true;
       }
 
       _isWithinBounds(val, min, max) {
