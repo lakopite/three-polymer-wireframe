@@ -260,7 +260,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView</div>
-        <paper-item>Build Date: 8/24/17</paper-item>
+        <paper-item>Build Date: 8/28/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -532,12 +532,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       uploadJsonModel() {
         this.$['json-upload-request'].generateRequest();
+        Polymer.dom(this.root).querySelector('#modelUpload').value = null
         alert("Success! File has been uploaded.")
       }
 
       handleJsonUpload(evt) {
         var inputFile = this.$.modelUpload.inputElement.inputElement.files[0]
         var fileName = inputFile.name
+        var fileNameNoExtension = fileName.slice(0, fileName.lastIndexOf('.json'))
         console.log('Selected file name: ' + fileName)
       	var reader = new FileReader()
         var that = this;
@@ -546,37 +548,41 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     			return function (e) {
     				// console.log('e readAsText = ', e);
     				// console.log('e readAsText target = ', e.target);
-    					that.jsonUploadPayload = e.target.result;
-              that.parsedJson = JSON.parse(that.jsonUploadPayload)
-    					//alert(JSON.stringify(that.json));
               //validation
               try {
+                that.jsonUploadPayload = JSON.parse(e.target.result)
+                // check that this json has not already been uplaoded
+                if (_.includes(that.dataOptions, fileNameNoExtension))
+                throw "it has already been uploaded."
                 // check that file name matches name in doc
-                if (that.parsedJson.modelInformation.name + ".json" !== fileName)
-                throw "it must be a .json -or- name of file does not match name within document"
+                if (that.jsonUploadPayload.modelInformation.name + ".json"!== fileName)
+                throw "it must be a .json -or- name of file does not match name within document."
                 // check that modelInfo and payload keys exist
-                if (_.has(that.parsedJson, 'modelInformation') === false ||
-                    _.has(that.parsedJson, 'payload') === false)
-                throw "modelInformation and payload properties are required"
+                if (_.has(that.jsonUploadPayload, 'modelInformation') === false ||
+                    _.has(that.jsonUploadPayload, 'payload') === false)
+                throw "modelInformation and payload properties are required."
                 // check that modelInfo has units and name keys
-                if (_.has(that.parsedJson, 'modelInformation.units') === false ||
-                    _.has(that.parsedJson, 'modelInformation.name') === false)
-                throw "modelInformation must contain units and name"
+                if (_.has(that.jsonUploadPayload, 'modelInformation.units') === false ||
+                    _.has(that.jsonUploadPayload, 'modelInformation.name') === false)
+                throw "modelInformation must contain units and name."
                 // check that units are either metric or imperial only
-                if (!(that.parsedJson.modelInformation.units === "metric" ||
-                that.parsedJson.modelInformation.units === "imperial"))
-                throw "units values must be either imperial or metric"
-                var payloadElems = that.parsedJson.payload
+                if (!(that.jsonUploadPayload.modelInformation.units === "metric" ||
+                that.jsonUploadPayload.modelInformation.units === "imperial"))
+                throw "units values must be either imperial or metric."
+                var payloadElems = that.jsonUploadPayload.payload
                 for (var i=0; i < payloadElems.length; i++) {
                   // go through payload elements and ensure each has vertices and metadata keys
                   if (_.has(payloadElems[i], 'vertices') === false ||
                       _.has(payloadElems[i], 'metadata') === false) {
-                    throw "payload must include vertices and metadata for each element"
+                    throw "payload must include vertices and metadata for each element."
                   }
                 }
+                //if it does not get stuck on any errors above, it'll make it to the below
                 console.log(that.jsonUploadPayload);
                 that._acceptUploadDisabled = false;
               } catch (err) {
+                  //same problem as _clearUploadInput
+                  Polymer.dom(that.root).querySelector('#modelUpload').value = ''
                   throw "--File could not be uploaded because " + err
               } finally {
                 console.log("tests completed")
@@ -587,10 +593,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _clearUploadInput() {
-        // clear input--but below only works after FIRST time clicking cancel button
-        Polymer.dom(this.root).querySelector('#modelUpload').value = ''
+        // clear input--but below only works after FIRST occasionlog
+        Polymer.dom(this.root).querySelector('#modelUpload').value = null
         this._acceptUploadDisabled = true;
-        console.log(this._acceptUploadDisabled);
       }
 
       _isWithinBounds(val, min, max) {
