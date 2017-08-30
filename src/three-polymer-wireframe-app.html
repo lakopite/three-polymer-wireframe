@@ -209,7 +209,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </div>
       <paper-toast id="validationToast" duration="3000" class="fit-bottom"></paper-toast>
     </paper-dialog>
-    <paper-toast id="uploadSuccessToast" duration="3000" class="fit-bottom"></paper-toast>
+    <paper-toast id="uploadSuccessToast" duration="3000"></paper-toast>
     <app-drawer-layout fullbleed>
       <!-- Drawer content -->
       <app-drawer id="drawer" slot="drawer">
@@ -550,7 +550,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         that.$['json-upload-request'].generateRequest();
         that._clearUploadInput()
         var toast = Polymer.dom(that.root).querySelector('#uploadSuccessToast')
-        toast.show({ text: "File has been uploaded successfully." })
+        toast.show({ text: "File has been uploaded successfully!" })
       }
 
       handleJsonUpload(evt) {
@@ -570,28 +570,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 that.jsonUploadPayload = JSON.parse(e.target.result)
                 // check that this json has not already been uplaoded
                 if (_.includes(that.dataOptions, fileNameNoExtension))
-                throw "it has already been uploaded."
+                throw "it has already been uploaded"
                 // check that file name matches name in doc
                 if (that.jsonUploadPayload.modelInformation.name + ".json"!== fileName)
-                throw "it must be a .json \n -or- \n name of file does not match name within document."
+                throw "it must be a .json -or- name of file does not match name within document"
                 // check that modelInfo and payload keys exist
                 if (_.has(that.jsonUploadPayload, 'modelInformation') === false ||
                     _.has(that.jsonUploadPayload, 'payload') === false)
-                throw "modelInformation and payload properties are required."
+                throw "modelInformation and payload properties are required"
                 // check that modelInfo has units and name keys
                 if (_.has(that.jsonUploadPayload, 'modelInformation.units') === false ||
                     _.has(that.jsonUploadPayload, 'modelInformation.name') === false)
-                throw "modelInformation must contain units and name."
+                throw "modelInformation must contain units and name"
                 // check that units are either metric or imperial only
                 if (!(that.jsonUploadPayload.modelInformation.units === "metric" ||
                 that.jsonUploadPayload.modelInformation.units === "imperial"))
-                throw "units values must be either imperial or metric."
+                throw "units values must be either imperial or metric"
                 var payloadElems = that.jsonUploadPayload.payload
                 for (var i=0; i < payloadElems.length; i++) {
                   // go through payload elements and ensure each has vertices and metadata keys
                   if (_.has(payloadElems[i], 'vertices') === false ||
                       _.has(payloadElems[i], 'metadata') === false) {
-                    throw "payload must include vertices and metadata for each element."
+                    throw "payload must include vertices and metadata for each element"
                   }
                 }
                 //if it does not get stuck on any errors above, it'll make it to the below
