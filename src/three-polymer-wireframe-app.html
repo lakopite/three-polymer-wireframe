@@ -33,6 +33,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="../bower_components/vaadin-grid/vaadin-grid-sorter.html">
 <link rel="import" href="../bower_components/three-polymer/three-view/three-view.html">
@@ -183,6 +184,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: #FFF;
       }
 
+      #validationToast {
+        padding: 1em 1em;
+        border: 1px solid gray;
+      }
+
+      #uploadSuccessToast {
+        --paper-toast-background-color: green;
+        --paper-toast-color: white;
+      }
+
     </style>
     <iron-ajax auto method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax method="GET" id="model-request" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
@@ -196,7 +207,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-button dialog-dismiss on-tap="_clearUploadInput">Cancel</paper-button>
         <paper-button id="acceptUploadBtn" dialog-confirm autofocus disabled$="{{_acceptUploadDisabled}}" on-tap="uploadJsonModel">Accept</paper-button>
       </div>
+      <paper-toast id="validationToast" duration="3000" class="fit-bottom"></paper-toast>
     </paper-dialog>
+    <paper-toast id="uploadSuccessToast" duration="3000" class="fit-bottom"></paper-toast>
     <app-drawer-layout fullbleed>
       <!-- Drawer content -->
       <app-drawer id="drawer" slot="drawer">
@@ -262,7 +275,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView</div>
-        <paper-item>Build Date: 8/29/17</paper-item>
+        <paper-item>Build Date: 8/30/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -536,7 +549,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var that = this
         that.$['json-upload-request'].generateRequest();
         that._clearUploadInput()
-        alert("Success! File has been uploaded.")
+        var toast = Polymer.dom(that.root).querySelector('#uploadSuccessToast')
+        toast.show({ text: "File has been uploaded successfully." })
       }
 
       handleJsonUpload(evt) {
@@ -559,7 +573,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 throw "it has already been uploaded."
                 // check that file name matches name in doc
                 if (that.jsonUploadPayload.modelInformation.name + ".json"!== fileName)
-                throw "it must be a .json \r\n -or- \r\n name of file does not match name within document."
+                throw "it must be a .json \n -or- \n name of file does not match name within document."
                 // check that modelInfo and payload keys exist
                 if (_.has(that.jsonUploadPayload, 'modelInformation') === false ||
                     _.has(that.jsonUploadPayload, 'payload') === false)
@@ -585,7 +599,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 that._acceptUploadDisabled = false;
               } catch (err) {
                   that._clearUploadInput()
-                  alert("File could not be uploaded because " + err)
+                  var toast = Polymer.dom(that.root).querySelector('#validationToast')
+                  toast.show({ text: "File could not be uploaded because " + err })
               } finally {
                 console.log("tests completed")
               }
