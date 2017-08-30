@@ -559,7 +559,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 throw "it has already been uploaded."
                 // check that file name matches name in doc
                 if (that.jsonUploadPayload.modelInformation.name + ".json"!== fileName)
-                throw "it must be a .json -or- name of file does not match name within document."
+                throw "it must be a .json \r\n -or- \r\n name of file does not match name within document."
                 // check that modelInfo and payload keys exist
                 if (_.has(that.jsonUploadPayload, 'modelInformation') === false ||
                     _.has(that.jsonUploadPayload, 'payload') === false)
@@ -585,7 +585,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 that._acceptUploadDisabled = false;
               } catch (err) {
                   that._clearUploadInput()
-                  throw "--File could not be uploaded because " + err
+                  alert("File could not be uploaded because " + err)
               } finally {
                 console.log("tests completed")
               }
@@ -645,7 +645,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return o.metadata[that.selectedContourBy]
         }), 6);
         this.showNumericalAggregations = true;
-        console.log(this.selectedSumField);
       }
 
       _getSumByForSelectedSumField(_selectedSumField) {
