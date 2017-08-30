@@ -261,11 +261,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-button class="filterBtn" raised disabled$="{{modelLoading}}" id="resetBtn" on-tap="resetFilters" type="number">Reset</paper-button>
     </div>
   </div>
+  <!-- for numerical aggregations -->
+  <div hidden$="{{_hideCsvButton(selectedView)}}">
+    <div class="csv-wrapper">
+      <div hidden$="[[!showNumericalAggregations]]">
+        <div class="csv-button">
+          <paper-button id="csv-button" on-tap="createNumericalCsv">Export Table to CSV</paper-button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- for string aggregations -->
     <div hidden$="{{_hideCsvButton(selectedView)}}">
     <div class="csv-wrapper">
     <div hidden$="[[!showStringAggregations]]">
     <div class="csv-button">
-      <paper-button id="csv-button" on-tap="createCsv">Export Table to CSV</paper-button>
+      <paper-button id="csv-button" on-tap="createGroupDataCsv">Export Table to CSV</paper-button>
     </div>
     </div>
     </div>
@@ -885,7 +896,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this._initChart();
       }
 
-      createCsv() {
+      createNumericalCsv() {
+        var rowData = ''
+        for (var i=0; i < this.numericalAggregationsTableData.length; i++) {
+          this.headers = [_.keys(this.numericalAggregationsTableData[i])] + '\r\n'
+          var el = [_.values(this.numericalAggregationsTableData[i])] + '\r\n'
+        	rowData += el
+        }
+        var csvData = this.headers + rowData
+        var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
+        var link = document.createElement("a");
+        link.href = uri;
+        link.style = "visibility:hidden";
+        link.download = this.selectedModel + ' ' + new Date() + ".csv";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      createGroupDataCsv() {
         var rowData = ''
         for (var i=0; i < this.groupSumData.length; i++) {
           this.headers = [_.keys(this.groupSumData[i])] + '\r\n'
