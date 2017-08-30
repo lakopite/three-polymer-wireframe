@@ -262,10 +262,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </div>
   </div>
     <div hidden$="{{_hideCsvButton(selectedView)}}">
-      <div class="csv-button">
-        <paper-button id="csv-button" on-tap="createCsv">Export Table to CSV</paper-button>
+    <div class="csv-wrapper">
+    <div hidden$="[[!showStringAggregations]]">
+    <div class="csv-button">
+      <paper-button id="csv-button" on-tap="createCsv">Export Table to CSV</paper-button>
     </div>
-  </div>
+    </div>
+    </div>
+    </div>
   </div>
   </div>
   </app-drawer>
@@ -904,8 +908,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _hideCsvButton(currentPage) {
-        //this needs to also hide when in numerical aggregations
-        return this.selectedView == 'model-view';
+        return this.selectedView == 'model-view'
       }
 
       //Ensure that the geometry input is within boundaries and is compatible with its input sibling
