@@ -197,7 +197,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
     <iron-ajax auto method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax method="GET" id="model-request" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
-    <iron-ajax id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="https://poxq4kkpy7.execute-api.us-west-2.amazonaws.com/api/echo-json"></iron-ajax>
+    <iron-ajax id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="https://vdnlk4k68g.execute-api.us-west-2.amazonaws.com/api/echo-json"></iron-ajax>
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
       <iron-input>

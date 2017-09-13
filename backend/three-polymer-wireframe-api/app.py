@@ -1,9 +1,14 @@
 # from chalice import Chalice, NotFoundError, ChaliceViewError, UnauthorizedError, CognitoUserPoolAuthorizer
 from chalice import Chalice, NotFoundError, ChaliceViewError
-import boto3
+from datetime import datetime
+from uploader import validateJson
 import json
+import os
+import boto3
+from botocore.client import Config
 
 app = Chalice(app_name='three-polymer-wireframe-api')
+app.debug = True
 
 s3 = boto3.resource('s3')
 
@@ -11,8 +16,6 @@ settings = {
 	'site-bucket': 'arup-model-data',
 	'data-folder': 'three-polymer-wireframe'
 }
-
-#authorizer = CognitoUserPoolAuthorizer('three-polymer-wireframe-pool', header='Authorization', provider_arns=['arn:aws:cognito-idp:us-west-2:702333098276:userpool/us-west-2_NzaCRimAo'])
 
 def getModelNames(_bucket,_prefix):
 	s3_objects_resp = s3.meta.client.list_objects(Bucket=_bucket, Prefix=_prefix)
@@ -46,7 +49,7 @@ def getModels():
     except:
     	raise ChaliceViewError()
 
+# # @app.route('/echo-json', methods=['POST'], cors=True, authorizer=authorizer)
 @app.route('/echo-json', methods=['POST'], cors=True)
 def echoJson():
-	postData = app.current_request.json_body
-	return json.dumps(postData)
+	validateJson()
