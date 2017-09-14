@@ -592,7 +592,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 if (_.includes(that.dataOptions, fileNameNoExtension))
                 throw "it has already been uploaded"
                 // check that file name matches name in doc
-                if (that.jsonUploadPayload.modelInformation.name + ".json"!== fileName)
+                if (_.toLower(that.jsonUploadPayload.modelInformation.name) + ".json"!== _.toLower(fileName))
                 throw "it must be a .json -or- name of file does not match name within document"
                 // check that modelInfo and payload keys exist
                 if (_.has(that.jsonUploadPayload, 'modelInformation') === false ||

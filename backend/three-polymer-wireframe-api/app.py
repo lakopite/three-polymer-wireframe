@@ -54,4 +54,7 @@ def getModels():
 def echoJson():
 	postData = app.current_request.json_body
 	result = validateJson(postData)
-	return json.dumps(result)
+	if result.get('error') is None:
+		return json.dumps(result)
+	else:
+		return result

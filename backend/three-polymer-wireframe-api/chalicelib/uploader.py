@@ -78,5 +78,5 @@ def validateJson(postData):
 	except AlreadyInBucketError:
 		{"error": "File with this name already exists in S3 bucket. Please rename file and try again." }
 	else:
-		#return {"success": "File is valid for upload"}
+		#upload file if data passes all validation above
 		return mybucket.put_object(Key=settings["data-folder"] + "/" + postData["modelInformation"]["name"] + ".json", Body=str(postData))
