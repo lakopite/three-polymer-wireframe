@@ -383,6 +383,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <vaadin-grid-column>
               <template class="header">cost</template>
               <template>[[_prettifyDollar(item.cost)]]</template>
+              <template class="footer">[[_prettifyDollar(totalCost)]]</template>
             </vaadin-grid-column>
             <!-- NUMERICAL AGGREGATIONS WITHIN STRING AGGREGATION TABLE-->
             <vaadin-grid-column>
@@ -504,6 +505,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             value: []
           },
           grandTotalSum : {
+            type: Number,
+            value: 0
+          },
+          totalCost: {
             type: Number,
             value: 0
           },
@@ -766,6 +771,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.grandTotalSum = _.round(_.sumBy(this.groupSumData, function(o) {
             return o.sum
           }), 6)
+          this.totalCost = _.sumBy(this.groupSumData, function(o) {
+            return o.cost
+          })
           // for pie chart
           var _pieData = []
           for (var i=0; i < this.groupSumData.length; i++) {

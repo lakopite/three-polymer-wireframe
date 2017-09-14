@@ -1,7 +1,7 @@
 # from chalice import Chalice, NotFoundError, ChaliceViewError, UnauthorizedError, CognitoUserPoolAuthorizer
 from chalice import Chalice, NotFoundError, ChaliceViewError
 from datetime import datetime
-from uploader import validateJson
+from chalicelib.uploader import validateJson
 import json
 import os
 import boto3
@@ -13,7 +13,7 @@ app.debug = True
 s3 = boto3.resource('s3')
 
 settings = {
-	'site-bucket': 'arup-model-data',
+	'site-bucket': 'arup-model-test-data',
 	'data-folder': 'three-polymer-wireframe'
 }
 
@@ -52,4 +52,6 @@ def getModels():
 # # @app.route('/echo-json', methods=['POST'], cors=True, authorizer=authorizer)
 @app.route('/echo-json', methods=['POST'], cors=True)
 def echoJson():
-	validateJson()
+	postData = app.current_request.json_body
+	result = validateJson(postData)
+	return json.dumps(result)
