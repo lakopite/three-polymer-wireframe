@@ -41,7 +41,7 @@ class AlreadyInBucketError(Error):
 def validateJson(postData):
     #postData defined in app.py
 	try:
-		#must insert wrong name error? or just on front-end?
+		#WrongNameError necessary to check that upload name matches name within JSON?
 		if "modelInformation" not in postData or "payload" not in postData:
 			raise KeyError
 		if "units" not in postData["modelInformation"] or "name" not in postData["modelInformation"]:
@@ -78,5 +78,5 @@ def validateJson(postData):
 	except AlreadyInBucketError:
 		{"error": "File with this name already exists in S3 bucket. Please rename file and try again." }
 	else:
-		return {"success": "File is valid for upload"}
-		#return mybucket.put_object(Key=settings["data-folder"] + "/" + "testing-chalice.json", Body=str(postData))
+		#return {"success": "File is valid for upload"}
+		return mybucket.put_object(Key=settings["data-folder"] + "/" + postData["modelInformation"]["name"] + ".json", Body=str(postData))
