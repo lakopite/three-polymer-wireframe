@@ -57,10 +57,14 @@ def validateJson(postData):
 			  	raise EmptyVerticesError
 			if not i["metadata"]:
 			  	raise EmptyMetadataError
-		#this might have to be tweaked
 		for obj in mybucket.objects.all():
-			if obj.key == postData["modelInformation"]["name"] + ".json":
+			if os.path.basename(obj.key) == postData["modelInformation"]["name"] + ".json":
 				raise AlreadyInBucketError
+		try:
+			mybucket.put_object(Key=settings["data-folder"] + "/" + postData["modelInformation"]["name"] + ".json", Body=str(postData))
+		except:
+			return {"success": False}
+		return {"success": True}
 	except WrongNameError:
 		return {"error": "File must be a .json -or- name of file does not match name within document"}
 	except KeyError:
@@ -76,7 +80,6 @@ def validateJson(postData):
 	except EmptyMetadataError:
 	  	return {"error": "'metadata' field is empty"}
 	except AlreadyInBucketError:
-		{"error": "File with this name already exists in S3 bucket. Please rename file and try again." }
-	else:
-		#upload file if data passes all validation above
-		return mybucket.put_object(Key=settings["data-folder"] + "/" + postData["modelInformation"]["name"] + ".json", Body=str(postData))
+		return {"error": "File with this name already exists in S3 bucket. Please rename file and try again." }
+	except:
+		return {"error": "unknown error occurred"}

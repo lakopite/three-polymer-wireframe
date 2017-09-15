@@ -13,7 +13,7 @@ app.debug = True
 s3 = boto3.resource('s3')
 
 settings = {
-	'site-bucket': 'arup-model-test-data',
+	'site-bucket': 'arup-model-data',
 	'data-folder': 'three-polymer-wireframe'
 }
 
@@ -54,7 +54,4 @@ def getModels():
 def echoJson():
 	postData = app.current_request.json_body
 	result = validateJson(postData)
-	if result.get('error') is None:
-		return json.dumps(result)
-	else:
-		return result
+	return json.dumps(result)
