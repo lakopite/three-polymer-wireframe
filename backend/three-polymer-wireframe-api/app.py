@@ -13,7 +13,7 @@ app.debug = True
 s3 = boto3.resource('s3')
 
 settings = {
-	'site-bucket': 'arup-model-data',
+	'site-bucket': 'arup-model-test-data',
 	'data-folder': 'three-polymer-wireframe'
 }
 

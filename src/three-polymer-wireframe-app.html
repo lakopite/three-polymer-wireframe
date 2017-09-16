@@ -571,11 +571,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         that._clearUploadInput()
         var toast = Polymer.dom(that.root).querySelector('#uploadSuccessToast')
         toast.show({ text: "File has been uploaded successfully!" })
-        //have dropdown automatically include new uploaded model without having to refresh
-
-        console.log("REMEMBER TO REMOVE THESE LOGS when dropdown refresh is resolved:");
-        console.log(that.jsonUploadPayload);
-        console.log(that.dataOptions);
+        //console.log(that.dataOptions);
       }
 
       handleJsonUpload(evt) {
@@ -1105,12 +1101,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       handleUploadResponse(event, response) {
-        console.log(response.response)
+        //console.log(response.response)
         var resp = response.response;
-        if ("success" in response.response) {
+        if ("success" in resp) {
           if (resp.success) this.$['get-models-request'].generateRequest();
         }
-        //
       }
     }
 
