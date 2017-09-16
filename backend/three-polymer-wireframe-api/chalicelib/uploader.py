@@ -17,9 +17,6 @@ mybucket = s3.Bucket(settings['site-bucket'])
 class Error(Exception):
   pass
 
-class WrongNameError(Error):
-  pass
-
 class MissingModelInfoKeysError(Error):
   pass
 
@@ -58,15 +55,13 @@ def validateJson(postData):
 			if not i["metadata"]:
 			  	raise EmptyMetadataError
 		for obj in mybucket.objects.all():
-			if os.path.basename(obj.key) == postData["modelInformation"]["name"] + ".json":
+			if (os.path.basename(obj.key)).lower() == (postData["modelInformation"]["name"] + ".json").lower():
 				raise AlreadyInBucketError
 		try:
-			mybucket.put_object(Key=settings["data-folder"] + "/" + postData["modelInformation"]["name"] + ".json", Body=str(postData))
+			mybucket.put_object(Key=settings["data-folder"] + "/" + postData["modelInformation"]["name"] + ".json", Body=json.dumps(postData))
 		except:
 			return {"success": False}
 		return {"success": True}
-	except WrongNameError:
-		return {"error": "File must be a .json -or- name of file does not match name within document"}
 	except KeyError:
 		return {"error": "'modelInformation' and 'payload' properties are required"}
 	except MissingModelInfoKeysError:

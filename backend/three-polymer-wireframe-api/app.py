@@ -50,8 +50,8 @@ def getModels():
     	raise ChaliceViewError()
 
 # # @app.route('/echo-json', methods=['POST'], cors=True, authorizer=authorizer)
-@app.route('/echo-json', methods=['POST'], cors=True)
-def echoJson():
+@app.route('/post-model', methods=['POST'], cors=True)
+def postModel():
 	postData = app.current_request.json_body
 	result = validateJson(postData)
 	return json.dumps(result)
