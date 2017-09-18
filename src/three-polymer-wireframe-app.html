@@ -205,7 +205,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </iron-input>
       <div class="buttons">
         <paper-button dialog-dismiss on-tap="_clearUploadInput">Cancel</paper-button>
-        <paper-button id="acceptUploadBtn" dialog-confirm autofocus disabled$="{{_acceptUploadDisabled}}" on-tap="uploadJsonModel">Accept</paper-button>
+        <paper-button id="acceptUploadBtn" dialog-confirm autofocus disabled$="{{_acceptUploadDisabled}}" on-tap="uploadJsonModel">Upload</paper-button>
       </div>
       <paper-toast id="validationToast" duration="3000" class="fit-bottom"></paper-toast>
     </paper-dialog>
@@ -582,7 +582,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var inputFile = this.$.modelUpload.files[0]
         var fileName = inputFile.name
         var fileNameNoExtension = fileName.slice(0, fileName.lastIndexOf('.json'))
-        console.log('Selected file name: ' + fileName)
       	var reader = new FileReader()
         var that = this;
         // Capture the file information
@@ -623,14 +622,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
               }
             //if it does not get stuck on any errors above, it'll make it to the below
-              console.log(that.jsonUploadPayload);
               that._acceptUploadDisabled = false;
             } catch (err) {
                 that._clearUploadInput()
                 var toast = Polymer.dom(that.root).querySelector('#validationToast')
                 toast.show({ text: "File could not be uploaded because " + err })
-            } finally {
-              console.log("tests completed")
             }
           }
         })(inputFile);
