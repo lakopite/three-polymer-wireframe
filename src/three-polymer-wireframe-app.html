@@ -195,14 +195,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
     </style>
-    <iron-ajax id="get-models-request" auto method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
-    <iron-ajax method="GET" id="model-request" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
-    <iron-ajax id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="[[baseUrl]]post-model"></iron-ajax>
+    <iron-ajax headers="{{authHeaders}}" id="get-models-request" auto method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
+    <iron-ajax headers="{{authHeaders}}" method="GET" id="model-request" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
+    <iron-ajax headers="{{authHeaders}}" id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="[[baseUrl]]post-model"></iron-ajax>
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
       <iron-input>
       <input id="modelUpload" label="JSON file" type="file" on-change="handleJsonUpload"></input>
-    </iron-input>
+      </iron-input>
       <div class="buttons">
         <paper-button dialog-dismiss on-tap="_clearUploadInput">Cancel</paper-button>
         <paper-button id="acceptUploadBtn" dialog-confirm autofocus disabled$="{{_acceptUploadDisabled}}" on-tap="uploadJsonModel">Accept</paper-button>
@@ -211,81 +211,81 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </paper-dialog>
     <paper-toast id="uploadSuccessToast" duration="3000"></paper-toast>
     <app-drawer-layout fullbleed>
-      <!-- Drawer content -->
-      <app-drawer id="drawer" slot="drawer">
-        <div style="height: 100%; overflow: auto;">
-        <app-toolbar>
-          <paper-item>Model Options</paper-item>
-        </app-toolbar>
-        <div class="drawer-list">
-          <paper-dropdown-menu label="Model">
-            <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
-              <template is="dom-repeat" items="[[dataOptions]]">
-                <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
-              </template>
-  </paper-listbox>
-  </paper-dropdown-menu>
-  <div hidden$="{{_hideMainDropdown(selectedView)}}">
-    <paper-dropdown-menu id="main-contour-dropdown" label="Contour">
-      <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-        <template is="dom-repeat" items="[[metadataFields]]">
-                  <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
-                </template>
-      </paper-listbox>
-    </paper-dropdown-menu>
-  </div>
-  <div id="filter-container">
-    <paper-item>Model Filters</paper-item>
-    <div class="horizontal">
-      <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min x" class="inline-input" type="number" value="{{geometryFilter.xMin}}" max="[[_computeMax(boundaries.xMax,geometryFilter.xMax)]]" min="[[boundaries.xMin]]"></paper-input>
-      <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max x" class="inline-input" type="number" value="{{geometryFilter.xMax}}" max="[[boundaries.xMax]]" min="[[_computeMin(boundaries.xMin,geometryFilter.xMin)]]"></paper-input>
-    </div>
-    <div class="horizontal">
-      <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min y" class="inline-input" type="number" value="{{geometryFilter.yMin}}" max="[[_computeMax(boundaries.yMax,geometryFilter.yMax)]]" min="[[boundaries.yMin]]"></paper-input>
-      <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max y" class="inline-input" type="number" value="{{geometryFilter.yMax}}" max="[[boundaries.yMax]]" min="[[_computeMin(boundaries.yMin,geometryFilter.yMin)]]"></paper-input>
-    </div>
-    <div class="horizontal">
-      <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min z"  class="inline-input" type="number" value="{{geometryFilter.zMin}}" max="[[_computeMax(boundaries.zMax,geometryFilter.zMax)]]" min="[[boundaries.zMin]]"></paper-input>
-      <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max z" class="inline-input" type="number" value="{{geometryFilter.zMax}}" max="[[boundaries.zMax]]" min="[[_computeMin(boundaries.zMin,geometryFilter.zMin)]]"></paper-input>
-    </div>
-    <!-- for force filter -->
-    <!-- <div hidden$="[[!showNumericalAggregations]]">
-      <div class="horizontal">
+    <!-- Drawer content -->
+    <app-drawer id="drawer" slot="drawer">
+    <div style="height: 100%; overflow: auto;">
+    <app-toolbar>
+      <paper-item>Model Options</paper-item>
+    </app-toolbar>
+    <div class="drawer-list">
+      <paper-dropdown-menu label="Model">
+        <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
+          <template is="dom-repeat" items="[[dataOptions]]">
+            <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
+          </template>
+        </paper-listbox>
+      </paper-dropdown-menu>
+      <div hidden$="{{_hideMainDropdown(selectedView)}}">
+        <paper-dropdown-menu id="main-contour-dropdown" label="Contour">
+          <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
+            <template is="dom-repeat" items="[[metadataFields]]">
+              <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+            </template>
+          </paper-listbox>
+        </paper-dropdown-menu>
+      </div>
+      <div id="filter-container">
+        <paper-item>Model Filters</paper-item>
+        <div class="horizontal">
+          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min x" class="inline-input" type="number" value="{{geometryFilter.xMin}}" max="[[_computeMax(boundaries.xMax,geometryFilter.xMax)]]" min="[[boundaries.xMin]]"></paper-input>
+          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max x" class="inline-input" type="number" value="{{geometryFilter.xMax}}" max="[[boundaries.xMax]]" min="[[_computeMin(boundaries.xMin,geometryFilter.xMin)]]"></paper-input>
+        </div>
+        <div class="horizontal">
+          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min y" class="inline-input" type="number" value="{{geometryFilter.yMin}}" max="[[_computeMax(boundaries.yMax,geometryFilter.yMax)]]" min="[[boundaries.yMin]]"></paper-input>
+          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max y" class="inline-input" type="number" value="{{geometryFilter.yMax}}" max="[[boundaries.yMax]]" min="[[_computeMin(boundaries.yMin,geometryFilter.yMin)]]"></paper-input>
+        </div>
+        <div class="horizontal">
+          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min z" class="inline-input" type="number" value="{{geometryFilter.zMin}}" max="[[_computeMax(boundaries.zMax,geometryFilter.zMax)]]" min="[[boundaries.zMin]]"></paper-input>
+          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max z" class="inline-input" type="number" value="{{geometryFilter.zMax}}" max="[[boundaries.zMax]]" min="[[_computeMin(boundaries.zMin,geometryFilter.zMin)]]"></paper-input>
+        </div>
+        <!-- for force filter -->
+        <!-- <div hidden$="[[!showNumericalAggregations]]">
+        <div class="horizontal">
         <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min [[selectedContourBy]]" class="inline-input" type="number" value="[[minResult]]" min="#"></paper-input>
         <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max [[selectedContourBy]]" class="inline-input" type="number" value="[[maxResult]]" max="#"></paper-input>
+        </div>
+        </div> -->
+        <!-- force filter end -->
+        <div class="horizontal">
+          <paper-button class="filterBtn" raised disabled$="{{_filtersDisabled}}" id="applyBtn" on-tap="applyFilters" type="number">Apply</paper-button>
+          <paper-button class="filterBtn" raised disabled$="{{modelLoading}}" id="resetBtn" on-tap="resetFilters" type="number">Reset</paper-button>
+        </div>
       </div>
-    </div> -->
-    <!-- force filter end -->
-    <div class="horizontal">
-      <paper-button class="filterBtn" raised disabled$="{{_filtersDisabled}}" id="applyBtn" on-tap="applyFilters" type="number">Apply</paper-button>
-      <paper-button class="filterBtn" raised disabled$="{{modelLoading}}" id="resetBtn" on-tap="resetFilters" type="number">Reset</paper-button>
-    </div>
-  </div>
-  <!-- for numerical aggregations -->
-  <div hidden$="{{_hideCsvButton(selectedView)}}">
-    <div class="csv-wrapper">
-      <div hidden$="[[!showNumericalAggregations]]">
-        <div class="csv-button">
-          <paper-button id="csv-button" on-tap="createNumericalCsv">Export Table to CSV</paper-button>
+      <!-- for numerical aggregations -->
+      <div hidden$="{{_hideCsvButton(selectedView)}}">
+        <div class="csv-wrapper">
+          <div hidden$="[[!showNumericalAggregations]]">
+            <div class="csv-button">
+              <paper-button id="csv-button" on-tap="createNumericalCsv">Export Table to CSV</paper-button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- for string aggregations -->
+      <div hidden$="{{_hideCsvButton(selectedView)}}">
+        <div class="csv-wrapper">
+          <div hidden$="[[!showStringAggregations]]">
+            <div class="csv-button">
+              <paper-button id="csv-button" on-tap="createGroupDataCsv">Export Table to CSV</paper-button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <!-- for string aggregations -->
-    <div hidden$="{{_hideCsvButton(selectedView)}}">
-    <div class="csv-wrapper">
-    <div hidden$="[[!showStringAggregations]]">
-    <div class="csv-button">
-      <paper-button id="csv-button" on-tap="createGroupDataCsv">Export Table to CSV</paper-button>
     </div>
-    </div>
-    </div>
-    </div>
-  </div>
-  </div>
-  </app-drawer>
+    </app-drawer>
   <!-- Main content -->
-  <app-header-layout has-scrolling-region>
+    <app-header-layout has-scrolling-region>
     <app-header slot="header" medium-tall>
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
@@ -303,67 +303,66 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </app-toolbar>
     </app-header>
     <iron-pages style="height:100%;" attr-for-selected="name" selected="{{selectedView}}">
-      <div name="model-view" class="three-container">
-        <three-view id="view" scene-background-color="#F5F5F5">
-          <three-model id="model" slot="model" metadata-fields="{{metadataFields}}" is-loading="{{modelLoading}}" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[_modelData]]">
-          </three-model>
-        </three-view>
-      </div>
-      <!-- Quantities tab -->
-      <!-- For numerical aggregations -->
-      <div name="aggregations-view">
-        <div hidden$="[[!showNumericalAggregations]]">
-          <div class="num-wrapper">
+    <div name="model-view" class="three-container">
+      <three-view id="view" scene-background-color="#F5F5F5">
+        <three-model id="model" slot="model" metadata-fields="{{metadataFields}}" is-loading="{{modelLoading}}" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[_modelData]]"></three-model>
+      </three-view>
+    </div>
+    <!-- Quantities tab -->
+    <!-- For numerical aggregations -->
+    <div name="aggregations-view">
+      <div hidden$="[[!showNumericalAggregations]]">
+        <div class="num-wrapper">
           <app-toolbar class="aggregation-toolbar">
             <div main-title>Aggregations</div>
           </app-toolbar>
           <paper-dropdown-menu id="num-contour-dropdown" label="Contour">
             <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
               <template is="dom-repeat" items="[[metadataFields]]">
-                        <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
-                      </template>
+                <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+              </template>
             </paper-listbox>
             </paper-dropdown-menu>
-          </div>
-            <!-- min/max/avg table -->
-              <vaadin-grid class="numerical-aggregations-table" items="[[numericalAggregationsTableData]]">
-                <vaadin-grid-column>
-                  <template class="header">Name</template>
-                  <template>[[item.name]]</template>
-                  <template class="footer">Grand Total: [[_prettify(totalResult)]]</template>
-                </vaadin-grid-column>
-                <vaadin-grid-column>
-                  <template class="header">Result</template>
-                  <template>[[_prettify(item.result)]]</template>
-                </vaadin-grid-column>
-              </vaadin-grid>
         </div>
-        <!-- For string aggregations -->
-        <div hidden$="[[!showStringAggregations]]">
-          <div class="str-header">
-            <app-toolbar class="aggregation-toolbar">
-              <div main-title>Data by Group</div>
-            </app-toolbar>
-            <paper-dropdown-menu id="str-contour-dropdown" label="Contour">
-              <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-                <template is="dom-repeat" items="[[metadataFields]]">
-                          <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
-                        </template>
-              </paper-listbox>
-              </paper-dropdown-menu>
-            <paper-dropdown-menu class="aggregation-toolbar" id="sum-field-dropdown" label="Select Sum Field">
-              <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
-                <template is="dom-repeat" items="[[numericalMetadataKeys]]">
-                  <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
-                </template>
-              </paper-listbox>
-            </paper-dropdown-menu>
+        <!-- min/max/avg table -->
+        <vaadin-grid class="numerical-aggregations-table" items="[[numericalAggregationsTableData]]">
+          <vaadin-grid-column>
+            <template class="header">Name</template>
+            <template>[[item.name]]</template>
+            <template class="footer">Grand Total: [[_prettify(totalResult)]]</template>
+          </vaadin-grid-column>
+          <vaadin-grid-column>
+            <template class="header">Result</template>
+            <template>[[_prettify(item.result)]]</template>
+          </vaadin-grid-column>
+        </vaadin-grid>
+      </div>
+      <!-- For string aggregations -->
+      <div hidden$="[[!showStringAggregations]]">
+        <div class="str-header">
+          <app-toolbar class="aggregation-toolbar">
+            <div main-title>Data by Group</div>
+          </app-toolbar>
+          <paper-dropdown-menu id="str-contour-dropdown" label="Contour">
+            <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
+              <template is="dom-repeat" items="[[metadataFields]]">
+                <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
+          <paper-dropdown-menu class="aggregation-toolbar" id="sum-field-dropdown" label="Select Sum Field">
+            <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
+              <template is="dom-repeat" items="[[numericalMetadataKeys]]">
+                <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
         </div>
         <!-- wrap all string aggregation info -->
-          <div id="wrap-str-info">
+        <div id="wrap-str-info">
           <!-- div holds pie chart -->
           <div id="chart-container"></div>
-            <!-- data by group table -->
+          <!-- data by group table -->
           <div id="group-data-table-section">
           <vaadin-grid class="data-by-group-table" items="[[groupSumData]]">
             <vaadin-grid-column>
@@ -399,13 +398,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template>[[_prettify(item.avg)]]</template>
             </vaadin-grid-column>
           </vaadin-grid>
+          </div>
         </div>
-      </div>
-      </div>
+    </div>
+    </div>
     </iron-pages>
-  </app-header-layout>
-  </app-drawer-layout>
-  </template>
+    </app-header-layout>
+    </app-drawer-layout>
+    </template>
 
   <script>
 
@@ -417,6 +417,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       static get properties() {
         return {
+          authHeaders: {
+            type: Object,
+            value: {}
+          },
           baseUrl: {
             type: String,
             //CI pipeline will replace with the production api link
@@ -581,53 +585,58 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         console.log('Selected file name: ' + fileName)
       	var reader = new FileReader()
         var that = this;
+
+
         // Capture the file information
         reader.onload = (function (theFile) {
     			return function (e) {
     				// console.log('e readAsText = ', e);
     				// console.log('e readAsText target = ', e.target);
               //validation
-              try {
-                that.jsonUploadPayload = JSON.parse(e.target.result)
-                // check that this json has not already been uplaoded
-                if (_.includes(that.dataOptions, fileNameNoExtension))
-                throw "it has already been uploaded"
-                // check that file name matches name in doc
-                if (_.toLower(that.jsonUploadPayload.modelInformation.name) + ".json"!== _.toLower(fileName))
-                throw "it must be a .json -or- name of file does not match name within document"
-                // check that modelInfo and payload keys exist
-                if (_.has(that.jsonUploadPayload, 'modelInformation') === false ||
-                    _.has(that.jsonUploadPayload, 'payload') === false)
-                throw "modelInformation and payload properties are required"
-                // check that modelInfo has units and name keys
-                if (_.has(that.jsonUploadPayload, 'modelInformation.units') === false ||
-                    _.has(that.jsonUploadPayload, 'modelInformation.name') === false)
-                throw "modelInformation must contain units and name"
-                // check that units are either metric or imperial only
-                if (!(that.jsonUploadPayload.modelInformation.units === "metric" ||
-                that.jsonUploadPayload.modelInformation.units === "imperial"))
-                throw "units values must be either imperial or metric"
-                var payloadElems = that.jsonUploadPayload.payload
-                for (var i=0; i < payloadElems.length; i++) {
-                  // go through payload elements and ensure each has vertices and metadata keys
-                  if (_.has(payloadElems[i], 'vertices') === false ||
-                      _.has(payloadElems[i], 'metadata') === false) {
-                    throw "payload must include vertices and metadata for each element"
-                  }
+            try {
+              //check extension
+              if (fileName.slice(-5) !== ".json")
+              throw "file must have a .json extension"
+              // check that this json has not already been uplaoded
+              if (_.includes(that.dataOptions, fileNameNoExtension))
+              throw "it has already been uploaded"
+              that.jsonUploadPayload = JSON.parse(e.target.result)
+              // check that file name matches name in doc
+              if (_.toLower(that.jsonUploadPayload.modelInformation.name) + ".json"!== _.toLower(fileName))
+              throw "name of file does not match name within document"
+              // check that modelInfo and payload keys exist
+              if (_.has(that.jsonUploadPayload, 'modelInformation') === false ||
+                  _.has(that.jsonUploadPayload, 'payload') === false)
+              throw "modelInformation and payload properties are required"
+              // check that modelInfo has units and name keys
+              if (_.has(that.jsonUploadPayload, 'modelInformation.units') === false ||
+                  _.has(that.jsonUploadPayload, 'modelInformation.name') === false)
+              throw "modelInformation must contain units and name"
+              // check that units are either metric or imperial only
+              if (!(that.jsonUploadPayload.modelInformation.units === "metric" ||
+              that.jsonUploadPayload.modelInformation.units === "imperial"))
+              throw "units values must be either imperial or metric"
+              var payloadElems = that.jsonUploadPayload.payload
+              for (var i=0; i < payloadElems.length; i++) {
+                // go through payload elements and ensure each has vertices and metadata keys
+                if (_.has(payloadElems[i], 'vertices') === false ||
+                    _.has(payloadElems[i], 'metadata') === false) {
+                  throw "payload must include vertices and metadata for each element"
                 }
-                //if it does not get stuck on any errors above, it'll make it to the below
-                console.log(that.jsonUploadPayload);
-                that._acceptUploadDisabled = false;
-              } catch (err) {
-                  that._clearUploadInput()
-                  var toast = Polymer.dom(that.root).querySelector('#validationToast')
-                  toast.show({ text: "File could not be uploaded because " + err })
-              } finally {
-                console.log("tests completed")
               }
-                  }
-              })(inputFile);
-            reader.readAsText(inputFile);
+            //if it does not get stuck on any errors above, it'll make it to the below
+              console.log(that.jsonUploadPayload);
+              that._acceptUploadDisabled = false;
+            } catch (err) {
+                that._clearUploadInput()
+                var toast = Polymer.dom(that.root).querySelector('#validationToast')
+                toast.show({ text: "File could not be uploaded because " + err })
+            } finally {
+              console.log("tests completed")
+            }
+          }
+        })(inputFile);
+        reader.readAsText(inputFile);
       }
       //clear upload input and disable accept button
       _clearUploadInput() {
