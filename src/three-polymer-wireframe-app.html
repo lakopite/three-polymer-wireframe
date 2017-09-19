@@ -194,6 +194,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         --paper-toast-color: white;
       }
 
+      #search-slot {
+        display: flex;
+      }
+
+
     </style>
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" auto method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" method="GET" id="model-request" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
@@ -218,6 +223,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-item>Model Options</paper-item>
     </app-toolbar>
     <div class="drawer-list">
+      <div id="search-slot"><paper-input id="search-input" label="Search Models..."></paper-input id="searchBtn"><paper-button on-click="searchModels">Search</paper-button></div>
       <paper-dropdown-menu label="Model">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
           <template is="dom-repeat" items="[[dataOptions]]">
@@ -636,6 +642,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _clearUploadInput() {
         Polymer.dom(this.root).querySelector('#modelUpload').value = ''
         this._acceptUploadDisabled = true;
+      }
+
+      searchModels() {
+        var that = this;
+        var input = Polymer.dom(that.root).querySelector('#search-input')
+        var filter = _.toUpper(input.value)
+        console.log(filter);
+        console.log(that.dataOptions);
+        for (var i=0; i < that.dataOptions.length; i++) {
+          if (_.toUpper(that.dataOptions[i]).includes(filter)) {
+            console.log(that.dataOptions[i]);
+            //the below is what makes the models load in dropdown
+            //this.$['get-models-request'].generateRequest();
+          }
+        }
       }
 
       _isWithinBounds(val, min, max) {
