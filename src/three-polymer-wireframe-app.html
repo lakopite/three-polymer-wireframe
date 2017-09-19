@@ -195,7 +195,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       #search-slot {
-        display: flex;
+        display: block;
+      }
+
+      #search-input {
+        margin: .5em;
+      }
+
+      #searchBtn {
+        background: #BDBDBD;
+        height: .75em;
+        padding: 1em;
+        margin: .5em;
       }
 
 
@@ -206,7 +217,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
       <iron-input>
-      <input id="modelUpload" label="JSON file" type="file" on-change="handleJsonUpload"></input>
+      <input id="modelUpload" type="file" on-change="handleJsonUpload"></input>
       </iron-input>
       <div class="buttons">
         <paper-button dialog-dismiss on-tap="_clearUploadInput">Cancel</paper-button>
@@ -223,7 +234,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-item>Model Options</paper-item>
     </app-toolbar>
     <div class="drawer-list">
-      <div id="search-slot"><paper-input id="search-input" label="Search Models..."></paper-input id="searchBtn"><paper-button on-tap="searchModels" disabled$="{{_searchDisabled}}">Search</paper-button></div>
+      <div id="search-slot"><iron-input><input id="search-input"></iron-input>
+        <paper-button id="searchBtn" on-tap="searchModels" disabled$="{{_searchDisabled}}">Search Models</paper-button>
+      </div>
+      <p id="number-of-results"></p>
       <paper-dropdown-menu label="Model">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
           <template is="dom-repeat" items="[[dataOptions]]">
@@ -664,9 +678,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         console.log(newDataOptions);
         //this.set('dataOptions', newDataOptions)
         //console.log(this.dataOptions);
+        Polymer.dom(that.root).querySelector('#number-of-results').innerHTML = newDataOptions.length + " results in dropdown..."
         that._initData(newDataOptions)
       }
-
 
       _isWithinBounds(val, min, max) {
         return val >= min && val <= max
