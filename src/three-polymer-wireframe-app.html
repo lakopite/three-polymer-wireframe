@@ -194,25 +194,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         --paper-toast-color: white;
       }
 
-      #search-slot {
-        display: block;
-      }
-
-      #search-input {
-        margin: .5em;
-      }
-
-      .search-buttons {
-        display: flex;
-      }
-
-      .searchBtns {
-        background: #BDBDBD;
-        height: .75em;
-        padding: 1em;
-        margin: .5em;
-      }
-
     </style>
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" auto method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" method="GET" id="model-request" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
@@ -237,15 +218,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-item>Model Options</paper-item>
     </app-toolbar>
     <div class="drawer-list">
-      <!-- <div id="search-slot"><iron-input><input id="search-input"></input></iron-input> -->
-      <div id="search-slot"><paper-input id="search-input" value="{{searchInput}}"></paper-input>
-        <div class="search-buttons">
-          <!-- BELOW: disabled$="{{_searchDisabled}}" -->
-          <!-- <paper-button class="searchBtns" on-tap="searchModels">Search</paper-button>
-          <paper-button class="searchBtns" on-tap="clearSearch" disabled$="{{_clearSearchDisabled}}">Clear</paper-button> -->
-        </div>
-      </div>
-      <p id="number-of-results"></p>
+      <paper-input id="search-input" value="{{searchInput}}"></paper-input>
       <paper-dropdown-menu label="Model">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
           <!-- <paper-input value="{{inputVal}}"></paper-input> -->
@@ -677,36 +650,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       searchFilter(searchInput) {
+        //to clear results of previous search and filter within ALL models in bucket
         this.dataOptions = this.getModelsResp
         searchInput = _.toLower(searchInput)
         var that = this;
         that.dataOptions = _.filter(that.dataOptions, function(o) {
-        return _.toLower(o).indexOf(searchInput) !== -1
+          return _.toLower(o).indexOf(searchInput) !== -1
         })
         console.log(that.dataOptions)
       }
-
-      // searchModels() {
-      //   this.dataOptions = this.getModelsResp
-      //   var that = this;
-      //   var input = Polymer.dom(that.root).querySelector('#search-input')
-      //   var filter = _.toLower(input.value)
-      //   var newDataOptions = []
-      //   for (var i=0; i < that.dataOptions.length; i++) {
-      //     if (_.toLower(that.dataOptions[i]).includes(filter)) {
-      //       newDataOptions.push(that.dataOptions[i])
-      //     }
-      //   }
-      //   Polymer.dom(this.root).querySelector('#number-of-results').innerHTML = newDataOptions.length + " results in dropdown:"
-      //   this._clearSearchDisabled = false;
-      //   this._initData(newDataOptions)
-      // }
-      //
-      // clearSearch() {
-      //   this.dataOptions = this.getModelsResp
-      //   Polymer.dom(this.root).querySelector('#search-input').value = ''
-      //   Polymer.dom(this.root).querySelector('#number-of-results').innerHTML = ''
-      // }
 
       _isWithinBounds(val, min, max) {
         return val >= min && val <= max
