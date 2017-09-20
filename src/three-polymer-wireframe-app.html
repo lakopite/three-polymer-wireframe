@@ -234,8 +234,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-item>Model Options</paper-item>
     </app-toolbar>
     <div class="drawer-list">
-      <div id="search-slot"><iron-input><input id="search-input"></iron-input>
-        <paper-button id="searchBtn" on-tap="searchModels" disabled$="{{_searchDisabled}}">Search Models</paper-button>
+      <div id="search-slot"><paper-input id="search-input" label="Search Models..."></paper-input>
+        <paper-button id="searchBtn" on-tap="searchModels" disabled$="{{_searchDisabled}}">Search</paper-button>
       </div>
       <p id="number-of-results"></p>
       <paper-dropdown-menu label="Model">
@@ -663,22 +663,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       searchModels() {
+        this.dataOptions = this.getModelsResp
         var that = this;
         var input = Polymer.dom(that.root).querySelector('#search-input')
-        var filter = _.toUpper(input.value)
-        console.log(filter);
-        console.log(that.dataOptions);
+        var filter = _.toLower(input.value)
         var newDataOptions = []
         for (var i=0; i < that.dataOptions.length; i++) {
-          if (_.toUpper(that.dataOptions[i]).includes(filter)) {
-            console.log(that.dataOptions[i]);
+          if (_.toLower(that.dataOptions[i]).includes(filter)) {
             newDataOptions.push(that.dataOptions[i])
           }
         }
-        console.log(newDataOptions);
-        //this.set('dataOptions', newDataOptions)
-        //console.log(this.dataOptions);
-        Polymer.dom(that.root).querySelector('#number-of-results').innerHTML = newDataOptions.length + " results in dropdown..."
+        Polymer.dom(that.root).querySelector('#number-of-results').innerHTML = newDataOptions.length + " results in dropdown:"
         that._initData(newDataOptions)
       }
 
@@ -1093,6 +1088,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       handleOptionsResponse(event, response) {
+        this.getModelsResp = response.response
         var resp = response.response;
         if (resp) {
           this.appLoading = false
