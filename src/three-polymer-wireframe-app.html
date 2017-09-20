@@ -218,11 +218,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-item>Model Options</paper-item>
     </app-toolbar>
     <div class="drawer-list">
-      <paper-input id="search-input" value="{{searchInput}}"></paper-input>
+      <paper-input id="search-input" label="Search Models..." value="{{searchInput}}"></paper-input>
       <paper-dropdown-menu label="Model">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
           <!-- <paper-input value="{{inputVal}}"></paper-input> -->
-          <template is="dom-repeat" items="[[dataOptions]]" filter="{{searchFilter(searchInput)}}">
+          <template is="dom-repeat" items="[[dataOptions]]" filter="{{searchFilter(searchInput)}}" selected="">
           <!-- <template is="dom-repeat" items="[[dataOptions]]"> -->
             <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
           </template>
@@ -654,10 +654,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.dataOptions = this.getModelsResp
         searchInput = _.toLower(searchInput)
         var that = this;
-        that.dataOptions = _.filter(that.dataOptions, function(o) {
+        var result = _.filter(that.dataOptions, function(o) {
           return _.toLower(o).indexOf(searchInput) !== -1
         })
-        console.log(that.dataOptions)
+        that.dataOptions = _.uniq(_.concat(that.selectedModel, result))
+        //console.log(that.dataOptions)
       }
 
       _isWithinBounds(val, min, max) {
