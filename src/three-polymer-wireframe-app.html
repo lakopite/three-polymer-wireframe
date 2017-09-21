@@ -218,12 +218,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-item>Model Options</paper-item>
     </app-toolbar>
     <div class="drawer-list">
-      <paper-input id="search-input" label="Search Models..." value="{{searchInput}}"></paper-input>
+      <!-- <paper-input id="search-input" label="Search Models..." value="{{searchInput}}"></paper-input> -->
       <paper-dropdown-menu label="Model">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
-          <!-- <paper-input value="{{inputVal}}"></paper-input> -->
-          <template is="dom-repeat" items="[[dataOptions]]" filter="{{searchFilter(searchInput)}}" selected="">
-          <!-- <template is="dom-repeat" items="[[dataOptions]]"> -->
+          <paper-input id="search-input" label="Search Models..." value="{{searchInput}}" type="text" autofocus minlength="1"></paper-input>
+          <!-- REMOVED FROM TEMPLATE BELOW: selected="" -->
+          <template is="dom-repeat" items="[[dataOptions]]" filter="{{searchFilter(searchInput)}}">
             <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
           </template>
         </paper-listbox>
@@ -592,7 +592,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       handleJsonUpload(evt) {
         var inputFile = this.$.modelUpload.files[0]
         var fileName = inputFile.name
-        var fileNameNoExtension = fileName.slice(0, fileName.lastIndexOf('.json'))
+        var fileNameNoExtension = fileName.slice(0, fileName.lastIndexOf('.'))
+        var extension = fileName.slice(fileName.indexOf('.'))
       	var reader = new FileReader()
         var that = this;
         // Capture the file information
@@ -604,32 +605,36 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             try {
               //check extension
               if (fileName.slice(-5) !== ".json")
-              throw "file must have a .json extension"
+              throw "file has a " + "\"'" + extension  + "'\"" + " extension, but must be a .json file."
               // check that this json has not already been uplaoded
               if (_.includes(that.dataOptions, fileNameNoExtension))
-              throw "it has already been uploaded"
+              throw "a file with the name " + "\"'" + fileNameNoExtension + "'\"" + " has already been uploaded."
+              //parse JSON
               that.jsonUploadPayload = JSON.parse(e.target.result)
               // check that file name matches name in doc
               if (_.toLower(that.jsonUploadPayload.modelInformation.name) + ".json"!== _.toLower(fileName))
-              throw "name of file does not match name within document"
-              // check that modelInfo and payload keys exist
-              if (_.has(that.jsonUploadPayload, 'modelInformation') === false ||
-                  _.has(that.jsonUploadPayload, 'payload') === false)
-              throw "modelInformation and payload properties are required"
+              throw "file name is "  + "\"'" + fileName + "'\"" + " and modelInformation.name is " + "\"'" + that.jsonUploadPayload.modelInformation.name + "'\"" + ". These must match."
+              // check that modelInfo keys exists
+              if (_.has(that.jsonUploadPayload, 'modelInformation') === false)
+              throw "it is missing a 'modelInformation' key. This property is required."
+              // check that payload key exists
+              if (_.has(that.jsonUploadPayload, 'payload') === false)
+              throw "it is missing payload key. This property is required."
               // check that modelInfo has units and name keys
-              if (_.has(that.jsonUploadPayload, 'modelInformation.units') === false ||
-                  _.has(that.jsonUploadPayload, 'modelInformation.name') === false)
-              throw "modelInformation must contain units and name"
+              if (_.has(that.jsonUploadPayload, 'modelInformation.units') === false)
+              throw "modelInformation must contain a 'units' key."
+              if (_.has(that.jsonUploadPayload, 'modelInformation.name') === false)
+              throw "modelInformation must contain a 'name' key."
               // check that units are either metric or imperial only
               if (!(that.jsonUploadPayload.modelInformation.units === "metric" ||
               that.jsonUploadPayload.modelInformation.units === "imperial"))
-              throw "units values must be either imperial or metric"
+              throw "units values must be either imperial or metric. " + "\"'" + that.jsonUploadPayload.modelInformation.units + "'\"" + " is not a valid unit type."
               var payloadElems = that.jsonUploadPayload.payload
               for (var i=0; i < payloadElems.length; i++) {
                 // go through payload elements and ensure each has vertices and metadata keys
                 if (_.has(payloadElems[i], 'vertices') === false ||
                     _.has(payloadElems[i], 'metadata') === false) {
-                  throw "payload must include vertices and metadata for each element"
+                  throw "payload must include both a 'vertices' and 'metadata' key for each element."
                 }
               }
             //if it does not get stuck on any errors above, it'll make it to the below
@@ -658,7 +663,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return _.toLower(o).indexOf(searchInput) !== -1
         })
         that.dataOptions = _.uniq(_.concat(that.selectedModel, result))
-        //console.log(that.dataOptions)
+        console.log("SEARCHING: " + searchInput)
+        console.log("RESULTS:")
+        console.log(that.dataOptions);
       }
 
       _isWithinBounds(val, min, max) {
