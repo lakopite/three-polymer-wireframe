@@ -226,10 +226,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-item>Model Options</paper-item>
     </app-toolbar>
     <div class="drawer-list">
-      <!-- <paper-input id="search-input" label="Search Models..." value="{{searchInput}}"></paper-input> -->
+      <paper-input id="search-input" label="Search Models..." value="{{searchInput}}"></paper-input>
       <paper-dropdown-menu label="Model">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
-          <paper-input id="search-input" label="Search Models..." value="{{searchInput}}" type="text" autofocus minlength="1"></paper-input>
+          <!-- <paper-input id="search-input" label="Search Models..." value="{{searchInput}}" type="text" autofocus minlength="1"></paper-input> -->
           <!-- REMOVED FROM TEMPLATE BELOW: selected="" -->
           <template is="dom-repeat" items="[[dataOptions]]" filter="{{searchFilter(searchInput)}}">
             <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
