@@ -189,6 +189,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         border: 1px solid gray;
       }
 
+      .yellow-toast {
+        text-transform: none;
+        color: #eeff41;
+      }
+
       #uploadSuccessToast {
         --paper-toast-background-color: green;
         --paper-toast-color: white;
@@ -207,7 +212,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-button dialog-dismiss on-tap="_clearUploadInput">Cancel</paper-button>
         <paper-button id="acceptUploadBtn" dialog-confirm autofocus disabled$="{{_acceptUploadDisabled}}" on-tap="uploadJsonModel">Upload</paper-button>
       </div>
-      <paper-toast id="validationToast" duration="3000" class="fit-bottom"></paper-toast>
+      <paper-toast id="validationToast" duration="0" class="fit-bottom">
+        <paper-button on-tap="" class="yellow-toast">Try Again</paper-button>
+        <paper-button on-tap="closeToast" class="yellow-toast">Cancel</paper-button>
+      </paper-toast>
     </paper-dialog>
     <paper-toast id="uploadSuccessToast" duration="3000"></paper-toast>
     <app-drawer-layout fullbleed>
@@ -584,9 +592,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var that = this
         that.$['json-upload-request'].generateRequest();
         that._clearUploadInput()
-        var toast = Polymer.dom(that.root).querySelector('#uploadSuccessToast')
-        toast.show({ text: "File has been uploaded successfully!" })
+        this.$.uploadSuccessToast.show({ text: "File has been uploaded successfully!" })
         //console.log(that.dataOptions);
+      }
+
+      closeToast() {
+        //var toast = Polymer.dom(this.root).querySelector('#validationToast')
+        this.$.validationToast.hide()
       }
 
       handleJsonUpload(evt) {
