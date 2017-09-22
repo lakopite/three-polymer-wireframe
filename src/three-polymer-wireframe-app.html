@@ -205,6 +205,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <iron-ajax headers="{{authHeaders}}" id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="[[baseUrl]]post-model"></iron-ajax>
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
+      <p>Uploaded by:</p>
+      <paper-input id="user-email" label="username" value="{{userEmail}}">
+        <div slot="suffix">@arup.com</div>
+      </paper-input>
       <iron-input>
       <input id="modelUpload" type="file" on-change="handleJsonUpload"></input>
       </iron-input>
@@ -593,6 +597,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         that.$['json-upload-request'].generateRequest();
         that._clearUploadInput()
         this.$.uploadSuccessToast.show({ text: "File has been uploaded successfully!" })
+        that.userEmail = ''
         //console.log(that.dataOptions);
       }
 
@@ -650,7 +655,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
               }
             //if it does not get stuck on any errors above, it'll make it to the below
-              that._acceptUploadDisabled = false;
+              that._checkEmailField()
             } catch (err) {
                 that._clearUploadInput()
                 var toast = Polymer.dom(that.root).querySelector('#validationToast')
@@ -659,6 +664,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         })(inputFile);
         reader.readAsText(inputFile);
+      }
+
+      _checkEmailField(userEmail) {
+        console.log(this.userEmail);
+        userEmail = Polymer.dom(this.root).querySelector('#user-email').value
+        try {
+          if (_.isEmpty(userEmail)) {
+            throw "you must include your email"
+          }
+          this._acceptUploadDisabled = false;
+        } catch (err) {
+          throw err
+        }
       }
       //clear upload input and disable accept button
       _clearUploadInput() {
@@ -675,9 +693,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return _.toLower(o).indexOf(searchInput) !== -1
         })
         that.dataOptions = _.uniq(_.concat(that.selectedModel, result))
-        console.log("SEARCHING: " + searchInput)
-        console.log("RESULTS:")
-        console.log(that.dataOptions);
+        // console.log("SEARCHING: " + searchInput)
+        // console.log("RESULTS:")
+        // console.log(that.dataOptions);
       }
 
       _isWithinBounds(val, min, max) {
@@ -1021,6 +1039,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _contourPropsChanged(metadataFields) {
+        this.metadataFields = this.metadataFields.sort()
         if (this.metadataFields.indexOf(this.selectedContourBy) === -1) {
           this.selectedContourBy = undefined;
           if (this.metadataFields.length > 0) {
