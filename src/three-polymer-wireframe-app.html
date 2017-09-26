@@ -179,7 +179,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       #csv-button {
-        margin: 25em 0 0 0;
+        margin: 60px 0 0 0;
         background: var(--app-primary-color);
         color: #FFF;
       }
@@ -390,16 +390,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </vaadin-grid-column>
             <vaadin-grid-column>
               <template class="header">
-                <vaadin-grid-sorter path="sum">[[selectedSumField]] sum [[_specifyUnits(selectedSumField)]]</vaadin-grid-sorter>
+                <vaadin-grid-sorter path="sum">sum [[selectedSumField]] [[_specifyUnits(selectedSumField)]]</vaadin-grid-sorter>
               </template>
               <template>[[_prettify(item.sum)]]</template>
               <template class="footer">[[_prettify(grandTotalSum)]] [[_specifyUnits(selectedSumField)]]</template>
             </vaadin-grid-column>
-            <vaadin-grid-column>
+            <!-- <vaadin-grid-column>
               <template class="header">cost (USD)</template>
               <template>[[_prettifyDollar(item.cost)]] USD</template>
               <template class="footer">[[_prettifyDollar(totalCost)]] USD</template>
-            </vaadin-grid-column>
+            </vaadin-grid-column> -->
             <!-- NUMERICAL AGGREGATIONS WITHIN STRING AGGREGATION TABLE-->
             <vaadin-grid-column>
               <template class="header">min [[selectedSumField]] [[_specifyUnits(selectedSumField)]]</template>
@@ -646,9 +646,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               throw "modelInformation must contain a 'units' key."
               if (_.has(that.jsonUploadPayload, 'modelInformation.name') === false)
               throw "modelInformation must contain a 'name' key."
-
-              //right here add email
-
+              //add email of user uploading file
+              that.jsonUploadPayload.modelInformation.user = that.userEmail
               // check that units are either metric or imperial only
               if (!(that.jsonUploadPayload.modelInformation.units === "metric" ||
               that.jsonUploadPayload.modelInformation.units === "imperial"))
@@ -679,8 +678,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       // }
 
       _checkEmailField(userEmail) {
-        //console.log(this.userEmail);
-        userEmail = Polymer.dom(this.root).querySelector('#user-email').value
+        userEmail = this.jsonUploadPayload.modelInformation.user
         try {
           if (_.isEmpty(userEmail)) {
             throw "you must include your email"
@@ -727,15 +725,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         measurement = _.toLower(that.selectedContourBy)
         unitType = _.toLower(that.currentModelResp.modelInformation.units)
         if (measurement.includes('area')) {
-          return unitType === 'imperial' ? ' (in\u00B2)' : ' (mm\u00B2)'
+          return unitType === 'imperial' ? that.unitLabel = ' (in\u00B2)' : that.unitLabel = ' (mm\u00B2)'
         } else if (measurement.includes('length')) {
-          return unitType === 'imperial' ? ' (in)' : ' (mm)'
+          return unitType === 'imperial' ? that.unitLabel = ' (in)' : that.unitLabel = ' (mm)'
         } else if (measurement.includes('mass')) {
-          return unitType === 'imperial' ? ' (lb)' : ' (kg)'
+          return unitType === 'imperial' ? that.unitLabel = ' (lb)' : that.unitLabel = ' (kg)'
         } else if (measurement.includes('vol')) {
-          return unitType === 'imperial' ? ' (in\u00B3)' : ' (mm\u00B3)'
+          return unitType === 'imperial' ? that.unitLabel = ' (in\u00B3)' : that.unitLabel = ' (mm\u00B3)'
         } else if (measurement.includes('cost')) {
-          return unitType === 'imperial' ? ' (USD)' : ''
+          return unitType === 'imperial' ? that.unitLabel = ' (USD)' : ''
         } else {
           return ''
         }
@@ -751,15 +749,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         measurement = _.toLower(that.selectedSumField)
         unitType = _.toLower(that.currentModelResp.modelInformation.units)
         if (measurement.includes('area')) {
-          return unitType === 'imperial' ? ' (in\u00B2)' : ' (mm\u00B2)'
+          return unitType === 'imperial' ? that.unitLabel = ' (in\u00B2)' : that.unitLabel =' (mm\u00B2)'
         } else if (measurement.includes('length')) {
-          return unitType === 'imperial' ? ' (in)' : ' (mm)'
+          return unitType === 'imperial' ? that.unitLabel =' (in)' : that.unitLabel =' (mm)'
         } else if (measurement.includes('mass')) {
-          return unitType === 'imperial' ? ' (lb)' : ' (kg)'
+          return unitType === 'imperial' ? that.unitLabel =' (lb)' : that.unitLabel =' (kg)'
         } else if (measurement.includes('vol')) {
-          return unitType === 'imperial' ? ' (in\u00B3)' : ' (mm\u00B3)'
+          return unitType === 'imperial' ? that.unitLabel =' (in\u00B3)' : that.unitLabel =' (mm\u00B3)'
         } else if (measurement.includes('cost')) {
-          return unitType === 'imperial' ? ' (USD)' : ''
+          return unitType === 'imperial' ? that.unitLabel =' (USD)' : ''
         } else {
           return ''
         }
@@ -882,6 +880,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               'max' : maxByGroup,
               'avg' : avgByGroup
             }
+            //groupSumDataSetup[this.selectedSumField + " sum " + "in" ]
             this.push('groupSumData', groupSumDataSetup)
             this.push('allObjectsByGroupDupe', groupObjects)
           }
@@ -1026,38 +1025,58 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       createNumericalCsv() {
         var rowData = ''
-        for (var i=0; i < this.numericalAggregationsTableData.length; i++) {
-          this.headers = [_.keys(this.numericalAggregationsTableData[i])] + '\r\n'
-          var el = [_.values(this.numericalAggregationsTableData[i])] + '\r\n'
-        	rowData += el
+        if (this.numericalAggregationsTableData.length > 0) {
+          for (var i=0; i < this.numericalAggregationsTableData.length; i++) {
+            this.numDataHeaders = _.keys(this.numericalAggregationsTableData[i])
+            var el = [_.values(this.numericalAggregationsTableData[i])] + '\r\n'
+          	rowData += el
+          }
+          var that = this;
+          var headers_ = _.map(this.numDataHeaders, function(h) {
+            if (h === 'name') {
+              return h
+            }
+            return h + that.unitLabel
+          })
+          this.numDataHeaders = headers_ + '\r\n'
+          var csvData = this.numDataHeaders + rowData
+          var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
+          var link = document.createElement("a");
+          link.href = uri;
+          link.style = "visibility:hidden";
+          link.download = this.selectedModel + ' ' + new Date() + ".csv";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
         }
-        var csvData = this.headers + rowData
-        var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
-        var link = document.createElement("a");
-        link.href = uri;
-        link.style = "visibility:hidden";
-        link.download = this.selectedModel + ' ' + new Date() + ".csv";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
       }
 
       createGroupDataCsv() {
         var rowData = ''
-        for (var i=0; i < this.groupSumData.length; i++) {
-          this.headers = [_.keys(this.groupSumData[i])] + '\r\n'
-          var el = [_.values(this.groupSumData[i])] + '\r\n'
-        	rowData += el
+        if (this.groupSumData.length > 0) {
+          for (var i=0; i < this.groupSumData.length; i++) {
+            this.groupDataHeaders = _.keys(this.groupSumData[i])
+            var el = [_.values(this.groupSumData[i])] + '\r\n'
+          	rowData += el
+          }
+          var that = this;
+          var headers_ = _.map(this.groupDataHeaders,function(h) {
+            if (h === 'group') {
+              return h
+            }
+            return that.selectedSumField + " " + h + that.unitLabel
+          })
+          this.groupDataHeaders = headers_ + '\r\n';
+          var csvData = this.groupDataHeaders + rowData
+          var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
+          var link = document.createElement("a");
+          link.href = uri;
+          link.style = "visibility:hidden";
+          link.download = this.selectedModel + ' ' + new Date() + ".csv";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
         }
-        var csvData = this.headers + rowData
-        var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
-        var link = document.createElement("a");
-        link.href = uri;
-        link.style = "visibility:hidden";
-        link.download = this.selectedModel + ' ' + new Date() + ".csv";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
       }
 
       _hideMainDropdown(currentPage) {
