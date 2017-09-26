@@ -48,9 +48,18 @@ def getModels():
     except:
     	raise ChaliceViewError()
 
-# # @app.route('/echo-json', methods=['POST'], cors=True, authorizer=authorizer)
+# # @app.route('/post-json', methods=['POST'], cors=True, authorizer=authorizer)
 @app.route('/post-model', methods=['POST'], cors=True)
 def postModel():
 	postData = app.current_request.json_body
 	result = validateJson(postData)
 	return json.dumps(result)
+
+# # @app.route('/delete-model', methods=['DELETE'], cors=True, authorizer=authorizer)
+# @app.route('/delete-model', methods=['DELETE'], cors=True)
+# def deleteModel():
+# 	try:
+# 		json_object.delete()
+# 	except:
+# 		return {"success": False}
+# 	return {"success": True}

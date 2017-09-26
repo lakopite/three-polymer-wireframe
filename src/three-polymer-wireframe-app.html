@@ -201,8 +201,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     </style>
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" auto method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
-    <iron-ajax headers="{{authHeaders}}" method="GET" id="model-request" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
+    <iron-ajax headers="{{authHeaders}}" id="model-request" method="GET" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="[[baseUrl]]post-model"></iron-ajax>
+    <!-- ?\<iron-ajax headers="{{authHeaders}}" id="remove-upload-request" method="DELETE" content-type="application/json" on-response="handleModelRemoval" url="[[baseUrl]]delete-model"></iron-ajax> -->
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
       <p>Uploaded by:</p>
@@ -236,7 +237,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <!-- <paper-input id="search-input" label="Search Models..." value="{{searchInput}}" type="text" autofocus minlength="1"></paper-input> -->
           <!-- REMOVED FROM TEMPLATE BELOW: selected="" -->
           <template is="dom-repeat" items="[[dataOptions]]" filter="{{searchFilter(searchInput)}}">
-            <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
+            <paper-item class="dropdown-item" on-mouseover="mouseOver" name="[[item]]">[[item]]</paper-item>
           </template>
         </paper-listbox>
       </paper-dropdown-menu>
@@ -584,6 +585,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         super();
       }
 
+      mouseOver() {
+        //do something
+        //console.log("hovering over item!")
+      }
+
       uploadJsonModel() {
         var that = this
         that.$['json-upload-request'].generateRequest();
@@ -595,7 +601,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       reopenUploadBox(){
         this.$.validationToast.hide()
-        this.userEmail = ''
         Polymer.dom(this.root).querySelector('#addModelDialog').open();
       }
 
@@ -666,8 +671,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         reader.readAsText(inputFile);
       }
 
+      // handleModelRemoval() {
+      //   this.$['remove-upload-request'].generateRequest();
+      // }
+
       _checkEmailField(userEmail) {
-        console.log(this.userEmail);
+        //console.log(this.userEmail);
         userEmail = Polymer.dom(this.root).querySelector('#user-email').value
         try {
           if (_.isEmpty(userEmail)) {
@@ -709,6 +718,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _prettifyDollar(n) {
         return (n) ? n.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : ""
       }
+
+      // _specifiyUnits(measurement, unitType) {
+      //selectedSumField:
+      //   measurement = _.toLower(measurement)
+      //this.currentModelResp.modelInformation.units
+      //   unitType = _.toLower(unitType)
+      //   switch(measurement) {
+      //     case 'volume':
+      //       return unitType === 'imperial' ? 'kips' : 'kilos';
+      //       break;
+      //     case 'length':
+      //       return unitType === 'imperial' ? 'inches' : 'cm';
+      //       break;
+      //     case 'mass':
+      //       return unitType === 'imperial' ? 'kips' : 'kilos';
+      //       break;
+      //     default:
+      //       return 'unknown units';
+      //   }
+      // }
 
       _numericalAggregations() {
         this.showStringAggregations = false;
@@ -845,6 +874,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
           this.pieData = _pieData;
         }
+        //log unit type
+        console.log(this.currentModelResp.modelInformation.units)
         this.showStringAggregations = true;
       }
 
@@ -1127,13 +1158,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       handleDataResponse(event, response) {
-        var resp = response.response;
-        //console.log(resp.modelInformation.units);
-        // console.log("data received")
-        if (resp && resp.modelInformation.name === this.selectedModel && "payload" in resp) {
+        this.currentModelResp = response.response
+        if (this.currentModelResp && this.currentModelResp.modelInformation.name === this.selectedModel && "payload" in this.currentModelResp) {
           this.appLoading = false;
           this.set('_modelData', {
-            'linearElements': resp.payload,
+            'linearElements': this.currentModelResp.payload,
             'planarElements': []
           });
           //set selectedSumField to undefined in order to trigger stringAggregtions initialization
