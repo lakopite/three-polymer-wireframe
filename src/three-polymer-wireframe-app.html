@@ -344,8 +344,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <vaadin-grid class="numerical-aggregations-table" items="[[numericalAggregationsTableData]]">
           <vaadin-grid-column>
             <template class="header">Name</template>
-            <template>[[item.name]]</template>
-            <template class="footer">Grand Total: [[_prettify(totalResult)]]</template>
+            <template>[[item.name]] [[_numericalAggUnitLabels(selectedContourBy)]]</template>
+            <template class="footer">Grand Total: [[_prettify(totalResult)]] [[_numericalAggUnitLabels(selectedContourBy)]]</template>
           </vaadin-grid-column>
           <vaadin-grid-column>
             <template class="header">Result</template>
@@ -722,8 +722,32 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return (n) ? n.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : ""
       }
 
+      _numericalAggUnitLabels(measurement, unitType) {
+        var that = this;
+        measurement = _.toLower(that.selectedContourBy)
+        unitType = _.toLower(that.currentModelResp.modelInformation.units)
+        if (measurement.includes('area')) {
+          return unitType === 'imperial' ? ' (in\u00B2)' : ' (mm\u00B2)'
+        } else if (measurement.includes('length')) {
+          return unitType === 'imperial' ? ' (in)' : ' (mm)'
+        } else if (measurement.includes('mass')) {
+          return unitType === 'imperial' ? ' (lb)' : ' (kg)'
+        } else if (measurement.includes('vol')) {
+          return unitType === 'imperial' ? ' (in\u00B3)' : ' (mm\u00B3)'
+        } else if (measurement.includes('cost')) {
+          return unitType === 'imperial' ? ' (USD)' : ''
+        } else {
+          return ''
+        }
+      }
+      //this should be turned into one sole function to hangle numerical and string table unit lables
       _specifyUnits(measurement, unitType) {
         var that = this;
+        // if (this.showStringAggregations = true) {
+        //   measurement = _.toLower(that.selectedSumField)
+        // } else if (this.showNumericalAggregations = true) {
+        //   measurement = _.toLower(that.selectedContourBy)
+        // }
         measurement = _.toLower(that.selectedSumField)
         unitType = _.toLower(that.currentModelResp.modelInformation.units)
         if (measurement.includes('area')) {
@@ -740,20 +764,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return ''
         }
       }
-      // switch(measurement) {
-      //   //make sure that all of these are uniform labels
-      //   case 'meta_vol':
-      //     return unitType === 'imperial' ? 'kips' : 'kg.';
-      //     break;
-      //   case 'meta_length':
-      //     return unitType === 'imperial' ? 'in.' : 'cm.';
-      //     break;
-      //   case 'meta_mass':
-      //     return unitType === 'imperial' ? 'kips' : 'kg.';
-      //     break;
-      //   default:
-      //     return '';
-      // }
 
       _numericalAggregations() {
         this.showStringAggregations = false;
