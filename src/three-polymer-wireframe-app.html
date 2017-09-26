@@ -713,11 +713,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _prettify(n) {
-        return (n) ? parseFloat(n).toLocaleString() : ""
+        return typeof(n) !== 'undefined' ? parseFloat(n).toLocaleString() : ""
       }
 
       _prettifyDollar(n) {
-        return (n) ? n.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : ""
+        return typeof(n) !== 'undefined' ? n.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : ""
       }
 
       _numericalAggUnitLabels(measurement, unitType) {
