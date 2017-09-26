@@ -392,7 +392,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template class="header">
                 <vaadin-grid-sorter path="sum">[[selectedSumField]] sum</vaadin-grid-sorter>
               </template>
-              <template>[[_prettify(item.sum)]]</template>
+              <template>[[_prettify(item.sum)]] [[_specifyUnits(item.sum)]]</template>
               <template class="footer">[[_prettify(grandTotalSum)]]</template>
             </vaadin-grid-column>
             <vaadin-grid-column>
@@ -403,15 +403,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <!-- NUMERICAL AGGREGATIONS WITHIN STRING AGGREGATION TABLE-->
             <vaadin-grid-column>
               <template class="header">min [[selectedSumField]]</template>
-              <template>[[_prettify(item.min)]]</template>
+              <template>[[_prettify(item.min)]] [[_specifyUnits(item.min)]]</template>
             </vaadin-grid-column>
             <vaadin-grid-column>
               <template class="header">max [[selectedSumField]]</template>
-              <template>[[_prettify(item.max)]]</template>
+              <template>[[_prettify(item.max)]] [[_specifyUnits(item.max)]]</template>
             </vaadin-grid-column>
             <vaadin-grid-column>
               <template class="header">avg [[selectedSumField]]</template>
-              <template>[[_prettify(item.avg)]]</template>
+              <template>[[_prettify(item.avg)]] [[_specifyUnits(item.avg)]]</template>
             </vaadin-grid-column>
           </vaadin-grid>
           </div>
@@ -719,27 +719,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return (n) ? n.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : ""
       }
 
-      //not completed
-      // _specifyUnits(measurement, unitType) {
-      //   var that = this;
-      //   //selectedSumField
-      //   measurement = _.toLower(measurement)
-      //   //that.currentModelResp.modelInformation.units
-      //   unitType = _.toLower(unitType)
-      //   switch(measurement) {
-      //     case 'volume':
-      //       return unitType === 'imperial' ? 'kips' : 'kilos';
-      //       break;
-      //     case 'length':
-      //       return unitType === 'imperial' ? 'inches' : 'cm';
-      //       break;
-      //     case 'mass':
-      //       return unitType === 'imperial' ? 'kips' : 'kilos';
-      //       break;
-      //     default:
-      //       return 'FIX FUNCTION';
-      //   }
-      // }
+      _specifyUnits(measurement, unitType) {
+        var that = this;
+        measurement = _.toLower(that.selectedSumField)
+        unitType = _.toLower(that.currentModelResp.modelInformation.units)
+        switch(measurement) {
+          //make sure that all of these are uniform labels
+          case 'meta_vol':
+            return unitType === 'imperial' ? 'kips' : 'kg';
+            break;
+          case 'meta_length':
+            return unitType === 'imperial' ? 'in' : 'cm';
+            break;
+          case 'meta_mass':
+            return unitType === 'imperial' ? 'kips' : 'kg';
+            break;
+          default:
+            return 'FIX FUNCTION';
+        }
+      }
 
       _numericalAggregations() {
         this.showStringAggregations = false;
