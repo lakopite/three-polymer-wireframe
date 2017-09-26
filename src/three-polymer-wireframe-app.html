@@ -875,12 +875,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var groupSumDataSetup = {
               'group': this.groupKeys[i],
               'sum': sumByGroup,
-              'cost' : cost,
+              //'cost' : cost,
               'min' : minByGroup,
               'max' : maxByGroup,
               'avg' : avgByGroup
             }
-            //groupSumDataSetup[this.selectedSumField + " sum " + "in" ]
             this.push('groupSumData', groupSumDataSetup)
             this.push('allObjectsByGroupDupe', groupObjects)
           }
