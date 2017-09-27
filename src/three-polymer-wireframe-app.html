@@ -199,6 +199,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         --paper-toast-color: white;
       }
 
+      #cost-tab[disabled] {
+        color: #9E9E9E;
+      }
+
     </style>
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" auto method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="model-request" method="GET" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
@@ -315,7 +319,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedView}}">
           <paper-tab name="model-view">Model</paper-tab>
           <paper-tab name="aggregations-view">Quantities</paper-tab>
-          <!-- <paper-tab name="cost-view">Cost</paper-tab> -->
+          <paper-tab name="cost-view" id="cost-tab" disabled$="{{_disableCostTab(currentModelResp)}}">Cost</paper-tab>
         </paper-tabs>
       </app-toolbar>
     </app-header>
@@ -419,11 +423,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
     </div>
     </div>
-    <!-- <div name="cost-view">
-    <div hidden$="[[!showNumericalAggregations]]">
-      <h3>Cost stuff will appear here IF payload.metadata includes "material"</h3>
+    <div name="cost-view">
+      <h3>If enabled, cost stuff should appear here</h3>
     </div>
-    </div> -->
     </iron-pages>
     </app-header-layout>
     </app-drawer-layout>
@@ -1087,6 +1089,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _hideCsvButton(currentPage) {
         return this.selectedView == 'model-view'
+      }
+
+      _disableCostTab(currentModel) {
+        var payloadElems = this.currentModelResp.payload
+        for (var i=0; i < payloadElems.length; i++) {
+          // go through payload elements and their metadata keys
+          //later use includes method for "material"
+        if(_.has(payloadElems[i], 'metadata.material') ||
+          	_.has(payloadElems[i], 'metadata.material_type')) {
+          	console.log(payloadElems[i].metadata.material || payloadElems[i].metadata.material_type)
+            return false
+          } else {
+            return true
+          }
+        }
       }
 
       //Ensure that the geometry input is within boundaries and is compatible with its input sibling
