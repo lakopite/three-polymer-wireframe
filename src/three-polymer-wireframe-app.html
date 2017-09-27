@@ -237,7 +237,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <!-- <paper-input id="search-input" label="Search Models..." value="{{searchInput}}" type="text" autofocus minlength="1"></paper-input> -->
           <!-- REMOVED FROM TEMPLATE BELOW: selected="" filter="{{searchFilter(searchInput)}}"-->
           <template is="dom-repeat" items="[[dataOptions]]">
-            <paper-item class="dropdown-item" on-mouseover="mouseOver" name="[[item]]">[[item]]</paper-item>
+            <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
           </template>
         </paper-listbox>
       </paper-dropdown-menu>
@@ -585,11 +585,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         super();
       }
 
-      // mouseOver() {
-      //   //do something
-      //   //console.log("hovering over item!")
-      // }
-
       uploadJsonModel() {
         var that = this
         that.$['json-upload-request'].generateRequest();
@@ -842,7 +837,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var metadataKeys = _.keys(metadataObject)
            for (var j = 0; j < metadataKeys.length; j++) {
              //to exclude these from the dropdown items
-             var ignoreSumGroups = ['meta_st7id', 'meta_groupid', 'meta_propnum', 'beamnum']
+            //  var ignoreSumGroups = ['meta_st7id', 'meta_groupid', 'meta_propnum', 'beamnum']
+            // var dontIgnoreSums = ['length', 'mass', 'vol']
+            //but also do an "includes/contains" because names could vary
              // to find unique keys with numeric values for dropdown options
              if(_.isNumber(metadataValues[j]) && this.numericalMetadataKeys.indexOf(metadataKeys[j]) === -1 && ignoreSumGroups.indexOf(metadataKeys[j]) === -1) {
                this.push('numericalMetadataKeys', metadataKeys[j])
@@ -1208,6 +1205,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.set('_modelData', {
             'linearElements': this.currentModelResp.payload,
             'planarElements': []
+            // 'linearElements': this.currentModelResp.payload.linearElements,
+            // 'planarElements': this.currentModelResp.payload.planarElements
           });
           //set selectedSumField to undefined in order to trigger stringAggregtions initialization
           this.selectedSumField = undefined
