@@ -1,5 +1,15 @@
 {
   "stages": {
+  	"prod": {
+      "api_gateway_stage": "dev",
+      "manage_iam_role": false,
+      "iam_role_arn": "arn:aws:iam::702333098276:role/three-polymer-wireframe-api-prod"
+    },
+    "feat": {
+      "api_gateway_stage": "dev",
+      "manage_iam_role": false,
+      "iam_role_arn": "arn:aws:iam::702333098276:role/three-polymer-wireframe-api-prod"
+    },
     "dev": {
       "api_gateway_stage": "dev",
       "manage_iam_role": false,
