@@ -454,6 +454,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           selectedModel: {
             type: String
           },
+          currentModelResp: {
+            type: Object
+          },
+          userEmail: {
+            type: String
+          },
           selectedContourBy: {
             type: String,
             value: "flexure"
@@ -1083,15 +1089,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      _hideMainDropdown(currentPage) {
+      _hideMainDropdown(_currentPage) {
         return this.selectedView == 'aggregations-view';
       }
 
-      _hideCsvButton(currentPage) {
+      _hideCsvButton(_currentPage) {
         return this.selectedView == 'model-view'
       }
 
-      _disableCostTab(currentModel) {
+      _disableCostTab(_currentModel) {
         var payloadElems = this.currentModelResp.payload
         for (var i=0; i < payloadElems.length; i++) {
           // go through payload elements and their metadata keys
@@ -1223,6 +1229,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleDataResponse(event, response) {
         this.currentModelResp = response.response
+        console.log("loading a new model!");
+        console.log("is cost tab is disabled: " + Polymer.dom(this.root).querySelector("#cost-tab").disabled)
         if (this.currentModelResp && this.currentModelResp.modelInformation.name === this.selectedModel && "payload" in this.currentModelResp) {
           this.appLoading = false;
           this.set('_modelData', {
