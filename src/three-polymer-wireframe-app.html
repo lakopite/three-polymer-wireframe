@@ -315,6 +315,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedView}}">
           <paper-tab name="model-view">Model</paper-tab>
           <paper-tab name="aggregations-view">Quantities</paper-tab>
+          <paper-tab name="cost-view">Cost</paper-tab>
         </paper-tabs>
       </app-toolbar>
     </app-header>
@@ -325,7 +326,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </three-view>
     </div>
     <!-- Quantities tab -->
-    <!-- For numerical aggregations -->
+      <!-- For numerical aggregations -->
     <div name="aggregations-view">
       <div hidden$="[[!showNumericalAggregations]]">
         <div class="num-wrapper">
@@ -416,6 +417,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </vaadin-grid>
           </div>
         </div>
+    </div>
+    </div>
+    <div name="cost-view">
+    <div hidden$="[[!showNumericalAggregations]]">
+      <h3>Cost stuff will appear here</h3>
     </div>
     </div>
     </iron-pages>
@@ -795,6 +801,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _getSumByForSelectedSumField(_selectedSumField) {
+        this.numericalMetadataKeys = this.numericalMetadataKeys.sort()
         if (typeof this.selectedSumField !== 'undefined') {
           this._stringAggregations();
         }
@@ -836,17 +843,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var metadataValues = _.values(metadataObject)
           var metadataKeys = _.keys(metadataObject)
            for (var j = 0; j < metadataKeys.length; j++) {
-             //to exclude these from the dropdown items
-            //  var ignoreSumGroups = ['meta_st7id', 'meta_groupid', 'meta_propnum', 'beamnum']
-            // var dontIgnoreSums = ['length', 'mass', 'vol']
+            //to include only these in dropdown menu
+            var validSumGroups = ['meta_length', 'length', 'meta_mass', 'mass', 'meta_vol', 'vol', 'volume']
             //but also do an "includes/contains" because names could vary
              // to find unique keys with numeric values for dropdown options
-             if(_.isNumber(metadataValues[j]) && this.numericalMetadataKeys.indexOf(metadataKeys[j]) === -1 && ignoreSumGroups.indexOf(metadataKeys[j]) === -1) {
+             if(_.isNumber(metadataValues[j]) && this.numericalMetadataKeys.indexOf(metadataKeys[j]) === -1 && validSumGroups.indexOf(metadataKeys[j]) !== -1) {
                this.push('numericalMetadataKeys', metadataKeys[j])
              }
            }
          }
-         this.selectedSumField = this.numericalMetadataKeys[0]
+         this.selectedSumField = this.numericalMetadataKeys.sort()[0]
        } else {
         this.groupSumData = []
         this.allObjectsByGroupDupe = []
