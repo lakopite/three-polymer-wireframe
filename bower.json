@@ -30,7 +30,8 @@
     "iron-list": "PolymerElements/iron-list#~2.0.4",
     "paper-tabs": "PolymerElements/paper-tabs#~2.0.0",
     "vaadin-grid": "^3.0.0",
-    "paper-toast": "PolymerElements/paper-toast#^2.0.0"
+    "paper-toast": "PolymerElements/paper-toast#^2.0.0",
+    "highcharts": "~5.0.14"
   },
   "resolutions": {
     "polymer": "^2.0.0-rc.3",
