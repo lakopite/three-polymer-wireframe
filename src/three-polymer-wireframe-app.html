@@ -231,12 +231,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-item>Model Options</paper-item>
     </app-toolbar>
     <div class="drawer-list">
-      <paper-input id="search-input" label="Search Models..." value="{{searchInput}}"></paper-input>
+      <!-- <paper-input id="search-input" label="Search Models..." value="{{searchInput}}"></paper-input> -->
       <paper-dropdown-menu label="Model">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
           <!-- <paper-input id="search-input" label="Search Models..." value="{{searchInput}}" type="text" autofocus minlength="1"></paper-input> -->
-          <!-- REMOVED FROM TEMPLATE BELOW: selected="" -->
-          <template is="dom-repeat" items="[[dataOptions]]" filter="{{searchFilter(searchInput)}}">
+          <!-- REMOVED FROM TEMPLATE BELOW: selected="" filter="{{searchFilter(searchInput)}}"-->
+          <template is="dom-repeat" items="[[dataOptions]]">
             <paper-item class="dropdown-item" on-mouseover="mouseOver" name="[[item]]">[[item]]</paper-item>
           </template>
         </paper-listbox>
@@ -694,19 +694,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this._acceptUploadDisabled = true;
       }
 
-      searchFilter(searchInput) {
-        //to clear results of previous search and filter within ALL models in bucket
-        this.dataOptions = this.getModelsResp
-        searchInput = _.toLower(searchInput)
-        var that = this;
-        var result = _.filter(that.dataOptions, function(o) {
-          return _.toLower(o).indexOf(searchInput) !== -1
-        })
-        that.dataOptions = _.uniq(_.concat(that.selectedModel, result))
-        // console.log("SEARCHING: " + searchInput)
-        // console.log("RESULTS:")
-        // console.log(that.dataOptions);
-      }
+      // searchFilter(searchInput) {
+      //   //to clear results of previous search and filter within ALL models in bucket
+      //   this.dataOptions = this.getModelsResp
+      //   searchInput = _.toLower(searchInput)
+      //   var that = this;
+      //   var result = _.filter(that.dataOptions, function(o) {
+      //     return _.toLower(o).indexOf(searchInput) !== -1
+      //   })
+      //   that.dataOptions = _.uniq(_.concat(that.selectedModel, result))
+      //   // console.log("SEARCHING: " + searchInput)
+      //   // console.log("RESULTS:")
+      //   // console.log(that.dataOptions);
+      // }
 
       _isWithinBounds(val, min, max) {
         return val >= min && val <= max
@@ -733,7 +733,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         } else if (measurement.includes('vol')) {
           return unitType === 'imperial' ? that.unitLabel = ' (in\u00B3)' : that.unitLabel = ' (mm\u00B3)'
         } else if (measurement.includes('cost')) {
-          return unitType === 'imperial' ? that.unitLabel = ' (USD)' : ''
+          return unitType === 'imperial' ? that.unitLabel = ' (USD)' : that.unitLabel = ''
         } else {
           return ''
         }
@@ -757,7 +757,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         } else if (measurement.includes('vol')) {
           return unitType === 'imperial' ? that.unitLabel =' (in\u00B3)' : that.unitLabel =' (mm\u00B3)'
         } else if (measurement.includes('cost')) {
-          return unitType === 'imperial' ? that.unitLabel =' (USD)' : ''
+          return unitType === 'imperial' ? that.unitLabel =' (USD)' : that.unitLabel = ''
         } else {
           return ''
         }
