@@ -1168,6 +1168,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.currentModelResp = response.response
         console.log("loading new model!");
         console.log("is cost tab is disabled: " + Polymer.dom(this.root).querySelector("#cost-tab").disabled)
+        if (Polymer.dom(this.root).querySelector("#cost-tab").disabled === true && this.selectedView === 'cost-view') {
+          this.selectedView = 'model-view'
+        }
         if (this.currentModelResp && this.currentModelResp.modelInformation.name === this.selectedModel && "payload" in this.currentModelResp) {
           this.appLoading = false;
           this.set('_modelData', {
