@@ -175,7 +175,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         /*height: 50%;*/
       }
 
-      #chart-container {
+      #sum-chart-container {
         height: 500px;
       }
 
@@ -372,7 +372,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <!-- wrap all string aggregation info -->
         <div id="wrap-str-info">
           <!-- div holds pie chart -->
-          <div id="chart-container"></div>
+          <div id="sum-chart-container"></div>
           <!-- data by group table -->
           <div id="group-data-table-section">
           <vaadin-grid class="data-by-group-table" items="[[groupSumData]]">
@@ -407,8 +407,47 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
     </div>
     </div>
+    <!-- Cost Tab -->
     <div name="cost-view">
-      <h3>If enabled, cost stuff should appear here</h3>
+      <div class="str-header">
+        <app-toolbar class="aggregation-toolbar">
+          <div main-title>Cost of [insert material here] by Group</div>
+        </app-toolbar>
+      </div>
+      <div id="wrap-cost-info">
+        <!-- to hold cost pie chart -->
+        <div id="cost-chart-container"></div>
+        <!-- cost by group pie chart -->
+        <div id="cost-table-section">
+        <!-- cost by group table -->
+        <vaadin-grid class="cost-by-group-table" items="{{groupSumData}}">
+          <vaadin-grid-column>
+            <template class="header">Group</template>
+            <template>Insert info</template>
+            <template class="footer">Grand Total</template>
+          </vaadin-grid-column>
+          <vaadin-grid-column>
+            <template class="header">Sum [mass or vol] [unit type]</template>
+            <template>Insert info</template>
+            <template class="footer">Total amount #</template>
+          </vaadin-grid-column>
+          <vaadin-grid-column>
+            <template class="header">Sum [mass or vol] [unit type]</template>
+            <template>Insert info</template>
+            <template class="footer">Total amount #</template>
+          </vaadin-grid-column>
+          <vaadin-grid-column>
+            <template class="header">Cost input</template>
+            <template>[input goes here]</template>
+          </vaadin-grid-column>
+          <vaadin-grid-column>
+            <template class="header">Cost Amt</template>
+            <template>[result goes here]</template>
+            <template class="footer">Total cost amount #</template>
+          </vaadin-grid-column>
+        </vaadin-grid>
+        </div>
+      </div>
     </div>
     </iron-pages>
     </app-header-layout>
@@ -872,8 +911,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
           this.pieData = _pieData;
         }
-        //log unit type
-        //console.log(this.currentModelResp.modelInformation.units)
         this.showStringAggregations = true;
       }
 
@@ -906,7 +943,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _initChart() {
-        var chartdiv = Polymer.dom(this.root).querySelector("#chart-container")
+        var chartdiv = Polymer.dom(this.root).querySelector("#sum-chart-container")
         this.pieChart = Highcharts.chart(chartdiv, {
         chart: {
             plotBackgroundColor: null,
@@ -939,7 +976,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _drawChart() {
-        var chartdiv = Polymer.dom(this.root).querySelector("#chart-container")
+        var chartdiv = Polymer.dom(this.root).querySelector("#sum-chart-container")
+        //console.log(this.pieData);
         this.pieChart = Highcharts.chart(chartdiv, {
         chart: {
             plotBackgroundColor: null,
@@ -1067,11 +1105,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _hideMainDropdown(_currentPage) {
-        return this.selectedView == 'aggregations-view';
+        return this.selectedView == 'aggregations-view' || this.selectedView == 'cost-view';
       }
 
       _hideCsvButton(_currentPage) {
-        return this.selectedView == 'model-view'
+        return this.selectedView == 'model-view' || this.selectedView == 'cost-view';
+      }
+
+      _disableCostTab(_currentModel) {
+        var payloadElems = this.currentModelResp.payload
+        for (var i=0; i < payloadElems.length; i++) {
+          // go through payload elements and their metadata keys
+          //later use includes method for "material"
+        if(_.has(payloadElems[i], 'metadata.material') ||
+          	_.has(payloadElems[i], 'metadata.material_type')) {
+          	console.log("material cost for: " + payloadElems[i].metadata.material || payloadElems[i].metadata.material_type)
+            return false
+          } else {
+            return true
+          }
+        }
       }
 
       //Ensure that the geometry input is within boundaries and is compatible with its input sibling
@@ -1100,7 +1153,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _contourPropsChanged(metadataFields) {
-        this.metadataFields = this.metadataFields.sort()
+        this.metadataFields = this.metadataFields.sort();
         if (this.metadataFields.indexOf(this.selectedContourBy) === -1) {
           this.selectedContourBy = undefined;
           if (this.metadataFields.length > 0) {
@@ -1184,11 +1237,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       handleDataResponse(event, response) {
-        console.log("loading new model!");
-        console.log(Polymer.dom(this.root).querySelector('#cost-tab'));
-        //WHY DOES IT SAY THE OPPOSITE BELOW????
-        console.log(Polymer.dom(this.root).querySelector("#cost-tab").disabled);
         this.currentModelResp = response.response
+        var costTab = Polymer.dom(this.root).querySelector("#cost-tab")
+        if (costTab.disabled === true && this.selectedView === 'cost-view') {
+          this.selectedView = 'model-view'
+        }
         if (this.currentModelResp && this.currentModelResp.modelInformation.name === this.selectedModel && "payload" in this.currentModelResp) {
           this.appLoading = false;
           this.set('_modelData', {
