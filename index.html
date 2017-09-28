@@ -58,11 +58,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       const baseUrl = document.querySelector('base').href;
 
       // Load and register pre-caching Service Worker
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-          navigator.serviceWorker.register(baseUrl + 'service-worker.js');
-        });
-      }
+      // if ('serviceWorker' in navigator) {
+      //   window.addEventListener('load', function() {
+      //     navigator.serviceWorker.register(baseUrl + 'service-worker.js');
+      //   });
+      // }
     </script>
     <!-- CI Pipeline will remove local_settings -->
     <script src="/local_settings.js"></script>
