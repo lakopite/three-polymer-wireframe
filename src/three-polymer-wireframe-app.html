@@ -309,10 +309,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedView}}">
           <paper-tab name="model-view">Model</paper-tab>
           <paper-tab name="aggregations-view">Quantities</paper-tab>
-<<<<<<< HEAD
-=======
           <paper-tab name="cost-view" id="cost-tab" disabled$="{{_disableCostTab(currentModelResp)}}">Cost</paper-tab>
->>>>>>> commiting progress to switch branches
         </paper-tabs>
       </app-toolbar>
     </app-header>
@@ -410,30 +407,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
     </div>
     </div>
-<<<<<<< HEAD
-=======
     <div name="cost-view">
-      <div class="str-header">
-        <app-toolbar class="aggregation-toolbar">
-          <div main-title>Cost by Group</div>
-        </app-toolbar>
-        <paper-dropdown-menu id="str-contour-dropdown" label="Contour">
-          <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-            <template is="dom-repeat" items="[[metadataFields]]">
-              <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
-            </template>
-          </paper-listbox>
-        </paper-dropdown-menu>
-        <paper-dropdown-menu class="aggregation-toolbar" id="sum-field-dropdown" label="Select Sum Field">
-          <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
-            <template is="dom-repeat" items="[[numericalMetadataKeys]]">
-              <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
-            </template>
-          </paper-listbox>
-        </paper-dropdown-menu>
-      </div>
+      <h3>If enabled, cost stuff should appear here</h3>
     </div>
->>>>>>> commiting progress to switch branches
     </iron-pages>
     </app-header-layout>
     </app-drawer-layout>
@@ -1208,12 +1184,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       handleDataResponse(event, response) {
-        this.currentModelResp = response.response
         console.log("loading new model!");
-        console.log("is cost tab is disabled: " + Polymer.dom(this.root).querySelector("#cost-tab").disabled)
-        if (Polymer.dom(this.root).querySelector("#cost-tab").disabled === true && this.selectedView === 'cost-view') {
-          this.selectedView = 'model-view'
-        }
+        console.log(Polymer.dom(this.root).querySelector('#cost-tab'));
+        //WHY DOES IT SAY THE OPPOSITE BELOW????
+        console.log(Polymer.dom(this.root).querySelector("#cost-tab").disabled);
+        this.currentModelResp = response.response
         if (this.currentModelResp && this.currentModelResp.modelInformation.name === this.selectedModel && "payload" in this.currentModelResp) {
           this.appLoading = false;
           this.set('_modelData', {
