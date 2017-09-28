@@ -1161,6 +1161,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _disableCostTab(_currentModel) {
         var payloadElems = this.currentModelResp.payload
+
+        //update this with logic tree
         for (var i=0; i < payloadElems.length; i++) {
           // go through payload elements and their metadata keys
           //later use includes method for "material"
