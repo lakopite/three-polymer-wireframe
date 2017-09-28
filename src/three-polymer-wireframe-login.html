@@ -8,6 +8,9 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/cognito-helper/cognito-helper.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="three-polymer-wireframe-app.html">
 
 <dom-module id="three-polymer-wireframe-login">
@@ -18,14 +21,58 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         --app-secondary-color: black;
         display: block;
       }
+
+      .login-container {
+        @apply(--layout-fit);
+        @apply(--layout-horizontal);
+        @apply(--layout-center-justified);
+      }
+
+      .login-container cognito-helper {
+        @apply(--layout-self-center);
+      }
     </style>
-    <three-polymer-wireframe-app></three-polymer-wireframe-app>
+    <paper-toast id="auth-failure-toast">Authentication Failed</paper-toast>
+    <div hidden$="[[loggedIn]]" class="login-container">
+      <cognito-helper id="cognito-helper-el" api-headers="{{apiHeaders}}" logged-in="{{loggedIn}}" auth-welcome="Three Polymer Login" user-pool-id="[[upid]]" client-id="[[cid]]"></cognito-helper>
+    </div>
+    <template is="dom-if" restamp if="[[loggedIn]]">
+      <three-polymer-wireframe-app auth-headers="{{apiHeaders}}"></three-polymer-wireframe-app>
+    </template>
   </template>
   <script>
     class ThreePolymerWireframeLogin extends Polymer.Element {
 
       static get is() {
         return 'three-polymer-wireframe-login';
+      }
+
+      static get properties() {
+        return {
+          upid: {
+            type: String,
+            value: _USERPOOL_ID_
+          },
+          cid: {
+            type: String,
+            value: _CLIENT_ID_
+          }
+        }
+      }
+
+      ready() {
+        super.ready();
+        this.addEventListener('authFailure', e => this._authFailure(e));
+        this.addEventListener('logout', e => this._logout(e));
+      }
+
+      _logout() {
+        this.$['cognito-helper-el'].logout();
+        window.location.reload(false);
+      }
+
+      _authFailure() {
+        this.$['auth-failure-toast'].open();
       }
 
     }
