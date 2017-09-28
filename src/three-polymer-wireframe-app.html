@@ -1190,11 +1190,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       handleDataResponse(event, response) {
-        console.log("loading new model!");
-        console.log(Polymer.dom(this.root).querySelector('#cost-tab'));
-        //WHY DOES IT SAY THE OPPOSITE BELOW????
-        console.log(Polymer.dom(this.root).querySelector("#cost-tab").disabled);
         this.currentModelResp = response.response
+        console.log("loading new model!");
+        console.log("is cost tab is disabled: " + Polymer.dom(this.root).querySelector("#cost-tab").disabled)
         if (this.currentModelResp && this.currentModelResp.modelInformation.name === this.selectedModel && "payload" in this.currentModelResp) {
           this.appLoading = false;
           this.set('_modelData', {
