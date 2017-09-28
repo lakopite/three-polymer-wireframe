@@ -319,7 +319,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedView}}">
           <paper-tab name="model-view">Model</paper-tab>
           <paper-tab name="aggregations-view">Quantities</paper-tab>
-          <paper-tab name="cost-view" id="cost-tab" disabled$="{{_disableCostTab(currentModelResp)}}">Cost</paper-tab>
+          <!-- <paper-tab name="cost-view" id="cost-tab" disabled$="{{_disableCostTab(currentModelResp)}}">Cost</paper-tab> -->
         </paper-tabs>
       </app-toolbar>
     </app-header>
@@ -423,9 +423,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
     </div>
     </div>
-    <div name="cost-view">
+    <!-- <div name="cost-view">
       <h3>If enabled, cost stuff should appear here</h3>
-    </div>
+    </div> -->
     </iron-pages>
     </app-header-layout>
     </app-drawer-layout>
@@ -1229,7 +1229,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleDataResponse(event, response) {
         this.currentModelResp = response.response
-        console.log("loading a new model!");
         if (this.currentModelResp && this.currentModelResp.modelInformation.name === this.selectedModel && "payload" in this.currentModelResp) {
           this.appLoading = false;
           this.set('_modelData', {
