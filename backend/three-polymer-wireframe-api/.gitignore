@@ -1,5 +1,0 @@
-.chalice/deployments/
-.chalice/venv/
-.chalice/deployed.json
-.chalice/policy*.json
-*.pyc
