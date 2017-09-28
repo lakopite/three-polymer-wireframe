@@ -309,6 +309,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedView}}">
           <paper-tab name="model-view">Model</paper-tab>
           <paper-tab name="aggregations-view">Quantities</paper-tab>
+<<<<<<< HEAD
+=======
+          <paper-tab name="cost-view" id="cost-tab" disabled$="{{_disableCostTab(currentModelResp)}}">Cost</paper-tab>
+>>>>>>> commiting progress to switch branches
         </paper-tabs>
       </app-toolbar>
     </app-header>
@@ -406,6 +410,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
     </div>
     </div>
+<<<<<<< HEAD
+=======
+    <div name="cost-view">
+      <h3>If enabled, cost stuff should appear here</h3>
+    </div>
+>>>>>>> commiting progress to switch branches
     </iron-pages>
     </app-header-layout>
     </app-drawer-layout>
@@ -1180,6 +1190,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       handleDataResponse(event, response) {
+        console.log("loading new model!");
+        console.log(Polymer.dom(this.root).querySelector('#cost-tab'));
+        //WHY DOES IT SAY THE OPPOSITE BELOW????
+        console.log(Polymer.dom(this.root).querySelector("#cost-tab").disabled);
         this.currentModelResp = response.response
         if (this.currentModelResp && this.currentModelResp.modelInformation.name === this.selectedModel && "payload" in this.currentModelResp) {
           this.appLoading = false;
