@@ -413,7 +413,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <<<<<<< HEAD
 =======
     <div name="cost-view">
-      <h3>If enabled, cost stuff should appear here</h3>
+      <div class="str-header">
+        <app-toolbar class="aggregation-toolbar">
+          <div main-title>Cost by Group</div>
+        </app-toolbar>
+        <paper-dropdown-menu id="str-contour-dropdown" label="Contour">
+          <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
+            <template is="dom-repeat" items="[[metadataFields]]">
+              <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+            </template>
+          </paper-listbox>
+        </paper-dropdown-menu>
+        <paper-dropdown-menu class="aggregation-toolbar" id="sum-field-dropdown" label="Select Sum Field">
+          <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
+            <template is="dom-repeat" items="[[numericalMetadataKeys]]">
+              <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+            </template>
+          </paper-listbox>
+        </paper-dropdown-menu>
+      </div>
     </div>
 >>>>>>> commiting progress to switch branches
     </iron-pages>
