@@ -5,7 +5,7 @@ Interface for interacting with three-polymer component and demonstrating desired
 ## Lifecycle
 All commits to three-polymer-wireframe#master and three-polymer#master will be built and deployed (within a few minutes) to:
 
-http://three-polymer-wireframe.s3-website-us-west-2.amazonaws.com/
+https://arup-model-viewer.firebaseapp.com/
 
 ## Accessing api in local environment
 three-polymer-wireframe accesses a chalice api to retrieve model json data.
