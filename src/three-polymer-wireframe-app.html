@@ -200,10 +200,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         --paper-toast-color: white;
       }
 
+      #cost-tab[disabled] {
+        color: #9E9E9E;
+      }
+
     </style>
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="model-request" method="GET" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="[[baseUrl]]post-model"></iron-ajax>
+    <!-- ?\<iron-ajax headers="{{authHeaders}}" id="remove-upload-request" method="DELETE" content-type="application/json" on-response="handleModelRemoval" url="[[baseUrl]]delete-model"></iron-ajax> -->
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
       <paper-input id="user-email" label="username" value="{{userEmail}}">
@@ -230,8 +235,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-item>Model Options</paper-item>
     </app-toolbar>
     <div class="drawer-list">
+      <!-- <paper-input id="search-input" label="Search Models..." value="{{searchInput}}"></paper-input> -->
       <paper-dropdown-menu label="Model">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
+          <!-- <paper-input id="search-input" label="Search Models..." value="{{searchInput}}" type="text" autofocus minlength="1"></paper-input> -->
+          <!-- REMOVED FROM TEMPLATE BELOW: selected="" filter="{{searchFilter(searchInput)}}"-->
           <template is="dom-repeat" items="[[dataOptions]]">
             <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
           </template>
@@ -260,6 +268,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min z" class="inline-input" type="number" value="{{geometryFilter.zMin}}" max="[[_computeMax(boundaries.zMax,geometryFilter.zMax)]]" min="[[boundaries.zMin]]"></paper-input>
           <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max z" class="inline-input" type="number" value="{{geometryFilter.zMax}}" max="[[boundaries.zMax]]" min="[[_computeMin(boundaries.zMin,geometryFilter.zMin)]]"></paper-input>
         </div>
+        <!-- for force filter -->
+        <!-- <div hidden$="[[!showNumericalAggregations]]">
+        <div class="horizontal">
+        <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min [[selectedContourBy]]" class="inline-input" type="number" value="[[minResult]]" min="#"></paper-input>
+        <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max [[selectedContourBy]]" class="inline-input" type="number" value="[[maxResult]]" max="#"></paper-input>
+        </div>
+        </div> -->
+        <!-- force filter end -->
         <div class="horizontal">
           <paper-button class="filterBtn" raised disabled$="{{_filtersDisabled}}" id="applyBtn" on-tap="applyFilters" type="number">Apply</paper-button>
           <paper-button class="filterBtn" raised disabled$="{{modelLoading}}" id="resetBtn" on-tap="resetFilters" type="number">Reset</paper-button>
@@ -390,6 +406,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template>[[_prettify(item.sum)]]</template>
               <template class="footer">[[_prettify(grandTotalSum)]] [[_specifyUnits(selectedSumField)]]</template>
             </vaadin-grid-column>
+            <!-- <vaadin-grid-column>
+              <template class="header">cost (USD)</template>
+              <template>[[_prettifyDollar(item.cost)]] USD</template>
+              <template class="footer">[[_prettifyDollar(totalCost)]] USD</template>
+            </vaadin-grid-column> -->
+            <!-- NUMERICAL AGGREGATIONS WITHIN STRING AGGREGATION TABLE-->
             <vaadin-grid-column>
               <template class="header">min [[selectedSumField]] [[_specifyUnits(selectedSumField)]]</template>
               <template>[[_prettify(item.min)]]</template>
@@ -632,6 +654,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         that._clearUploadInput()
         this.$.uploadSuccessToast.show({ text: "File has been uploaded successfully!" })
         this.userEmail = ''
+        //console.log(that.dataOptions);
       }
 
       reopenUploadBox(){
@@ -640,6 +663,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       closeToast() {
+        //var toast = Polymer.dom(this.root).querySelector('#validationToast')
         this.$.validationToast.hide()
         this.userEmail = ''
       }
@@ -707,6 +731,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         reader.readAsText(inputFile);
       }
 
+      // handleModelRemoval() {
+      //   this.$['remove-upload-request'].generateRequest();
+      // }
+
       _checkEmailField(userEmail) {
         userEmail = this.jsonUploadPayload.modelInformation.user
         try {
@@ -723,6 +751,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         Polymer.dom(this.root).querySelector('#modelUpload').value = ''
         this._acceptUploadDisabled = true;
       }
+
+      // searchFilter(searchInput) {
+      //   //to clear results of previous search and filter within ALL models in bucket
+      //   this.dataOptions = this.getModelsResp
+      //   searchInput = _.toLower(searchInput)
+      //   var that = this;
+      //   var result = _.filter(that.dataOptions, function(o) {
+      //     return _.toLower(o).indexOf(searchInput) !== -1
+      //   })
+      //   that.dataOptions = _.uniq(_.concat(that.selectedModel, result))
+      //   // console.log("SEARCHING: " + searchInput)
+      //   // console.log("RESULTS:")
+      //   // console.log(that.dataOptions);
+      // }
 
       _isWithinBounds(val, min, max) {
         return val >= min && val <= max
@@ -757,6 +799,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       //this should be turned into one sole function to hangle numerical and string table unit lables
       _specifyUnits(measurement, unitType) {
         var that = this;
+        // if (this.showStringAggregations = true) {
+        //   measurement = _.toLower(that.selectedSumField)
+        // } else if (this.showNumericalAggregations = true) {
+        //   measurement = _.toLower(that.selectedContourBy)
+        // }
         measurement = _.toLower(that.selectedSumField)
         unitType = _.toLower(that.currentModelResp.modelInformation.units)
         if (measurement.includes('area')) {
@@ -1146,9 +1193,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _boundariesChanged(boundaries) {
         this.resetFilters();
+        //console.log(this.boundaries)
       }
 
       _loadingChanged(modelLoading) {
+        //console.log(modelLoading)
         this.checkValidInput();
       }
 
@@ -1198,6 +1247,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.geometryFilter = _.cloneDeep(this.boundaries);
         this.checkValidInput();
         this._aggregations(this._modelData, this.selectedContourBy);
+        //reset filter selection to the model boundaries
+        //console.log(this.geometryFilter)
+        //console.log(this.boundaries)
       }
 
       applyFilters() {
@@ -1214,6 +1266,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _initData(dataOptions_) {
         this.set('dataOptions', dataOptions_);
+        //console.log(this.dataOptions)
         if (this.dataOptions.length > 0) {
           this.set('selectedModel', this.dataOptions[0])
         }
