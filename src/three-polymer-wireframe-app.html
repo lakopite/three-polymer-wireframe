@@ -206,7 +206,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <iron-ajax headers="{{authHeaders}}" id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="[[baseUrl]]post-model"></iron-ajax>
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
-      <p>Uploaded by:</p>
       <paper-input id="user-email" label="username" value="{{userEmail}}">
         <div slot="suffix">@arup.com</div>
       </paper-input>
@@ -1014,7 +1013,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var link = document.createElement("a");
           link.href = uri;
           link.style = "visibility:hidden";
-          link.download = this.selectedModel + ' ' + new Date() + ".csv";
+          var d = new Date();
+          var curr_date = d.getDate();
+          var curr_month = d.getMonth() + 1;
+          var curr_year = d.getFullYear();
+          var curr_hour = d.getHours();
+          var currMins = d.getMinutes()
+          var timeFormat = curr_year + "-" + curr_month + "-" + curr_date + "_" + curr_hour + currMins + " "
+          link.download = timeFormat + this.selectedModel + ".csv";
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -1042,7 +1048,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var link = document.createElement("a");
           link.href = uri;
           link.style = "visibility:hidden";
-          link.download = this.selectedModel + ' ' + new Date() + ".csv";
+          var d = new Date();
+          var curr_date = d.getDate();
+          var curr_month = d.getMonth() + 1;
+          var curr_year = d.getFullYear();
+          var curr_hour = d.getHours();
+          var currMins = d.getMinutes()
+          var timeFormat = curr_year + "-" + curr_month + "-" + curr_date + "_" + curr_hour + currMins + " "
+          link.download = timeFormat + this.selectedModel + ".csv";
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
