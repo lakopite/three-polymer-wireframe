@@ -295,7 +295,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView</div>
-        <paper-item>Build Date: 9/27/17</paper-item>
+        <paper-item>Build Date: 9/28/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -744,13 +744,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         })
         this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        }).metadata[this.selectedContourBy], 6)
+        }).metadata[this.selectedContourBy], 3)
         this.maxResult = _.round(_.maxBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        }).metadata[this.selectedContourBy], 6)
+        }).metadata[this.selectedContourBy], 3)
         this.avgResult = _.round(_.meanBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        }), 6);
+        }), 3);
         this._getAggregationLabels()
         this.numericalAggregationsTableData = []
         var name = [this.getMinLabel, this.getMaxLabel, this.getAvgLabel];
@@ -764,7 +764,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         this.totalResult = _.round(_.sumBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
-        }), 6);
+        }), 3);
         this.showNumericalAggregations = true;
       }
 
@@ -831,16 +831,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var groupObjects = resultGroupByName[this.groupKeys[i]]
             var sumByGroup = _.round(_.sumBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
-            }), 6)
+            }), 1)
             var minByGroup = _.round(_.minBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
-            }).metadata[that.selectedSumField], 6)
+            }).metadata[that.selectedSumField], 1)
             var maxByGroup = _.round(_.maxBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
-            }).metadata[that.selectedSumField], 6)
+            }).metadata[that.selectedSumField], 1)
             var avgByGroup = _.round(_.meanBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
-            }), 6);
+            }), 0);
             //.2 is a temp placeholder, we will later place a cost costCoefficient in there
             var cost = _.multiply(.2, sumByGroup);
             var groupSumDataSetup = {
@@ -857,7 +857,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           // for chart total sum by group
           this.grandTotalSum = _.round(_.sumBy(this.groupSumData, function(o) {
             return o.sum
-          }), 6)
+          }), 1)
           this.totalCost = _.sumBy(this.groupSumData, function(o) {
             return o.cost
           })
