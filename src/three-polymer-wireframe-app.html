@@ -141,7 +141,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         height: calc(100vh - 192px);
       }
 
-      .data-by-group-table, .numerical-aggregations-table {
+      .data-by-group-table, .numerical-aggregations-table, .cost-by-group-table {
         --vaadin-grid-body-row-odd-cell: {
           background-color: #f5f5f5;
         };
@@ -211,7 +211,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <!-- ?\<iron-ajax headers="{{authHeaders}}" id="remove-upload-request" method="DELETE" content-type="application/json" on-response="handleModelRemoval" url="[[baseUrl]]delete-model"></iron-ajax> -->
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
-      <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\-\._]+)" value="{{userEmail}}">
+      <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._]+)" value="{{userEmail}}">
         <div slot="suffix">@arup.com</div>
       </paper-input>
       <iron-input>
@@ -310,7 +310,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView</div>
-        <paper-item>Build Date: 9/28/17</paper-item>
+        <paper-item>Build Date: 9/29/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -325,7 +325,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedView}}">
           <paper-tab name="model-view">Model</paper-tab>
           <paper-tab name="aggregations-view">Quantities</paper-tab>
-          <paper-tab name="cost-view" id="cost-tab" disabled$="{{_disableCostTab(currentModelResp)}}">Cost</paper-tab>
+          <paper-tab name="cost-view" id="cost-tab" disabled$="{{_disableCostTab(metadataFields, currentModelResp)}}">Cost</paper-tab>
         </paper-tabs>
       </app-toolbar>
     </app-header>
@@ -433,7 +433,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <div name="cost-view">
       <div class="str-header">
         <app-toolbar class="aggregation-toolbar">
-          <div main-title>Cost of [insert material here] by Group</div>
+          <div main-title>Cost of Material by Group</div>
         </app-toolbar>
       </div>
       <div id="wrap-cost-info">
@@ -442,31 +442,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <!-- cost by group pie chart -->
         <div id="cost-table-section">
         <!-- cost by group table -->
-        <vaadin-grid class="cost-by-group-table" items="{{groupSumData}}">
+        <vaadin-grid class="cost-by-group-table" items="[[costTableData]]">
+        <vaadin-grid-column>
+          <template class="header">Group</template>
+          <template>[[item.group]]</template>
+          <template class="footer">Grand Total</template>
+        </vaadin-grid-column>
           <vaadin-grid-column>
-            <template class="header">Group</template>
-            <template>Insert info</template>
-            <template class="footer">Grand Total</template>
+            <template class="header">[[material]] sum</template>
+            <template>[[_prettify(item.sum)]]</template>
+            <template class="footer">[[_prettify(totalConcVolSum)]]</template>
           </vaadin-grid-column>
           <vaadin-grid-column>
-            <template class="header">Sum [mass or vol] [unit type]</template>
-            <template>Insert info</template>
-            <template class="footer">Total amount #</template>
-          </vaadin-grid-column>
-          <vaadin-grid-column>
-            <template class="header">Sum [mass or vol] [unit type]</template>
-            <template>Insert info</template>
-            <template class="footer">Total amount #</template>
+            <template class="header">[[material]] sum (other unit)</template>
+            <template>[[_prettify(item.diffUnitSum)]]</template>
+            <template class="footer">[[_prettify(totalConcVolSumDiffUnit)]]</template>
           </vaadin-grid-column>
           <vaadin-grid-column>
             <template class="header">Cost input</template>
-            <template>[input goes here]</template>
+            <template>
+              <input id="cost-input" value="[[item.input]]" on-input="#">
+            </template>
           </vaadin-grid-column>
-          <vaadin-grid-column>
-            <template class="header">Cost Amt</template>
-            <template>[result goes here]</template>
-            <template class="footer">Total cost amount #</template>
-          </vaadin-grid-column>
+        <vaadin-grid-column>
+          <template class="header">Cost Amounts</template>
+          <template>[item.costResult]</template>
+          <template class="footer">[[_prettifyDollar(totalCost)]]</template>
+        </vaadin-grid-column>
         </vaadin-grid>
         </div>
       </div>
@@ -596,6 +598,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             value: "total"
           },
           groupSumData: {
+            type: Array,
+            value: []
+          },
+          costTableData: {
             type: Array,
             value: []
           },
@@ -940,12 +946,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var avgByGroup = _.round(_.meanBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
             }), 0);
-            //.2 is a temp placeholder, we will later place a cost costCoefficient in there
-            var cost = _.multiply(.2, sumByGroup);
             var groupSumDataSetup = {
               'group': this.groupKeys[i],
               'sum': sumByGroup,
-              //'cost' : cost,
               'min' : minByGroup,
               'max' : maxByGroup,
               'avg' : avgByGroup
@@ -960,10 +963,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }), 1)
 =======
           }), 0)
+<<<<<<< Updated upstream
 >>>>>>> adds validation to username for upload
           this.totalCost = _.sumBy(this.groupSumData, function(o) {
             return o.cost
           })
+=======
+>>>>>>> Stashed changes
           // for pie chart
           var _pieData = []
           for (var i=0; i < this.groupSumData.length; i++) {
@@ -1173,21 +1179,86 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return this.selectedView == 'model-view' || this.selectedView == 'cost-view';
       }
 
-      _disableCostTab(_currentModel) {
-        var payloadElems = this.currentModelResp.payload
-
-        //update this with logic tree
-        for (var i=0; i < payloadElems.length; i++) {
-          // go through payload elements and their metadata keys
-          //later use includes method for "material"
-        if(_.has(payloadElems[i], 'metadata.material') ||
-          	_.has(payloadElems[i], 'metadata.material_type')) {
-          	console.log("material cost for: " + payloadElems[i].metadata.material || payloadElems[i].metadata.material_type)
-            return false
-          } else {
-            return true
+      _disableCostTab(_currentMetadataFields, _currentModel) {
+        //console.log(this.metadataFields);
+        //console.log("material key present: " + this.metadataFields.includes('material'));
+        // console.log(this.currentModelResp);
+        if (this.metadataFields.includes('material')) {
+          var payloadElems = this.currentModelResp.payload
+          // NOTE this only includes "material" NOT "material_type"
+          for (var i=0; i < payloadElems.length; i++) {
+            //var material = _.toLower(payloadElems[i].metadata.material)
+            this.material = _.toLower(payloadElems[i].metadata.material)
+            // go through payload elements and their metadata keys
+            //later use includes method for "material"
+            if (_.toLower(payloadElems[i].metadata.material) === 'concrete' && _.has(payloadElems[i], 'metadata.volume') ||  _.has(payloadElems[i], 'metadata.vol') ||  _.has(payloadElems[i], 'metadata.meta_volume') ||
+                _.toLower(payloadElems[i].metadata.material) === 'steel' && _.has(payloadElems[i], 'metadata.mass')) {
+              // console.log("material cost for: " + this.material)
+              // console.log("does it include 'conc': " + this.material.includes('conc'))
+              // console.log("does it include 'steel': " + this.material.includes('steel'))
+              this._costAggregations()
+              return false
+            } else {
+              //console.log("cost-tab should be DISABLED!");
+            }
           }
         }
+        return true
+      }
+
+      _costAggregations() {
+        console.log("material: " + this.material);
+        var volumeDataList = []
+        var massDataList = []
+        this.costTableData = []
+        // if (this.material === 'concrete') {console.log(volumeDataList)};
+        // if (this.material === 'steel') {console.log(massDataList)};
+        var payloadElems = this.currentModelResp.payload
+        var groupsForMaterial = _.groupBy(payloadElems, function(o) {
+          return o.metadata.propertyname
+        })
+        // console.log(groupsForMaterial);
+        // console.log(_.keys(groupsForMaterial));
+        var groupKeys = _.keys(groupsForMaterial)
+        console.log("# of groups: " + groupKeys.length);
+        console.log(Polymer.dom(this.root).querySelector('#cost-input'));
+        var allObjectsByMaterialGroup = []
+        // console.log(allObjectsByMaterialGroup);
+        for (var i=0; i < groupKeys.length; i++) {
+          var groupObjects = groupsForMaterial[groupKeys[i]];
+          allObjectsByMaterialGroup.push(groupObjects)
+          var sumByGroup = _.sumBy(groupObjects, function(o) {
+            //hardcoding volume in here but have to account for material-->steel-->mass AS WELL AS UNIT TYPES
+            return o.metadata.volume
+          })
+          var costTableDataSetup = {
+            'group': groupKeys[i],
+            'sum': sumByGroup,
+            'diffUnitSum': sumByGroup/46656,
+            'input': 0
+            //'costResult': //multiply by input val
+          }
+          this.push('costTableData', costTableDataSetup)
+        }
+        for (var i=0; i < payloadElems.length; i++) {
+          if (this.material === 'concrete') {
+            volumeDataList.push(payloadElems[i].metadata.volume)
+            // var costTableDataSetup = {
+            //   'group' :
+            // }
+            // this.push('costTableData', costTableDataSetup)
+          } else if (this.material == 'steel') {
+            massDataList.push(payloadElems[i].metadata.mass)
+            // var costTableDataSetup = {
+            //   'group' :
+            // }
+            // this.push('costTableData', costTableDataSetup)
+          }
+
+        }
+        this.totalConcVolSum = _.sum(volumeDataList);
+        this.totalConcVolSumDiffUnit = this.totalConcVolSum/46656
+        this.totalSteelMassSum = _.sum(massDataList)
       }
 
       //Ensure that the geometry input is within boundaries and is compatible with its input sibling
@@ -1308,7 +1379,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       handleDataResponse(event, response) {
         this.currentModelResp = response.response
         var costTab = Polymer.dom(this.root).querySelector("#cost-tab")
-        if (costTab.disabled === true && this.selectedView === 'cost-view') {
+        //comment back in once _disableCostTab logic is complete
+        if (costTab.disabled && this.selectedView === 'cost-view') {
           this.selectedView = 'model-view'
         }
         if (this.currentModelResp && this.currentModelResp.modelInformation.name === this.selectedModel && "payload" in this.currentModelResp) {
