@@ -211,7 +211,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <!-- ?\<iron-ajax headers="{{authHeaders}}" id="remove-upload-request" method="DELETE" content-type="application/json" on-response="handleModelRemoval" url="[[baseUrl]]delete-model"></iron-ajax> -->
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
-      <paper-input id="user-email" label="username" value="{{userEmail}}">
+      <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\-\._]+)" value="{{userEmail}}">
         <div slot="suffix">@arup.com</div>
       </paper-input>
       <iron-input>
@@ -920,6 +920,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var groupObjects = resultGroupByName[this.groupKeys[i]]
             var sumByGroup = _.round(_.sumBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
+<<<<<<< HEAD
             }), 1)
             var minByGroup = _.round(_.minBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
@@ -927,6 +928,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var maxByGroup = _.round(_.maxBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
             }).metadata[that.selectedSumField], 1)
+=======
+            }), 0)
+            var minByGroup = _.round(_.minBy(groupObjects, function(o) {
+              return o.metadata[that.selectedSumField]
+            }).metadata[that.selectedSumField], 0)
+            var maxByGroup = _.round(_.maxBy(groupObjects, function(o) {
+              return o.metadata[that.selectedSumField]
+            }).metadata[that.selectedSumField], 0)
+>>>>>>> adds validation to username for upload
             var avgByGroup = _.round(_.meanBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
             }), 0);
@@ -946,7 +956,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           // for chart total sum by group
           this.grandTotalSum = _.round(_.sumBy(this.groupSumData, function(o) {
             return o.sum
+<<<<<<< HEAD
           }), 1)
+=======
+          }), 0)
+>>>>>>> adds validation to username for upload
           this.totalCost = _.sumBy(this.groupSumData, function(o) {
             return o.cost
           })
