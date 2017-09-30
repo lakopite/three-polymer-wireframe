@@ -406,11 +406,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template>[[_prettify(item.sum)]]</template>
               <template class="footer">[[_prettify(grandTotalSum)]] [[_specifyUnits(selectedSumField)]]</template>
             </vaadin-grid-column>
-            <!-- <vaadin-grid-column>
-              <template class="header">cost (USD)</template>
-              <template>[[_prettifyDollar(item.cost)]] USD</template>
-              <template class="footer">[[_prettifyDollar(totalCost)]] USD</template>
-            </vaadin-grid-column> -->
             <!-- NUMERICAL AGGREGATIONS WITHIN STRING AGGREGATION TABLE-->
             <vaadin-grid-column>
               <template class="header">min [[selectedSumField]] [[_specifyUnits(selectedSumField)]]</template>
@@ -455,18 +450,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </vaadin-grid-column>
           <vaadin-grid-column>
             <template class="header">[[material]] sum (other unit)</template>
-            <template>[[_prettify(item.diffUnitSum)]]</template>
+            <template>[[_prettify(item.eachAltUnitSum)]]</template>
             <template class="footer">[[_prettify(totalConcVolSumDiffUnit)]]</template>
           </vaadin-grid-column>
           <vaadin-grid-column>
             <template class="header">Cost input</template>
             <template>
-              <input id="cost-input" value="[[item.input]]" on-input="#">
+              <input class="cost-input" value="[[item.input]]" on-input="_getCostInputVal">
             </template>
           </vaadin-grid-column>
         <vaadin-grid-column>
           <template class="header">Cost Amounts</template>
-          <template>[item.costResult]</template>
+          <template>[[item.costResult]]</template>
           <template class="footer">[[_prettifyDollar(totalCost)]]</template>
         </vaadin-grid-column>
         </vaadin-grid>
@@ -926,15 +921,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var groupObjects = resultGroupByName[this.groupKeys[i]]
             var sumByGroup = _.round(_.sumBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
-<<<<<<< HEAD
-            }), 1)
-            var minByGroup = _.round(_.minBy(groupObjects, function(o) {
-              return o.metadata[that.selectedSumField]
-            }).metadata[that.selectedSumField], 1)
-            var maxByGroup = _.round(_.maxBy(groupObjects, function(o) {
-              return o.metadata[that.selectedSumField]
-            }).metadata[that.selectedSumField], 1)
-=======
             }), 0)
             var minByGroup = _.round(_.minBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
@@ -942,7 +928,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var maxByGroup = _.round(_.maxBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
             }).metadata[that.selectedSumField], 0)
->>>>>>> adds validation to username for upload
             var avgByGroup = _.round(_.meanBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
             }), 0);
@@ -959,17 +944,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           // for chart total sum by group
           this.grandTotalSum = _.round(_.sumBy(this.groupSumData, function(o) {
             return o.sum
-<<<<<<< HEAD
-          }), 1)
-=======
           }), 0)
-<<<<<<< Updated upstream
->>>>>>> adds validation to username for upload
-          this.totalCost = _.sumBy(this.groupSumData, function(o) {
-            return o.cost
-          })
-=======
->>>>>>> Stashed changes
           // for pie chart
           var _pieData = []
           for (var i=0; i < this.groupSumData.length; i++) {
@@ -1122,14 +1097,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var link = document.createElement("a");
           link.href = uri;
           link.style = "visibility:hidden";
-          var d = new Date();
-          var curr_date = d.getDate();
-          var curr_month = d.getMonth() + 1;
-          var curr_year = d.getFullYear();
-          var curr_hour = d.getHours();
-          var currMins = d.getMinutes()
-          var timeFormat = curr_year + "-" + curr_month + "-" + curr_date + "_" + curr_hour + currMins + " "
-          link.download = timeFormat + this.selectedModel + ".csv";
+          link.download = this.selectedModel + ' ' + new Date() + ".csv";
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -1157,14 +1125,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var link = document.createElement("a");
           link.href = uri;
           link.style = "visibility:hidden";
-          var d = new Date();
-          var curr_date = d.getDate();
-          var curr_month = d.getMonth() + 1;
-          var curr_year = d.getFullYear();
-          var curr_hour = d.getHours();
-          var currMins = d.getMinutes()
-          var timeFormat = curr_year + "-" + curr_month + "-" + curr_date + "_" + curr_hour + currMins + " "
-          link.download = timeFormat + this.selectedModel + ".csv";
+          link.download = this.selectedModel + ' ' + new Date() + ".csv";
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -1206,11 +1167,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return true
       }
 
+      _getCostInputVal() {
+        this.costInput = parseFloat(Polymer.dom(this.root).querySelector('.cost-input').value)
+        console.log(this.costInput);
+      }
+
       _costAggregations() {
         console.log("material: " + this.material);
         var volumeDataList = []
         var massDataList = []
         this.costTableData = []
+        console.log(this.costTableData);
         // if (this.material === 'concrete') {console.log(volumeDataList)};
         // if (this.material === 'steel') {console.log(massDataList)};
         var payloadElems = this.currentModelResp.payload
@@ -1223,20 +1190,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         console.log("# of groups: " + groupKeys.length);
         console.log(Polymer.dom(this.root).querySelector('#cost-input'));
         var allObjectsByMaterialGroup = []
-        // console.log(allObjectsByMaterialGroup);
+        //console.log(allObjectsByMaterialGroup);
         for (var i=0; i < groupKeys.length; i++) {
           var groupObjects = groupsForMaterial[groupKeys[i]];
+
           allObjectsByMaterialGroup.push(groupObjects)
           var sumByGroup = _.sumBy(groupObjects, function(o) {
             //hardcoding volume in here but have to account for material-->steel-->mass AS WELL AS UNIT TYPES
             return o.metadata.volume
           })
+          var eachAltUnitSum = sumByGroup/46656
+
           var costTableDataSetup = {
             'group': groupKeys[i],
             'sum': sumByGroup,
-            'diffUnitSum': sumByGroup/46656,
-            'input': 0
-            //'costResult': //multiply by input val
+            'eachAltUnitSum': eachAltUnitSum,
+            'input': 0,
+            'costResult': 0
           }
           this.push('costTableData', costTableDataSetup)
         }
