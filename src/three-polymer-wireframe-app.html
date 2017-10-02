@@ -310,7 +310,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView</div>
-        <paper-item>Build Date: 9/29/17</paper-item>
+        <paper-item>Build Date: 10/02/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -454,14 +454,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <template class="footer">[[_prettify(totalConcVolSumDiffUnit)]]</template>
           </vaadin-grid-column>
           <vaadin-grid-column>
-            <template class="header">Cost input</template>
+            <template class="header">Cost per (other unit)</template>
             <template>
-              <input class="cost-input" value="[[item.input]]" on-input="_getCostInputVal">
+              <input id="cost-input-[[index]]" value="[[item.input]]" on-input="_setCostResults">
             </template>
           </vaadin-grid-column>
         <vaadin-grid-column>
           <template class="header">Cost Amounts</template>
-          <template>[[item.costResult]]</template>
+          <template>[[_prettifyDollar(item.costResult)]]</template>
           <template class="footer">[[_prettifyDollar(totalCost)]]</template>
         </vaadin-grid-column>
         </vaadin-grid>
@@ -1167,68 +1167,87 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return true
       }
 
-      _getCostInputVal() {
-        this.costInput = parseFloat(Polymer.dom(this.root).querySelector('.cost-input').value)
-        console.log(this.costInput);
+      _setCostResults(e) {
+        //console.log(e.model);
+        var item = e.model.item
+        var inputIndex = e.model.index
+        //var costInputVal = parseFloat(Polymer.dom(this.root).querySelector('#cost-input-' + e.model.index).value)
+        this.costInputVal = parseFloat(e.target.value)
+        //console.log(this.costInputVal);
+        for (var i=0; i < this.costTableData.length; i++) {
+          if (i === inputIndex) {
+            this.costTableData[i].input = this.costInputVal
+            this.costTableData[i].costResult = this.costInputVal*this.costTableData[i].eachAltUnitSum
+          }
+        }
+        console.log(this.costTableData)
       }
 
       _costAggregations() {
-        console.log("material: " + this.material);
-        var volumeDataList = []
-        var massDataList = []
-        this.costTableData = []
-        console.log(this.costTableData);
-        // if (this.material === 'concrete') {console.log(volumeDataList)};
-        // if (this.material === 'steel') {console.log(massDataList)};
-        var payloadElems = this.currentModelResp.payload
-        var groupsForMaterial = _.groupBy(payloadElems, function(o) {
+        var that = this
+        // ================ repeated function start ==========================================
+        var resultFilterInput = _.filter(that._modelData.linearElements, function(o) {
+          return _.every(o.vertices, function(j) {
+            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+              that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
+              that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
+          })
+        })
+        // ================ repeated function end ==========================================
+        //console.log(resultFilterInput);
+        var groupsForMaterial = _.groupBy(resultFilterInput, function(o) {
           return o.metadata.propertyname
         })
+        // ================ repeated CODE end ==========================================
+        console.log("material: " + this.material);
+        this.costTableData = []
+        console.log(this.costTableData);
+        //var payloadElems = this.currentModelResp.payload
+        // var groupsForMaterial = _.groupBy(payloadElems, function(o) {
+        //   return o.metadata.propertyname
+        // })
         // console.log(groupsForMaterial);
         // console.log(_.keys(groupsForMaterial));
         var groupKeys = _.keys(groupsForMaterial)
-        console.log("# of groups: " + groupKeys.length);
-        console.log(Polymer.dom(this.root).querySelector('#cost-input'));
         var allObjectsByMaterialGroup = []
         //console.log(allObjectsByMaterialGroup);
         for (var i=0; i < groupKeys.length; i++) {
           var groupObjects = groupsForMaterial[groupKeys[i]];
-
           allObjectsByMaterialGroup.push(groupObjects)
           var sumByGroup = _.sumBy(groupObjects, function(o) {
             //hardcoding volume in here but have to account for material-->steel-->mass AS WELL AS UNIT TYPES
             return o.metadata.volume
           })
-          var eachAltUnitSum = sumByGroup/46656
-
+          this.eachAltUnitSum = _.round(sumByGroup/46656, 3)
           var costTableDataSetup = {
             'group': groupKeys[i],
             'sum': sumByGroup,
-            'eachAltUnitSum': eachAltUnitSum,
-            'input': 0,
-            'costResult': 0
+            'eachAltUnitSum': this.eachAltUnitSum,
+            'input': 0
+            //uncomment below? doesn't render in vaadin-grid because defined in "_setCostResults"
+            // 'costResult': this.costInputVal*this.eachAltUnitSum
           }
           this.push('costTableData', costTableDataSetup)
         }
-        for (var i=0; i < payloadElems.length; i++) {
-          if (this.material === 'concrete') {
-            volumeDataList.push(payloadElems[i].metadata.volume)
-            // var costTableDataSetup = {
-            //   'group' :
-            // }
-            // this.push('costTableData', costTableDataSetup)
-          } else if (this.material == 'steel') {
-            massDataList.push(payloadElems[i].metadata.mass)
-            // var costTableDataSetup = {
-            //   'group' :
-            // }
-            // this.push('costTableData', costTableDataSetup)
-          }
-
-        }
-        this.totalConcVolSum = _.sum(volumeDataList);
-        this.totalConcVolSumDiffUnit = this.totalConcVolSum/46656
-        this.totalSteelMassSum = _.sum(massDataList)
+        // for (var i=0; i < payloadElems.length; i++) {
+        //   if (this.material == 'concrete') {
+        //     // var costTableDataSetup = {
+        //     //   'group' :
+        //     // }
+        //     // this.push('costTableData', costTableDataSetup)
+        //   } else if (this.material == 'steel') {
+        //     // var costTableDataSetup = {
+        //     //   'group' :
+        //     // }
+        //   }
+        //
+        // }
+        this.totalConcVolSum = _.round(_.sumBy(this.costTableData, function(o) {
+          return o.sum
+        }), 3)
+        this.totalConcVolSumDiffUnit = _.round(_.sumBy(this.costTableData, function(o) {
+          return o.eachAltUnitSum
+        }), 3)
       }
 
       //Ensure that the geometry input is within boundaries and is compatible with its input sibling
@@ -1304,6 +1323,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.geometryFilter = _.cloneDeep(this.boundaries);
         this.checkValidInput();
         this._aggregations(this._modelData, this.selectedContourBy);
+        this._costAggregations()
         //reset filter selection to the model boundaries
         //console.log(this.geometryFilter)
         //console.log(this.boundaries)
@@ -1319,6 +1339,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'zMax': parseFloat(this.geometryFilter.zMax)
         }
         this._aggregations(this._modelData, this.selectedContourBy);
+        this._costAggregations()
       }
 
       _initData(dataOptions_) {
