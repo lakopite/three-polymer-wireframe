@@ -834,7 +834,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
           })
         })
-        //handle when resultFilterInput.length === 0
         this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
         }).metadata[this.selectedContourBy], 3)
@@ -1095,12 +1094,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return h + that.unitLabel
           })
           this.numDataHeaders = headers_ + '\r\n'
-          var csvData = this.numDataHeaders + rowData
+          var currentFilters = "Filters:" + '\r\n' +
+          'min x, ' + JSON.stringify(this.geometryFilter.xMin) + '\r\n' + 'max x, ' + JSON.stringify(this.geometryFilter.xMax) + '\r\n' +
+          'min y, ' + JSON.stringify(this.geometryFilter.yMin) + '\r\n' + 'max y, ' + JSON.stringify(this.geometryFilter.yMax) + '\r\n' +
+          'min z, ' + JSON.stringify(this.geometryFilter.zMin) + '\r\n' + 'max z, ' + JSON.stringify(this.geometryFilter.zMax)
+          var csvData = this.numDataHeaders + rowData + '\r\n' + currentFilters
           var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
           var link = document.createElement("a");
           link.href = uri;
           link.style = "visibility:hidden";
-          link.download = this.selectedModel + ' ' + new Date() + ".csv";
+          var d = new Date();
+          var curr_date = d.getDate();
+          var curr_month = d.getMonth() + 1;
+          var curr_year = d.getFullYear();
+          var curr_hour = d.getHours();
+          var currMins = d.getMinutes()
+          var timeFormat = curr_year + "-" + curr_month + "-" + curr_date + "_" + curr_hour + currMins + " "
+          link.download = timeFormat + this.selectedModel + ".csv";
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -1123,12 +1133,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return that.selectedSumField + " " + h + that.unitLabel
           })
           this.groupDataHeaders = headers_ + '\r\n';
-          var csvData = this.groupDataHeaders + rowData
+          var currentFilters = "Filters:" + '\r\n' +
+          'min x, ' + JSON.stringify(this.geometryFilter.xMin) + '\r\n' + 'max x, ' + JSON.stringify(this.geometryFilter.xMax) + '\r\n' +
+          'min y, ' + JSON.stringify(this.geometryFilter.yMin) + '\r\n' + 'max y, ' + JSON.stringify(this.geometryFilter.yMax) + '\r\n' +
+          'min z, ' + JSON.stringify(this.geometryFilter.zMin) + '\r\n' + 'max z, ' + JSON.stringify(this.geometryFilter.zMax)
+          var csvData = this.numDataHeaders + rowData + '\r\n' + currentFilters
           var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
           var link = document.createElement("a");
           link.href = uri;
           link.style = "visibility:hidden";
-          link.download = this.selectedModel + ' ' + new Date() + ".csv";
+          var d = new Date();
+          var curr_date = d.getDate();
+          var curr_month = d.getMonth() + 1;
+          var curr_year = d.getFullYear();
+          var curr_hour = d.getHours();
+          var currMins = d.getMinutes()
+          var timeFormat = curr_year + "-" + curr_month + "-" + curr_date + "_" + curr_hour + currMins + " "
+          link.download = timeFormat + this.selectedModel + ".csv";
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -1174,15 +1195,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         //console.log(e.model);
         var item = e.model.item
         var inputIndex = e.model.index
-        //var costInputVal = parseFloat(Polymer.dom(this.root).querySelector('#cost-input-' + e.model.index).value)
-        //this.costInputVal = parseFloat(e.target.value)
-        //console.log(this.costInputVal);
         for (var i=0; i < this.costTableData.length; i++) {
           if (i === inputIndex) {
-            console.log("values: " + e.target.value + " : " + this.costTableData[i].input)
-            //dont overwrite binding
-            //this.costTableData[i].input = this.costInputVal
-            //this.costTableData[i].costResult = this.costTableData[i].input*this.costTableData[i].eachAltUnitSum
+            //console.log("values: " + e.target.value + " : " + this.costTableData[i].input)
             this.set('costTableData.'+i+'.costResult',this.costTableData[i].input*this.costTableData[i].eachAltUnitSum)
           }
         }
