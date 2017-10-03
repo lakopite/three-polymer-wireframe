@@ -600,10 +600,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Array,
             value: []
           },
-          pieChart: {
+          strPieChart: {
             type: Object
           },
-          pieData: {
+          strPieData: {
             type: Array
           },
           costCoefficient: {
@@ -636,7 +636,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_aggregations(_modelData,selectedContourBy)',
           '_getAggregationLabels(_modelData, selectedContourBy)',
           '_getSumByForSelectedSumField(selectedSumField)',
-          '_drawChart(pieData)',
+          '_drawStrChart(strPieData)',
           '_delayChartResize(selectedView, selectedContourBy)'
         ]
       }
@@ -946,12 +946,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return o.sum
           }), 0)
           // for pie chart
-          var _pieData = []
+          var _strPieData = []
           for (var i=0; i < this.groupSumData.length; i++) {
             var item = this.groupSumData[i]
-            _pieData.push([item.group, parseFloat(item.sum)])
+            _strPieData.push([item.group, parseFloat(item.sum)])
             }
-          this.pieData = _pieData;
+          this.strPieData = _strPieData;
         }
         this.showStringAggregations = true;
       }
@@ -984,9 +984,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      _initChart() {
+      _initStrChart() {
         var chartdiv = Polymer.dom(this.root).querySelector("#sum-chart-container")
-        this.pieChart = Highcharts.chart(chartdiv, {
+        this.strPieChart = Highcharts.chart(chartdiv, {
         chart: {
             plotBackgroundColor: null,
             plotBorderWidth: null,
@@ -1017,10 +1017,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
       }
 
-      _drawChart() {
+      _drawStrChart() {
         var chartdiv = Polymer.dom(this.root).querySelector("#sum-chart-container")
-        //console.log(this.pieData);
-        this.pieChart = Highcharts.chart(chartdiv, {
+        //console.log(this.strPieData);
+        this.strPieChart = Highcharts.chart(chartdiv, {
         chart: {
             plotBackgroundColor: null,
             plotBorderWidth: null,
@@ -1057,23 +1057,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     '#f15c80', '#e4d354', '#2b908f', '#f45b5b', '#91e8e1', '#2f7ed8', '#0d233a', '#8bbc21', '#910000', '#1aadce',
                     '#492970', '#f28f43', '#77a1e5', '#c42525', '#a6c96a', '#4572A7', '#AA4643', '#89A54E', '#80699B', '#3D96AE',
                     '#DB843D', '#92A8CD', '#A47D7C', '#B5CA92'],
-            data: this.pieData
+            data: this.strPieData
           }]
         });
-        //console.log(this.pieChart.series[0].userOptions.data);
+        //console.log(this.strPieChart.series[0].userOptions.data);
       }
 
       _delayChartResize() {
         var that = this;
         setTimeout(function() {
-          that.pieChart.reflow()
+          that.strPieChart.reflow()
         }, 0)
       }
 
       ready() {
         super.ready();
         this.$['get-models-request'].generateRequest();
-        this._initChart();
+        this._initStrChart();
       }
 
       createNumericalCsv() {
@@ -1198,6 +1198,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var groupsForMaterial = _.groupBy(resultFilterInput, function(o) {
           return o.metadata.propertyname
         })
+        //console.log(groupsForMaterial);
         // ================ repeated CODE end ==========================================
         console.log("material: " + this.material);
         this.costTableData = []
@@ -1210,7 +1211,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // console.log(_.keys(groupsForMaterial));
         var groupKeys = _.keys(groupsForMaterial)
         var allObjectsByMaterialGroup = []
-        //console.log(allObjectsByMaterialGroup);
+        // console.log(allObjectsByMaterialGroup);
         for (var i=0; i < groupKeys.length; i++) {
           var groupObjects = groupsForMaterial[groupKeys[i]];
           allObjectsByMaterialGroup.push(groupObjects)
@@ -1230,12 +1231,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.push('costTableData', costTableDataSetup)
         }
         // for (var i=0; i < payloadElems.length; i++) {
-        //   if (this.material == 'concrete') {
+        //   if (this.material === 'concrete') {
         //     // var costTableDataSetup = {
         //     //   'group' :
         //     // }
         //     // this.push('costTableData', costTableDataSetup)
-        //   } else if (this.material == 'steel') {
+        //   } else if (this.material === 'steel') {
         //     // var costTableDataSetup = {
         //     //   'group' :
         //     // }
