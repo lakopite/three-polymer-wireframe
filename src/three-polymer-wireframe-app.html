@@ -310,7 +310,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView</div>
-        <paper-item>Build Date: 10/02/17</paper-item>
+        <paper-item>Build Date: 10/03/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -1143,7 +1143,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _disableCostTab(_currentMetadataFields, _currentModel) {
         //console.log(this.metadataFields);
         //console.log("material key present: " + this.metadataFields.includes('material'));
-        // console.log(this.currentModelResp);
+        //console.log(this.currentModelResp);
         if (this.metadataFields.includes('material')) {
           var payloadElems = this.currentModelResp.payload
           // NOTE this only includes "material" NOT "material_type"
@@ -1194,24 +1194,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           })
         })
         // ================ repeated function end ==========================================
-        //console.log(resultFilterInput);
         var groupsForMaterial = _.groupBy(resultFilterInput, function(o) {
           return o.metadata.propertyname
         })
         //console.log(groupsForMaterial);
-        // ================ repeated CODE end ==========================================
+        // ================ repeated pattern for CODE end ==========================================
         console.log("material: " + this.material);
         this.costTableData = []
         console.log(this.costTableData);
-        //var payloadElems = this.currentModelResp.payload
-        // var groupsForMaterial = _.groupBy(payloadElems, function(o) {
-        //   return o.metadata.propertyname
-        // })
-        // console.log(groupsForMaterial);
-        // console.log(_.keys(groupsForMaterial));
         var groupKeys = _.keys(groupsForMaterial)
         var allObjectsByMaterialGroup = []
-        // console.log(allObjectsByMaterialGroup);
+        console.log(allObjectsByMaterialGroup);
         for (var i=0; i < groupKeys.length; i++) {
           var groupObjects = groupsForMaterial[groupKeys[i]];
           allObjectsByMaterialGroup.push(groupObjects)
@@ -1243,6 +1236,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         //   }
         //
         // }
+        //AGAIN, this only accounts for material === 'concrete' volume
         this.totalConcVolSum = _.round(_.sumBy(this.costTableData, function(o) {
           return o.sum
         }), 3)
