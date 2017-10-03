@@ -211,7 +211,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <!-- ?\<iron-ajax headers="{{authHeaders}}" id="remove-upload-request" method="DELETE" content-type="application/json" on-response="handleModelRemoval" url="[[baseUrl]]delete-model"></iron-ajax> -->
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
-      <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._]+)" value="{{userEmail}}">
+      <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" value="{{userEmail}}">
         <div slot="suffix">@arup.com</div>
       </paper-input>
       <iron-input>
@@ -456,7 +456,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <vaadin-grid-column>
             <template class="header">Cost per (other unit)</template>
             <template>
-              <input id="cost-input-[[index]]" value="[[item.input]]" on-input="_setCostResults">
+              <iron-input bind-value="{{item.input}}" on-change="_setCostResults">
+                <input>
+              </iron-input>
             </template>
           </vaadin-grid-column>
         <vaadin-grid-column>
@@ -832,6 +834,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
           })
         })
+        //handle when resultFilterInput.length === 0
         this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
         }).metadata[this.selectedContourBy], 3)
@@ -1143,7 +1146,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _disableCostTab(_currentMetadataFields, _currentModel) {
         //console.log(this.metadataFields);
         //console.log("material key present: " + this.metadataFields.includes('material'));
-        //console.log(this.currentModelResp);
+        console.log(this.currentModelResp);
         if (this.metadataFields.includes('material')) {
           var payloadElems = this.currentModelResp.payload
           // NOTE this only includes "material" NOT "material_type"
@@ -1172,12 +1175,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var item = e.model.item
         var inputIndex = e.model.index
         //var costInputVal = parseFloat(Polymer.dom(this.root).querySelector('#cost-input-' + e.model.index).value)
-        this.costInputVal = parseFloat(e.target.value)
+        //this.costInputVal = parseFloat(e.target.value)
         //console.log(this.costInputVal);
         for (var i=0; i < this.costTableData.length; i++) {
           if (i === inputIndex) {
-            this.costTableData[i].input = this.costInputVal
-            this.costTableData[i].costResult = this.costInputVal*this.costTableData[i].eachAltUnitSum
+            console.log("values: " + e.target.value + " : " + this.costTableData[i].input)
+            //dont overwrite binding
+            //this.costTableData[i].input = this.costInputVal
+            //this.costTableData[i].costResult = this.costTableData[i].input*this.costTableData[i].eachAltUnitSum
+            this.set('costTableData.'+i+'.costResult',this.costTableData[i].input*this.costTableData[i].eachAltUnitSum)
           }
         }
         console.log(this.costTableData)
@@ -1209,18 +1215,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var groupObjects = groupsForMaterial[groupKeys[i]];
           allObjectsByMaterialGroup.push(groupObjects)
           var sumByGroup = _.sumBy(groupObjects, function(o) {
-            //hardcoding volume in here but have to account for material-->steel-->mass AS WELL AS UNIT TYPES
+            //NOTE hardcoding volume in here but have to account for material-->steel-->mass AS WELL AS UNIT TYPES
             return o.metadata.volume
           })
-          this.eachAltUnitSum = _.round(sumByGroup/46656, 3)
+          //this.eachAltUnitSum = _.round(sumByGroup/46656, 3)
           var costTableDataSetup = {
             'group': groupKeys[i],
             'sum': sumByGroup,
-            'eachAltUnitSum': this.eachAltUnitSum,
-            'input': 0
+            'eachAltUnitSum':  _.round(sumByGroup/46656, 3),
+            'input': 0,
             //uncomment below? doesn't render in vaadin-grid because defined in "_setCostResults"
             // 'costResult': this.costInputVal*this.eachAltUnitSum
           }
+          costTableDataSetup['costResult'] = costTableDataSetup.eachAltUnitSum * costTableDataSetup.input;
+
           this.push('costTableData', costTableDataSetup)
         }
         // for (var i=0; i < payloadElems.length; i++) {
@@ -1236,7 +1244,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         //   }
         //
         // }
-        //AGAIN, this only accounts for material === 'concrete' volume
+        //AGAIN, NOTE this only accounts for material === 'concrete' volume
         this.totalConcVolSum = _.round(_.sumBy(this.costTableData, function(o) {
           return o.sum
         }), 3)
