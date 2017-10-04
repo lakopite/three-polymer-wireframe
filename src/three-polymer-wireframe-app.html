@@ -449,12 +449,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <template class="footer">[[_prettify(totalMaterialSum)]]</template>
           </vaadin-grid-column>
           <vaadin-grid-column>
-            <template class="header">[[material]] sum (other unit)</template>
-            <template>[[_prettify(item.eachAltUnitSum)]]</template>
+            <template class="header">[[material]] sum [[otherUnitLabel]]</template>
+            <template>[[_prettify(item.otherUnitSum)]]</template>
             <template class="footer">[[_prettify(totalMaterialSumDiffUnit)]]</template>
           </vaadin-grid-column>
           <vaadin-grid-column>
-            <template class="header">Cost per (other unit)</template>
+            <template class="header">Cost/[[otherUnitLabel]]</template>
             <template>
               <iron-input bind-value="{{item.input}}" on-change="_setCostResults">
                 <input>
@@ -1309,7 +1309,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         for (var i=0; i < this.costTableData.length; i++) {
           if (i === inputIndex) {
             //console.log("values: " + e.target.value + " : " + this.costTableData[i].input)
-            this.set('costTableData.'+i+'.costResult',this.costTableData[i].input*this.costTableData[i].eachAltUnitSum)
+            this.set('costTableData.'+i+'.costResult',this.costTableData[i].input*this.costTableData[i].otherUnitSum)
           }
         }
         console.log(this.costTableData)
@@ -1343,6 +1343,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         //console.log(groupsForMaterial);
         // ================ repeated pattern for CODE end ==========================================
         console.log("material: " + this.material);
+        var unitType = this.currentModelResp.modelInformation.units
+        // console.log(unitType);
         this.costTableData = []
         console.log(this.costTableData);
         var groupKeys = _.keys(groupsForMaterial)
@@ -1355,13 +1357,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var sumByGroup = _.sumBy(groupObjects, function(o) {
               return o.metadata.volume
             })
+            var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/46656, 3) : _.round(sumByGroup/1000000000, 3)
+            this.otherUnitLabel = unitType === 'imperial' ? '(yd\u00B3)' : '(m\u00B3)'
             var costTableDataSetup = {
               'group': groupKeys[i],
               'sum': sumByGroup,
-              'eachAltUnitSum':  _.round(sumByGroup/46656, 3),
+              'otherUnitSum': _otherUnitSum,
               'input': 0
             }
-            costTableDataSetup['costResult'] = costTableDataSetup.eachAltUnitSum * costTableDataSetup.input;
+            costTableDataSetup['costResult'] = costTableDataSetup.otherUnitSum * costTableDataSetup.input;
             this.push('costTableData', costTableDataSetup)
           }
         } else if (this.material === 'steel') {
@@ -1371,13 +1375,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var sumByGroup = _.sumBy(groupObjects, function(o) {
               return o.metadata.mass
             })
+            var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/2000, 3) : _.round(sumByGroup/1000, 3)
+            this.otherUnitLabel = unitType === 'imperial' ? '(ton)' : '(tonne)'
             var costTableDataSetup = {
               'group': groupKeys[i],
               'sum': sumByGroup,
-              'eachAltUnitSum':  _.round(sumByGroup/2000, 3),
+              'otherUnitSum':  _otherUnitSum,
               'input': 0
             }
-            costTableDataSetup['costResult'] = costTableDataSetup.eachAltUnitSum * costTableDataSetup.input;
+            costTableDataSetup['costResult'] = costTableDataSetup.otherUnitSum * costTableDataSetup.input;
             this.push('costTableData', costTableDataSetup)
           }
         }
@@ -1385,7 +1391,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return o.sum
         }), 3)
         this.totalMaterialSumDiffUnit = _.round(_.sumBy(this.costTableData, function(o) {
-          return o.eachAltUnitSum
+          return o.otherUnitSum
         }), 3)
       }
 
