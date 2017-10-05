@@ -176,7 +176,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       #chart-container {
-        height: 500px;
+        height: 398px;
       }
 
       #csv-button {
@@ -768,7 +768,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _getSumByForSelectedSumField(_selectedSumField) {
-        this.numericalMetadataKeys = this.numericalMetadataKeys.sort()
+        this.numericalMetadataKeys = this.numericalMetadataKeys
         if (typeof this.selectedSumField !== 'undefined') {
           this._stringAggregations();
         }
@@ -803,7 +803,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var groupObjects = resultGroupByName[this.groupKeys[i]]
             this.push('allObjectsByGroup', groupObjects)
         }
-        this.numericalMetadataKeys = []
+        var _numericalMetadataKeys = []
         var totalGroupObjects = _.flatten(this.allObjectsByGroup)
         for (var i = 0; i < totalGroupObjects.length; i++) {
           var metadataObject = totalGroupObjects[i].metadata
@@ -814,14 +814,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var validSumGroups = ['meta_length', 'length', 'meta_mass', 'mass', 'meta_vol', 'vol', 'volume']
             //but also do an "includes/contains" because names could vary
              // to find unique keys with numeric values for dropdown options
-             if(_.isNumber(metadataValues[j]) && this.numericalMetadataKeys.indexOf(metadataKeys[j]) === -1 && validSumGroups.indexOf(metadataKeys[j]) !== -1) {
-               this.push('numericalMetadataKeys', metadataKeys[j])
+             if(_.isNumber(metadataValues[j]) && _numericalMetadataKeys.indexOf(metadataKeys[j]) === -1 && validSumGroups.indexOf(metadataKeys[j]) !== -1) {
+               _numericalMetadataKeys.push(metadataKeys[j])
              }
+             this.set('numericalMetadataKeys', _numericalMetadataKeys.sort())
            }
          }
-         this.selectedSumField = this.numericalMetadataKeys.sort()[0]
+         this.selectedSumField = this.numericalMetadataKeys[0]
        } else {
-        this.groupSumData = []
+        var _groupSumData = []
         this.allObjectsByGroupDupe = []
         // console.log("ALL OBJECTS BY GROUP SECOND");
         // console.log(this.allObjectsByGroupDupe);
@@ -840,19 +841,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var avgByGroup = _.round(_.meanBy(groupObjects, function(o) {
               return o.metadata[that.selectedSumField]
             }), 0);
-            //.2 is a temp placeholder, we will later place a cost costCoefficient in there
             var cost = _.multiply(.2, sumByGroup);
             var groupSumDataSetup = {
               'group': this.groupKeys[i],
               'sum': sumByGroup,
-              //'cost' : cost,
               'min' : minByGroup,
               'max' : maxByGroup,
               'avg' : avgByGroup
             }
-            this.push('groupSumData', groupSumDataSetup)
+            _groupSumData.push(groupSumDataSetup)
             this.push('allObjectsByGroupDupe', groupObjects)
           }
+          this.set('groupSumData', _.sortBy(_groupSumData, [function(o) { return o.group }]))
           // for chart total sum by group
           this.grandTotalSum = _.round(_.sumBy(this.groupSumData, function(o) {
             return o.sum
