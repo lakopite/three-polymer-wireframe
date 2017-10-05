@@ -110,6 +110,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         cursor: pointer;
       }
 
+      #uploaded-by {
+        font-size: .9em;
+        color: #3F51B5;
+        padding: 0;
+      }
+
+      #model-dropdown {
+        font-size: .75em;
+      }
+
       paper-button.filterBtn {
         background: var(--app-primary-color);
         color: #FFF;
@@ -139,6 +149,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       .numerical-aggregations-table {
         height: calc(100vh - 192px);
+      }
+
+      .cost-by-group-table {
+        height: calc(100vh - 192px);
+        /*this.costPieChart ?  height: 398px : height: calc(100vh - 192px);*/
       }
 
       .data-by-group-table, .numerical-aggregations-table, .cost-by-group-table {
@@ -245,10 +260,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <!-- <paper-input id="search-input" label="Search Models..." value="{{searchInput}}" type="text" autofocus minlength="1"></paper-input> -->
           <!-- REMOVED FROM TEMPLATE BELOW: selected="" filter="{{searchFilter(searchInput)}}"-->
           <template is="dom-repeat" items="[[dataOptions]]">
-            <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
+            <paper-item id="model-dropdown" class="dropdown-item" name="[[item]]">[[item]]</paper-item>
           </template>
         </paper-listbox>
       </paper-dropdown-menu>
+      <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: [[currentModelResp.modelInformation.user]]<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
         <paper-dropdown-menu id="main-contour-dropdown" label="Contour">
           <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
@@ -904,6 +920,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }), 3);
         } else {
           console.log("no data");
+          this.numericalAggregationsTableData = []
+          this.totalResult = 0
         }
         this.showNumericalAggregations = true;
       }
@@ -915,7 +933,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         return
       }
-
 
       _stringAggregations() {
         this.showNumericalAggregations = false;
@@ -1009,6 +1026,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         } else {
           console.log("no data");
+          this.groupSumData = []
+          this.grandTotalSum = 0
+          this.strPieData = []
         }
         this.showStringAggregations = true;
       }
@@ -1368,63 +1388,71 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
           })
         })
-        // ================ repeated function end ==========================================
-        var groupsForMaterial = _.groupBy(resultFilterInput, function(o) {
-          return o.metadata.propertyname
-        })
-        //console.log(groupsForMaterial);
-        // ================ repeated pattern for CODE end ==========================================
-        var unitType = this.currentModelResp.modelInformation.units
-        // console.log(unitType);
-        var _costTableData = []
-        // console.log(this.costTableData);
-        var groupKeys = _.keys(groupsForMaterial)
-        var allObjectsByMaterialGroup = []
-        if (this.material === 'concrete') {
-          for (var i=0; i < groupKeys.length; i++) {
-            var groupObjects = groupsForMaterial[groupKeys[i]];
-            allObjectsByMaterialGroup.push(groupObjects)
-            var sumByGroup = _.sumBy(groupObjects, function(o) {
-              return o.metadata.volume
-            })
-            var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/46656, 3) : _.round(sumByGroup/1000000000, 3)
-            this.otherUnitLabel = unitType === 'imperial' ? '(yd\u00B3)' : '(m\u00B3)'
-            var costTableDataSetup = {
-              'group': groupKeys[i],
-              'sum': sumByGroup,
-              'otherUnitSum': _otherUnitSum,
-              'input': 0
+        if (resultFilterInput.length > 0) {
+          // ================ repeated function end ==========================================
+          var groupsForMaterial = _.groupBy(resultFilterInput, function(o) {
+            return o.metadata.propertyname
+          })
+          //console.log(groupsForMaterial);
+          // ================ repeated pattern for CODE end ==========================================
+          var unitType = this.currentModelResp.modelInformation.units
+          // console.log(unitType);
+          var _costTableData = []
+          // console.log(this.costTableData);
+          var groupKeys = _.keys(groupsForMaterial)
+          var allObjectsByMaterialGroup = []
+          if (this.material === 'concrete') {
+            for (var i=0; i < groupKeys.length; i++) {
+              var groupObjects = groupsForMaterial[groupKeys[i]];
+              allObjectsByMaterialGroup.push(groupObjects)
+              var sumByGroup = _.sumBy(groupObjects, function(o) {
+                return o.metadata.volume
+              })
+              var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/46656, 3) : _.round(sumByGroup/1000000000, 3)
+              this.otherUnitLabel = unitType === 'imperial' ? '(yd\u00B3)' : '(m\u00B3)'
+              var costTableDataSetup = {
+                'group': groupKeys[i],
+                'sum': sumByGroup,
+                'otherUnitSum': _otherUnitSum,
+                'input': 0
+              }
+              costTableDataSetup['costResult'] = costTableDataSetup.otherUnitSum * costTableDataSetup.input;
+              _costTableData.push(costTableDataSetup)
             }
-            costTableDataSetup['costResult'] = costTableDataSetup.otherUnitSum * costTableDataSetup.input;
-            _costTableData.push(costTableDataSetup)
-          }
-          this.set('costTableData', _.sortBy(_costTableData, [function(o) { return o.group }]))
-        } else if (this.material === 'steel') {
-          for (var i=0; i < groupKeys.length; i++) {
-            var groupObjects = groupsForMaterial[groupKeys[i]];
-            allObjectsByMaterialGroup.push(groupObjects)
-            var sumByGroup = _.sumBy(groupObjects, function(o) {
-              return o.metadata.mass
-            })
-            var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/2000, 3) : _.round(sumByGroup/1000, 3)
-            this.otherUnitLabel = unitType === 'imperial' ? ' (ton)' : ' (tonne)'
-            var costTableDataSetup = {
-              'group': groupKeys[i],
-              'sum': sumByGroup,
-              'otherUnitSum': _otherUnitSum,
-              'input': 0
+            this.set('costTableData', _.sortBy(_costTableData, [function(o) { return o.group }]))
+          } else if (this.material === 'steel') {
+            for (var i=0; i < groupKeys.length; i++) {
+              var groupObjects = groupsForMaterial[groupKeys[i]];
+              allObjectsByMaterialGroup.push(groupObjects)
+              var sumByGroup = _.sumBy(groupObjects, function(o) {
+                return o.metadata.mass
+              })
+              var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/2000, 3) : _.round(sumByGroup/1000, 3)
+              this.otherUnitLabel = unitType === 'imperial' ? ' (ton)' : ' (tonne)'
+              var costTableDataSetup = {
+                'group': groupKeys[i],
+                'sum': sumByGroup,
+                'otherUnitSum': _otherUnitSum,
+                'input': 0
+              }
+              costTableDataSetup['costResult'] = costTableDataSetup.otherUnitSum * costTableDataSetup.input;
+              _costTableData.push(costTableDataSetup)
             }
-            costTableDataSetup['costResult'] = costTableDataSetup.otherUnitSum * costTableDataSetup.input;
-            _costTableData.push(costTableDataSetup)
+            this.set('costTableData', _.sortBy(_costTableData, [function(o) { return o.group }]))
           }
-          this.set('costTableData', _.sortBy(_costTableData, [function(o) { return o.group }]))
+          this.totalMaterialSum = _.round(_.sumBy(this.costTableData, function(o) {
+            return o.sum
+          }), 3)
+          this.totalMaterialSumDiffUnit = _.round(_.sumBy(this.costTableData, function(o) {
+            return o.otherUnitSum
+          }), 3)
+        } else {
+          console.log("no data");
+          this.costTableData = []
+          this.totalMaterialSum = 0
+          this.totalMaterialSumDiffUnit = 0
+          this.totalCost = 0
         }
-        this.totalMaterialSum = _.round(_.sumBy(this.costTableData, function(o) {
-          return o.sum
-        }), 3)
-        this.totalMaterialSumDiffUnit = _.round(_.sumBy(this.costTableData, function(o) {
-          return o.otherUnitSum
-        }), 3)
       }
 
       //Ensure that the geometry input is within boundaries and is compatible with its input sibling
