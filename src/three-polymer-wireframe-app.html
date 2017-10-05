@@ -450,17 +450,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <!-- cost by group table -->
         <vaadin-grid class="cost-by-group-table" items="[[costTableData]]">
         <vaadin-grid-column>
-          <template class="header">Group</template>
+          <template class="header">
+            <vaadin-grid-sorter path="group">Group</vaadin-grid-sorter>
+          </template>
           <template>[[item.group]]</template>
           <template class="footer">Grand Total</template>
         </vaadin-grid-column>
           <vaadin-grid-column>
-            <template class="header">[[material]] sum [[_costUnitLabels(material, unitType)]]</template>
+            <template class="header">
+              <vaadin-grid-sorter path="sum">[[material]] sum [[_costUnitLabels(material, unitType)]]</vaadin-grid-sorter>
+            </template>
             <template>[[_prettify(item.sum)]]</template>
             <template class="footer">[[_prettify(totalMaterialSum)]]</template>
           </vaadin-grid-column>
           <vaadin-grid-column>
-            <template class="header">[[material]] sum [[otherUnitLabel]]</template>
+            <template class="header">
+              <vaadin-grid-sorter path="otherUnitLabel">[[material]] sum [[otherUnitLabel]]</vaadin-grid-sorter>
+            </template>
             <template>[[_prettify(item.otherUnitSum)]]</template>
             <template class="footer">[[_prettify(totalMaterialSumDiffUnit)]]</template>
           </vaadin-grid-column>
@@ -473,7 +479,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </template>
           </vaadin-grid-column>
         <vaadin-grid-column>
-          <template class="header">Cost Amounts</template>
+          <template class="header">
+            <vaadin-grid-sorter path="costResult">Cost Amounts</vaadin-grid-sorter>
+          </template>
           <template>[[_prettifyDollar(item.costResult)]]</template>
           <template class="footer">[[_prettifyDollar(totalCost)]]</template>
         </vaadin-grid-column>
