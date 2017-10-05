@@ -243,11 +243,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-dropdown-menu label="Model">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
           <template is="dom-repeat" items="[[dataOptions]]">
-            <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
+            <paper-item id="model-dropdown" class="dropdown-item" name="[[item]]">[[item]]</paper-item>
           </template>
         </paper-listbox>
       </paper-dropdown-menu>
-      <paper-item id="uploaded-by">Uploaded by: [[currentModelResp.modelInformation.user]]</paper-item>
+      <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: [[currentModelResp.modelInformation.user]]<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
         <paper-dropdown-menu id="main-contour-dropdown" label="Contour">
           <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
