@@ -1411,12 +1411,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var costTableDataSetup = {
               'group': groupKeys[i],
               'sum': sumByGroup,
-              'otherUnitSum':  _otherUnitSum,
+              'otherUnitSum': _otherUnitSum,
               'input': 0
             }
             costTableDataSetup['costResult'] = costTableDataSetup.otherUnitSum * costTableDataSetup.input;
-            this.push('costTableData', costTableDataSetup)
+            _costTableData.push(costTableDataSetup)
           }
+          this.set('costTableData', _.sortBy(_costTableData, [function(o) { return o.group }]))
         }
         this.totalMaterialSum = _.round(_.sumBy(this.costTableData, function(o) {
           return o.sum
