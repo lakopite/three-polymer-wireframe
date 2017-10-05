@@ -652,7 +652,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_loadingChanged(modelLoading)',
           '_contourPropsChanged(metadataFields)',
           '_getModelData(selectedModel)',
-          '_aggregations(_modelData,selectedContourBy)',
+          '_aggregations(_modelData,selectedContourBy, selectedView)',
           '_getAggregationLabels(_modelData, selectedContourBy)',
           '_getSumByForSelectedSumField(selectedSumField)',
           '_drawStrChart(strPieData)',
@@ -1009,7 +1009,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       //
       // }
 
-      _aggregations(_modelData, selectedContourBy) {
+      _aggregations(_modelData, selectedContourBy, _currentPage) {
+        if(this.selectedView === 'cost-view') {
+          this._disableCostTab()
+        }
         if (this._isNumberField(_modelData, selectedContourBy)) {
           this._numericalAggregations();
           return
@@ -1301,15 +1304,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _disableCostTab(_currentMetadataFields, _currentModel, _geoFilter) {
-        //console.log(this.metadataFields);
-        //console.log("material key present: " + this.metadataFields.includes('material'));
-      //  NOTE should I change this to depend on resultFilterInput and not the currentMetadataFields?
-        //console.log(this.currentModelResp);
         if (!_.isEmpty(this.geometryFilter) && this.metadataFields.includes('material')) {
           var payloadElems = this.currentModelResp.payload
           // NOTE this only includes "material" NOT "material_type"
           for (var i=0; i < payloadElems.length; i++) {
-            //var material = _.toLower(payloadElems[i].metadata.material)
             this.material = _.toLower(payloadElems[i].metadata.material)
             // go through payload elements and their metadata keys
             //later use includes method for "material"
@@ -1491,8 +1489,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       resetFilters() {
         this.geometryFilter = _.cloneDeep(this.boundaries);
         this.checkValidInput();
-        this._aggregations(this._modelData, this.selectedContourBy);
-        this._disableCostTab()
+        this._aggregations(this._modelData, this.selectedContourBy, this.selectedView);
         //reset filter selection to the model boundaries
         //console.log(this.geometryFilter)
         //console.log(this.boundaries)
@@ -1507,8 +1504,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'zMin': parseFloat(this.geometryFilter.zMin),
           'zMax': parseFloat(this.geometryFilter.zMax)
         }
-        this._aggregations(this._modelData, this.selectedContourBy);
-        this._disableCostTab()
+        this._aggregations(this._modelData, this.selectedContourBy, this.selectedView);
       }
 
       _initData(dataOptions_) {
@@ -1539,7 +1535,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       handleDataResponse(event, response) {
         this.currentModelResp = response.response
         var costTab = Polymer.dom(this.root).querySelector("#cost-tab")
-        //comment back in once _disableCostTab logic is complete
         if (costTab.disabled && this.selectedView === 'cost-view') {
           this.selectedView = 'model-view'
         }
