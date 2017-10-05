@@ -1300,12 +1300,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return this.selectedView == 'model-view' || this.selectedView == 'cost-view';
       }
 
-      _disableCostTab(_currentMetadataFields, _currentModel) {
+      _disableCostTab(_currentMetadataFields, _currentModel, _geoFilter) {
         //console.log(this.metadataFields);
         //console.log("material key present: " + this.metadataFields.includes('material'));
       //  NOTE should I change this to depend on resultFilterInput and not the currentMetadataFields?
         //console.log(this.currentModelResp);
-        if (this.metadataFields.includes('material')) {
+        if (!_.isEmpty(this.geometryFilter) && this.metadataFields.includes('material')) {
           var payloadElems = this.currentModelResp.payload
           // NOTE this only includes "material" NOT "material_type"
           for (var i=0; i < payloadElems.length; i++) {
@@ -1492,7 +1492,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.geometryFilter = _.cloneDeep(this.boundaries);
         this.checkValidInput();
         this._aggregations(this._modelData, this.selectedContourBy);
-        this._costAggregations()
+        this._disableCostTab()
         //reset filter selection to the model boundaries
         //console.log(this.geometryFilter)
         //console.log(this.boundaries)
@@ -1508,7 +1508,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'zMax': parseFloat(this.geometryFilter.zMax)
         }
         this._aggregations(this._modelData, this.selectedContourBy);
-        this._costAggregations()
+        this._disableCostTab()
       }
 
       _initData(dataOptions_) {
