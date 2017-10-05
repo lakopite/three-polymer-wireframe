@@ -110,6 +110,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         cursor: pointer;
       }
 
+      #uploaded-by {
+        font-size: .9em;
+        color: #3F51B5;
+        padding: 0;
+      }
+
+      #model-dropdown {
+        font-size: .75em;
+      }
+
       paper-button.filterBtn {
         background: var(--app-primary-color);
         color: #FFF;
@@ -237,6 +247,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </template>
         </paper-listbox>
       </paper-dropdown-menu>
+      <paper-item id="uploaded-by">Uploaded by: [[currentModelResp.modelInformation.user]]</paper-item>
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
         <paper-dropdown-menu id="main-contour-dropdown" label="Contour">
           <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
