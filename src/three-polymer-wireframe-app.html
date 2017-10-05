@@ -1368,7 +1368,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // ================ repeated pattern for CODE end ==========================================
         var unitType = this.currentModelResp.modelInformation.units
         // console.log(unitType);
-        this.costTableData = []
+        var _costTableData = []
         // console.log(this.costTableData);
         var groupKeys = _.keys(groupsForMaterial)
         var allObjectsByMaterialGroup = []
@@ -1388,8 +1388,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               'input': 0
             }
             costTableDataSetup['costResult'] = costTableDataSetup.otherUnitSum * costTableDataSetup.input;
-            this.push('costTableData', costTableDataSetup)
+            _costTableData.push(costTableDataSetup)
           }
+          this.set('costTableData', _.sortBy(_costTableData, [function(o) { return o.group }]))
         } else if (this.material === 'steel') {
           for (var i=0; i < groupKeys.length; i++) {
             var groupObjects = groupsForMaterial[groupKeys[i]];
