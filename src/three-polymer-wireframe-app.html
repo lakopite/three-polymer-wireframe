@@ -260,7 +260,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <!-- <paper-input id="search-input" label="Search Models..." value="{{searchInput}}" type="text" autofocus minlength="1"></paper-input> -->
           <!-- REMOVED FROM TEMPLATE BELOW: selected="" filter="{{searchFilter(searchInput)}}"-->
           <template is="dom-repeat" items="[[dataOptions]]">
-            <paper-item id="model-dropdown" class="dropdown-item" name="[[item]]">[[item]]</paper-item>
+            <paper-item id="model-dropdown" class="dropdown-item" name="[[item.model]]">[[item.model]]</paper-item>
           </template>
         </paper-listbox>
       </paper-dropdown-menu>
@@ -738,7 +738,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               if (fileName.slice(-5) !== ".json")
               throw "file has a " + "\"'" + extension  + "'\"" + " extension, but must be a .json file."
               // check that this json has not already been uplaoded
-              if (_.includes(that.dataOptions, fileNameNoExtension))
+              if (_.includes(_.map(that.dataOptions,'model'), fileNameNoExtension))
               throw "a file with the name " + "\"'" + fileNameNoExtension + "'\"" + " has already been uploaded."
               //parse JSON
               that.jsonUploadPayload = JSON.parse(e.target.result)
@@ -1598,7 +1598,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.set('dataOptions', dataOptions_);
         //console.log(this.dataOptions)
         if (this.dataOptions.length > 0) {
-          this.set('selectedModel', this.dataOptions[0])
+          this.set('selectedModel', this.dataOptions[0].model)
         }
       }
 
