@@ -325,7 +325,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </app-header>
     <iron-pages style="height:100%;" attr-for-selected="name" selected="{{selectedView}}">
     <div name="model-view" class="three-container">
-      <three-view id="view" scene-background-color="#F5F5F5">
+      <three-view id="view" legend-position="top-left" scene-background-color="#F5F5F5">
         <three-model id="model" slot="model" metadata-fields="{{metadataFields}}" is-loading="{{modelLoading}}" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[_modelData]]"></three-model>
       </three-view>
     </div>
