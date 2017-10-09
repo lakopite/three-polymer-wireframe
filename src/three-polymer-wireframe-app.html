@@ -914,6 +914,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.push('allObjectsByGroupDupe', groupObjects)
           }
           this.set('groupSumData', _.sortBy(_groupSumData, [function(o) { return o.group }]))
+          this._strOtherUnitLabel()
           // for chart total sum by group
           this.totalElements = _.round(_.sumBy(this.groupSumData, function(o) {
             return o.elemsPerGroup
