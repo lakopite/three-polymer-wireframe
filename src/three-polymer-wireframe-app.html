@@ -1107,6 +1107,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           for (var i=0; i < this.groupSumData.length; i++) {
             this.groupDataHeaders = _.keys(this.groupSumData[i])
             var el = [_.values(this.groupSumData[i])] + '\r\n'
+            console.log("so commit logs a change");
             rowData += el
           }
           var that = this;
