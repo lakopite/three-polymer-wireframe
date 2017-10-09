@@ -330,7 +330,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView</div>
-        <paper-item>Build Date: 10/06/17</paper-item>
+        <paper-item>Build Date: 10/09/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -424,7 +424,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <vaadin-grid-sorter path="elemsPerGroup">elements/group</vaadin-grid-sorter>
               </template>
               <template>[[_prettify(item.elemsPerGroup)]]</template>
-              <template class="footer">[[_prettify(totalElements)]]</template>
+              <template class="footer">[[_prettify(costTotalElements)]]</template>
             </vaadin-grid-column>
             <vaadin-grid-column>
               <template class="header">
@@ -474,10 +474,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <vaadin-grid class="cost-by-group-table" items="[[costTableData]]">
         <vaadin-grid-column>
           <template class="header">
-            <vaadin-grid-sorter path="group">Group</vaadin-grid-sorter>
+            <vaadin-grid-sorter path="group">group</vaadin-grid-sorter>
           </template>
           <template>[[item.group]]</template>
           <template class="footer">Grand Total</template>
+        </vaadin-grid-column>
+        <vaadin-grid-column>
+          <template class="header">
+            <vaadin-grid-sorter path="elemsPerGroup">elements/group</vaadin-grid-sorter>
+          </template>
+          <template>[[_prettify(item.elemsPerGroup)]]</template>
+          <template class="footer">[[_prettify(costTotalElements)]]</template>
         </vaadin-grid-column>
           <vaadin-grid-column>
             <template class="header">
@@ -1078,10 +1085,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.showStringAggregations = true;
       }
 
-      // _strOtherUnitColumn(measurementVal, currUnitType) {
-      //
-      // }
-
       _aggregations(_modelData, selectedContourBy, _currentPage) {
         if(this.selectedView === 'cost-view') {
           this._disableCostTab()
@@ -1338,12 +1341,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           for (var i=0; i < this.groupSumData.length; i++) {
             this.groupDataHeaders = _.keys(this.groupSumData[i])
             var el = [_.values(this.groupSumData[i])] + '\r\n'
-          	rowData += el
+            rowData += el
           }
           var that = this;
           var headers_ = _.map(this.groupDataHeaders,function(h) {
             if (h === 'group') {
               return h
+            } if (h === 'elemsPerGroup') {
+              return "elements per group"
+            } if (h === 'otherUnitSum' && that.selectedSumField.includes('length')) {
+              return ''
+            } if (h === 'otherUnitSum') {
+              return that.selectedSumField + " sum " + that.strOtherUnitLabel
             }
             return that.selectedSumField + " " + h + that.unitLabel
           })
@@ -1410,7 +1419,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         for (var i=0; i < this.costTableData.length; i++) {
           if (i === inputIndex) {
             //console.log("values: " + e.target.value + " : " + this.costTableData[i].input)
-            this.set('costTableData.'+i+'.costResult',this.costTableData[i].input*this.costTableData[i].otherUnitSum)
+            this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum)
           }
         }
         // console.log(this.costTableData)
@@ -1453,6 +1462,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           if (this.material === 'concrete') {
             for (var i=0; i < groupKeys.length; i++) {
               var groupObjects = groupsForMaterial[groupKeys[i]];
+              var elemsPerGroup = groupObjects.length
               allObjectsByMaterialGroup.push(groupObjects)
               var sumByGroup = _.sumBy(groupObjects, function(o) {
                 return o.metadata.volume
@@ -1461,6 +1471,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               this.costOtherUnitLabel = unitType === 'imperial' ? '(yd\u00B3)' : '(m\u00B3)'
               var costTableDataSetup = {
                 'group': groupKeys[i],
+                'elemsPerGroup': elemsPerGroup,
                 'sum': sumByGroup,
                 'otherUnitSum': _otherUnitSum,
                 'input': 0
@@ -1472,6 +1483,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           } else if (this.material === 'steel') {
             for (var i=0; i < groupKeys.length; i++) {
               var groupObjects = groupsForMaterial[groupKeys[i]];
+              var elemsPerGroup = groupObjects.length
               allObjectsByMaterialGroup.push(groupObjects)
               var sumByGroup = _.sumBy(groupObjects, function(o) {
                 return o.metadata.mass
@@ -1480,6 +1492,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               this.costOtherUnitLabel = unitType === 'imperial' ? ' (ton)' : ' (tonne)'
               var costTableDataSetup = {
                 'group': groupKeys[i],
+                'elemsPerGroup': elemsPerGroup,
                 'sum': sumByGroup,
                 'otherUnitSum': _otherUnitSum,
                 'input': 0
@@ -1489,6 +1502,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
             this.set('costTableData', _.sortBy(_costTableData, [function(o) { return o.group }]))
           }
+          this.costTotalElements = _.round(_.sumBy(this.costTableData, function(o) {
+           return o.elemsPerGroup
+          }), 0)
           this.totalMaterialSum = _.round(_.sumBy(this.costTableData, function(o) {
             return o.sum
           }), 3)
