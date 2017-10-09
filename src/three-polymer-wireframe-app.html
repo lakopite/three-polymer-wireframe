@@ -269,7 +269,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-dropdown-menu id="main-contour-dropdown" label="Contour">
           <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
             <template is="dom-repeat" items="[[metadataFields]]">
-              <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+               <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
             </template>
           </paper-listbox>
         </paper-dropdown-menu>
@@ -366,7 +366,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <paper-dropdown-menu id="num-contour-dropdown" label="Contour">
             <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
               <template is="dom-repeat" items="[[metadataFields]]">
-                <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+                <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
               </template>
             </paper-listbox>
             </paper-dropdown-menu>
@@ -837,8 +837,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return typeof(n) !== 'undefined' ? n.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : ""
       }
 
-      _alphabetize(arr) {
-        return arr.sort(function(a,b) {return (a.group > b.group) ? 1 : ((b.group > a.group) ? -1 : 0)} )
+      _dropdownUnitLabel(item, unitType) {
+        var that = this;
+        item = _.toLower(item)
+        unitType = _.toLower(that.currentModelResp.modelInformation.units)
+        if (item.includes('area')) {
+          return unitType === 'imperial' ? item + ' (in\u00B2)' : item + ' (mm\u00B2)'
+        } else if (item.includes('length')) {
+          return unitType === 'imperial' ? item + ' (in)' : item + ' (mm)'
+        } else if (item.includes('mass')) {
+          return unitType === 'imperial' ? item + ' (lb)' : item + ' (kg)'
+        } else if (item.includes('vol')) {
+          return unitType === 'imperial' ? item + ' (in\u00B3)' : item + ' (mm\u00B3)'
+        } else {
+          return item
+        }
       }
 
       _numericalAggUnitLabels(measurement, unitType) {
