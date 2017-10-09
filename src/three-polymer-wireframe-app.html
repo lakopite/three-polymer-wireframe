@@ -243,7 +243,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-dropdown-menu label="Model">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
           <template is="dom-repeat" items="[[dataOptions]]">
-            <paper-item id="model-dropdown" class="dropdown-item" name="[[item]]">[[item]]</paper-item>
+            <paper-item id="model-dropdown" class="dropdown-item" name="[[item.model]]">[[item.model]]</paper-item>
           </template>
         </paper-listbox>
       </paper-dropdown-menu>
@@ -645,7 +645,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               if (fileName.slice(-5) !== ".json")
               throw "file has a " + "\"'" + extension  + "'\"" + " extension, but must be a .json file."
               // check that this json has not already been uplaoded
-              if (_.includes(that.dataOptions, fileNameNoExtension))
+              if (_.includes(_.map(that.dataOptions,'model'), fileNameNoExtension))
               throw "a file with the name " + "\"'" + fileNameNoExtension + "'\"" + " has already been uploaded."
               //parse JSON
               that.jsonUploadPayload = JSON.parse(e.target.result)
@@ -874,31 +874,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         for (var i = 0; i < this.groupKeys.length; i++) {
           //reusing var groupObjects below (was local variable in previous loop for numericalMetadataKeys)
           var groupObjects = resultGroupByName[this.groupKeys[i]]
-            var elemsPerGroup = groupObjects.length
-            var sumByGroup = _.round(_.sumBy(groupObjects, function(o) {
-              return o.metadata[that.selectedSumField]
-            }), 1)
-            var minByGroup = _.round(_.minBy(groupObjects, function(o) {
-              return o.metadata[that.selectedSumField]
-            }).metadata[that.selectedSumField], 1)
-            var maxByGroup = _.round(_.maxBy(groupObjects, function(o) {
-              return o.metadata[that.selectedSumField]
-            }).metadata[that.selectedSumField], 1)
-            var avgByGroup = _.round(_.meanBy(groupObjects, function(o) {
-              return o.metadata[that.selectedSumField]
-            }), 0);
-            //for conversion
-            if (that.currentModelResp.modelInformation.units === 'imperial') {
+          var elemsPerGroup = groupObjects.length
+          var sumByGroup = _.round(_.sumBy(groupObjects, function(o) {
+            return o.metadata[that.selectedSumField]
+          }), 1)
+          var minByGroup = _.round(_.minBy(groupObjects, function(o) {
+            return o.metadata[that.selectedSumField]
+          }).metadata[that.selectedSumField], 1)
+          var maxByGroup = _.round(_.maxBy(groupObjects, function(o) {
+            return o.metadata[that.selectedSumField]
+          }).metadata[that.selectedSumField], 1)
+          var avgByGroup = _.round(_.meanBy(groupObjects, function(o) {
+            return o.metadata[that.selectedSumField]
+          }), 0);
+          //for conversion
+          if (that.currentModelResp.modelInformation.units === 'imperial') {
               if (that.selectedSumField.includes('mass')) {
-              this.strOtherUnitSum = sumByGroup/2000
+              this.strOtherUnitSum = _.round(sumByGroup/2000, 3)
             } else if (that.selectedSumField.includes('vol')) {
-              this.strOtherUnitSum = sumByGroup/46656
+              this.strOtherUnitSum = _.round(sumByGroup/46656, 3)
             }
             } else if (that.currentModelResp.modelInformation.units === 'metric') {
               if (that.selectedSumField.includes('mass')) {
-                this.strOtherUnitSum = sumByGroup/1000
+                this.strOtherUnitSum = _.round(sumByGroup/1000, 3)
               } else if (that.selectedSumField.includes('vol')) {
-                this.strOtherUnitSum = sumByGroup/1000000000
+                this.strOtherUnitSum = _.round(sumByGroup/1000000000, 3)
               }
             }
             var groupSumDataSetup = {
@@ -1078,9 +1078,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           })
           this.numDataHeaders = headers_ + '\r\n'
           var currentFilters = "Filters:" + '\r\n' +
-          'min x, ' + JSON.stringify(this.geometryFilter.xMin) + '\r\n' + 'max x, ' + JSON.stringify(this.geometryFilter.xMax) + '\r\n' +
-          'min y, ' + JSON.stringify(this.geometryFilter.yMin) + '\r\n' + 'max y, ' + JSON.stringify(this.geometryFilter.yMax) + '\r\n' +
-          'min z, ' + JSON.stringify(this.geometryFilter.zMin) + '\r\n' + 'max z, ' + JSON.stringify(this.geometryFilter.zMax)
+          'min x, ' + this.geometryFilter.xMin + '\r\n' + 'max x, ' + this.geometryFilter.xMax + '\r\n' +
+          'min y, ' + this.geometryFilter.yMin + '\r\n' + 'max y, ' + this.geometryFilter.yMax + '\r\n' +
+          'min z, ' + this.geometryFilter.zMin + '\r\n' + 'max z, ' + this.geometryFilter.zMax
           var csvData = this.numDataHeaders + rowData + '\r\n' + currentFilters
           var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
           var link = document.createElement("a");
@@ -1107,20 +1107,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           for (var i=0; i < this.groupSumData.length; i++) {
             this.groupDataHeaders = _.keys(this.groupSumData[i])
             var el = [_.values(this.groupSumData[i])] + '\r\n'
-          	rowData += el
+            rowData += el
           }
           var that = this;
           var headers_ = _.map(this.groupDataHeaders,function(h) {
             if (h === 'group') {
               return h
+            } if (h === 'elemsPerGroup') {
+              return "elements per group"
+            } if (h === 'otherUnitSum' && that.selectedSumField.includes('length')) {
+              return ''
+            } if (h === 'otherUnitSum') {
+              return that.selectedSumField + " sum " + that.strOtherUnitLabel
             }
             return that.selectedSumField + " " + h + that.unitLabel
           })
           this.groupDataHeaders = headers_ + '\r\n';
           var currentFilters = "Filters:" + '\r\n' +
-          'min x, ' + JSON.stringify(this.geometryFilter.xMin) + '\r\n' + 'max x, ' + JSON.stringify(this.geometryFilter.xMax) + '\r\n' +
-          'min y, ' + JSON.stringify(this.geometryFilter.yMin) + '\r\n' + 'max y, ' + JSON.stringify(this.geometryFilter.yMax) + '\r\n' +
-          'min z, ' + JSON.stringify(this.geometryFilter.zMin) + '\r\n' + 'max z, ' + JSON.stringify(this.geometryFilter.zMax)
+          'min x, ' + this.geometryFilter.xMin + '\r\n' + 'max x, ' + this.geometryFilter.xMax + '\r\n' +
+          'min y, ' + this.geometryFilter.yMin + '\r\n' + 'max y, ' + this.geometryFilter.yMax + '\r\n' +
+          'min z, ' + this.geometryFilter.zMin + '\r\n' + 'max z, ' + this.geometryFilter.zMax
           var csvData = this.groupDataHeaders + rowData + '\r\n' + currentFilters
           var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
           var link = document.createElement("a");
@@ -1231,13 +1237,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'zMin': parseFloat(this.geometryFilter.zMin),
           'zMax': parseFloat(this.geometryFilter.zMax)
         }
-        this._aggregations(this._modelData, this.selectedContourBy);
+        this._aggregations(this._modelData, this.selectedContourBy)
       }
 
       _initData(dataOptions_) {
         this.set('dataOptions', dataOptions_);
         if (this.dataOptions.length > 0) {
-          this.set('selectedModel', this.dataOptions[0])
+          this.set('selectedModel', this.dataOptions[0].model)
         }
       }
 
