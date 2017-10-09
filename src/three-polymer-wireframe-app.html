@@ -340,7 +340,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <paper-dropdown-menu id="num-contour-dropdown" label="Contour">
             <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
               <template is="dom-repeat" items="[[metadataFields]]">
-                <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+                <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
               </template>
             </paper-listbox>
             </paper-dropdown-menu>
@@ -367,7 +367,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <paper-dropdown-menu id="str-contour-dropdown" label="Contour">
             <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
               <template is="dom-repeat" items="[[metadataFields]]">
-                <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+                <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
               </template>
             </paper-listbox>
           </paper-dropdown-menu>
