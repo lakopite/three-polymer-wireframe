@@ -269,7 +269,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-dropdown-menu id="main-contour-dropdown" label="Contour">
           <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
             <template is="dom-repeat" items="[[metadataFields]]">
-               <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
+              <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
             </template>
           </paper-listbox>
         </paper-dropdown-menu>
@@ -351,7 +351,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </app-header>
     <iron-pages style="height:100%;" attr-for-selected="name" selected="{{selectedView}}">
     <div name="model-view" class="three-container">
-      <three-view id="view" scene-background-color="#F5F5F5">
+      <three-view id="view" legend-position="top-left" scene-background-color="#F5F5F5">
         <three-model id="model" slot="model" metadata-fields="{{metadataFields}}" is-loading="{{modelLoading}}" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[_modelData]]"></three-model>
       </three-view>
     </div>
@@ -393,7 +393,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <paper-dropdown-menu id="str-contour-dropdown" label="Contour">
             <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
               <template is="dom-repeat" items="[[metadataFields]]">
-                <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+                <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
               </template>
             </paper-listbox>
           </paper-dropdown-menu>
@@ -522,7 +522,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </iron-pages>
     </app-header-layout>
     </app-drawer-layout>
-    </template>
+  </template>
 
   <script>
 
@@ -1080,7 +1080,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }), 0)
             this.grandTotalOtherUnitSum = _.round(_.sumBy(this.groupSumData, function(o) {
               return o.otherUnitSum
-            }), 0)
+            }), 3)
             // for pie chart
             var _strPieData = []
             for (var i=0; i < this.groupSumData.length; i++) {
