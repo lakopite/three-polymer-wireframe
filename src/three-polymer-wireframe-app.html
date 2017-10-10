@@ -1166,7 +1166,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _hideColumn(_stringDropdown) {
-        return this.selectedSumField.includes('length')
+        if (this.selectedSumField) {
+          return this.selectedSumField.includes('length')
+        }
       }
 
       _initCostChart() {
