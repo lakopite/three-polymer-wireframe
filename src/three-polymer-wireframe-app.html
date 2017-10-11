@@ -695,7 +695,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_getSumByForSelectedSumField(selectedSumField)',
           '_drawStrChart(strPieData)',
           '_drawCostChart(costPieData)',
-          '_delayChartResize(selectedView, selectedContourBy)'
+          '_delayChartResize(selectedView, selectedContourBy)',
+          '_updateCostValues(geometryFilter)'
         ]
       }
 
@@ -1330,11 +1331,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'min x, ' + this.geometryFilter.xMin + '\r\n' + 'max x, ' + this.geometryFilter.xMax + '\r\n' +
           'min y, ' + this.geometryFilter.yMin + '\r\n' + 'max y, ' + this.geometryFilter.yMax + '\r\n' +
           'min z, ' + this.geometryFilter.zMin + '\r\n' + 'max z, ' + this.geometryFilter.zMax
-          var csvData = this.numDataHeaders + rowData + '\r\n' + currentFilters
-          var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
-          var link = document.createElement("a");
-          link.href = uri;
-          link.style = "visibility:hidden";
           var d = new Date();
           var curr_date = (d.getDate() < 9 ? '0': '') + (d.getDate()+1)
           var curr_month = (d.getMonth() < 9 ? '0': '') + (d.getMonth()+1)
@@ -1343,7 +1339,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var curr_hour = (d.getHours() < 9 ? '0': '') + d.getHours()
           var currMins = (d.getMinutes() < 9 ? '0': '') + d.getMinutes()
           var timeFormat = curr_year_formatted + curr_month + curr_date + "_" + curr_hour + currMins
-          link.download = this.selectedModel + " " + timeFormat + ".csv";
+          var downloadStamp = "Downloaded on: " + timeFormat + '\r\n'
+          var csvData = this.numDataHeaders + rowData + '\r\n' + currentFilters + '\r\n' + downloadStamp
+          var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
+          var link = document.createElement("a");
+          link.href = uri;
+          link.style = "visibility:hidden";
+          link.download = this.selectedModel + ".csv";
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -1376,11 +1378,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'min x, ' + this.geometryFilter.xMin + '\r\n' + 'max x, ' + this.geometryFilter.xMax + '\r\n' +
           'min y, ' + this.geometryFilter.yMin + '\r\n' + 'max y, ' + this.geometryFilter.yMax + '\r\n' +
           'min z, ' + this.geometryFilter.zMin + '\r\n' + 'max z, ' + this.geometryFilter.zMax
-          var csvData = this.groupDataHeaders + rowData + '\r\n' + currentFilters
-          var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
-          var link = document.createElement("a");
-          link.href = uri;
-          link.style = "visibility:hidden";
           var d = new Date();
           var curr_date = (d.getDate() < 9 ? '0': '') + (d.getDate()+1)
           var curr_month = (d.getMonth() < 9 ? '0': '') + (d.getMonth()+1)
@@ -1389,7 +1386,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var curr_hour = (d.getHours() < 9 ? '0': '') + d.getHours()
           var currMins = (d.getMinutes() < 9 ? '0': '') + d.getMinutes()
           var timeFormat = curr_year_formatted + curr_month + curr_date + "_" + curr_hour + currMins
-          link.download = this.selectedModel + " " + timeFormat + ".csv";
+          var downloadStamp = "Downloaded on: " + timeFormat + '\r\n'
+          var csvData = this.groupDataHeaders + rowData + '\r\n' + currentFilters + '\r\n' + downloadStamp
+          var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
+          var link = document.createElement("a");
+          link.href = uri;
+          link.style = "visibility:hidden";
+          link.download = this.selectedModel + ".csv";
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -1427,20 +1430,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return true
       }
 
-      _setCostResults(e) {
-        //console.log(e.model);
-        var item = e.model.item
-        var inputIndex = e.model.index
-        for (var i=0; i < this.costTableData.length; i++) {
-          if (i === inputIndex) {
-            //console.log("values: " + e.target.value + " : " + this.costTableData[i].input)
-            this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum)
-          }
-        }
-        // console.log(this.costTableData)
-        this.totalCost = _.sumBy(this.costTableData, function(o) {
-          return o.costResult
-        })
+      _setCostPieData() {
         // for pie chart
         var _costPieData = []
         for (var i=0; i < this.costTableData.length; i++) {
@@ -1448,6 +1438,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           _costPieData.push([item.group, parseFloat(item.costResult)])
           }
         this.costPieData = _costPieData;
+      }
+
+      _setCostResults(e) {
+        this.costItems = []
+        //console.log(e.model);
+        var item = e.model.item
+        var inputIndex = e.model.index
+        for (var i=0; i < this.costTableData.length; i++) {
+          if (i === inputIndex) {
+            //console.log("values: " + e.target.value + " : " + this.costTableData[i].input)
+            this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
+          }
+          //save group name and input(push into an object). if names match, use that input * new otherunitsum for new costResult/totalCost/costPieData.
+          this.costItems.push({'group': this.costTableData[i].group, 'input': this.costTableData[i].input})
+        }
+        console.log(this.costItems);
+        // console.log(this.costTableData)
+        this.totalCost = _.sumBy(this.costTableData, function(o) {
+          return o.costResult
+        })
+        this._setCostPieData()
         // console.log(this.costPieData);
       }
 
@@ -1572,6 +1583,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               that.selectedContourBy = that.metadataFields[0];
             }, 0);
           }
+        }
+      }
+
+      _updateCostValues(geometryFilter) {
+        if (typeof(this.costItems) !== 'undefined') {
+          for (var i=0; i < this.costTableData.length; i++) {
+            for (var j=0; j < this.costItems.length; j++) {
+              if (this.costTableData[i].group == this.costItems[j].group) {
+                console.log(this.costTableData[i].group + " = " + this.costItems[j].group);
+                this.set('costTableData.'+i+'.input', this.costItems[j].input);
+                this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
+              }
+            }
+          }
+          this.totalCost = _.sumBy(this.costTableData, function(o) {
+            return o.costResult
+          })
+          console.log(this.costTableData);
+          this._setCostPieData()
         }
       }
 
