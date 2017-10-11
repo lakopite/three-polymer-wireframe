@@ -264,7 +264,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </template>
         </paper-listbox>
       </paper-dropdown-menu>
-      <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: [[currentModelResp.modelInformation.user]]<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
+      <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: {{_uploadedBy(currentModelResp.modelInformation.user)}}<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
         <paper-dropdown-menu id="main-contour-dropdown" label="Contour">
           <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
@@ -471,7 +471,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <!-- cost by group pie chart -->
         <div id="cost-table-section">
         <!-- cost by group table -->
-        <vaadin-grid class="cost-by-group-table" items="[[costTableData]]">
+        <vaadin-grid class="cost-by-group-table" items="{{costTableData}}">
         <vaadin-grid-column>
           <template class="header">
             <vaadin-grid-sorter path="group">group</vaadin-grid-sorter>
@@ -695,8 +695,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_getSumByForSelectedSumField(selectedSumField)',
           '_drawStrChart(strPieData)',
           '_drawCostChart(costPieData)',
-          '_delayChartResize(selectedView, selectedContourBy)',
-          '_updateCostValues(geometryFilter)'
+          '_delayChartResize(selectedView, selectedContourBy)'
         ]
       }
 
@@ -706,6 +705,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       logout() {
         this.dispatchEvent(new CustomEvent('logout', {bubbles: true, composed: true}))
+      }
+
+      _uploadedBy(user) {
+        if (_.isEmpty(user)) {
+          return user = "admin"
+        } else {
+          return user
+        }
       }
 
       uploadJsonModel() {
@@ -1093,6 +1100,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           console.log("no data");
           this.groupSumData = []
           this.grandTotalSum = 0
+          this.grandTotalOtherUnitSum = 0
           this.strPieData = []
         }
         this.showStringAggregations = true;
@@ -1386,15 +1394,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var currMins = (d.getMinutes() < 9 ? '0': '') + d.getMinutes()
           var timeFormat = curr_year_formatted + curr_month + curr_date + "_" + curr_hour + currMins
           var downloadStamp = "Downloaded on: " + timeFormat + '\r\n'
-          var csvData = this.groupDataHeaders + rowData + '\r\n' + currentFilters + '\r\n' + downloadStamp
-          var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
-          var link = document.createElement("a");
-          link.href = uri;
-          link.style = "visibility:hidden";
-          link.download = this.selectedModel + ".csv";
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
+          // var csvData = this.groupDataHeaders + rowData + '\r\n' + currentFilters + '\r\n' + downloadStamp
+          // var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
+          // var link = document.createElement("a");
+          // link.href = uri;
+          // link.style = "visibility:hidden";
+          // link.download = this.selectedModel + ".csv";
+          // document.body.appendChild(link);
+          // link.click();
+          // document.body.removeChild(link);
         }
       }
 
@@ -1451,13 +1459,32 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
           }
           //save group name and input(push into an object). if names match, use that input * new otherunitsum for new costResult/totalCost/costPieData.
-          this.costItems.push({'group': this.costTableData[i].group, 'input': this.costTableData[i].input})
+          this.costItems.push({'model': this.selectedModel, 'group': this.costTableData[i].group, 'input': this.costTableData[i].input})
         }
-        console.log(this.costItems);
+        //console.log(this.costItems);
         this.totalCost = _.sumBy(this.costTableData, function(o) {
           return o.costResult
         })
         this._setCostPieData()
+      }
+
+      _updateCostValues() {
+        if (typeof(this.costItems) !== 'undefined') {
+          for (var i=0; i < this.costTableData.length; i++) {
+            for (var j=0; j < this.costItems.length; j++) {
+              if (this.costTableData[i].group == this.costItems[j].group) {
+                //console.log(this.costTableData[i].group + " = " + this.costItems[j].group);
+                this.set('costTableData.'+i+'.input', this.costItems[j].input);
+                this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
+              }
+            }
+          }
+          this.totalCost = _.sumBy(this.costTableData, function(o) {
+            return o.costResult
+          })
+          //console.log(this.costTableData);
+          this._setCostPieData()
+        }
       }
 
       _costAggregations() {
@@ -1535,9 +1562,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.totalMaterialSumDiffUnit = _.round(_.sumBy(this.costTableData, function(o) {
             return o.otherUnitSum
           }), 3)
+          this._updateCostValues()
         } else {
           console.log("no data");
           this.costTableData = []
+          this.costTotalElements = 0
           this.totalMaterialSum = 0
           this.totalMaterialSumDiffUnit = 0
           this.totalCost = 0
@@ -1581,25 +1610,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               that.selectedContourBy = that.metadataFields[0];
             }, 0);
           }
-        }
-      }
-
-      _updateCostValues(geometryFilter) {
-        if (typeof(this.costItems) !== 'undefined') {
-          for (var i=0; i < this.costTableData.length; i++) {
-            for (var j=0; j < this.costItems.length; j++) {
-              if (this.costTableData[i].group == this.costItems[j].group) {
-                console.log(this.costTableData[i].group + " = " + this.costItems[j].group);
-                this.set('costTableData.'+i+'.input', this.costItems[j].input);
-                this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
-              }
-            }
-          }
-          this.totalCost = _.sumBy(this.costTableData, function(o) {
-            return o.costResult
-          })
-          console.log(this.costTableData);
-          this._setCostPieData()
         }
       }
 
@@ -1706,6 +1716,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _getModelData(_selectedModel) {
+        console.log(this.costItems);
         this.viewData = {
              "linearElements": [],
              "planarElements": []
