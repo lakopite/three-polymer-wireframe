@@ -651,6 +651,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Array,
             value: []
           },
+          costItems: {
+            type: Array,
+            value: []
+          },
           strPieChart: {
             type: Object
           },
@@ -1394,15 +1398,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var currMins = (d.getMinutes() < 9 ? '0': '') + d.getMinutes()
           var timeFormat = curr_year_formatted + curr_month + curr_date + "_" + curr_hour + currMins
           var downloadStamp = "Downloaded on: " + timeFormat + '\r\n'
-          // var csvData = this.groupDataHeaders + rowData + '\r\n' + currentFilters + '\r\n' + downloadStamp
-          // var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
-          // var link = document.createElement("a");
-          // link.href = uri;
-          // link.style = "visibility:hidden";
-          // link.download = this.selectedModel + ".csv";
-          // document.body.appendChild(link);
-          // link.click();
-          // document.body.removeChild(link);
+          var csvData = this.groupDataHeaders + rowData + '\r\n' + currentFilters + '\r\n' + downloadStamp
+          var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
+          var link = document.createElement("a");
+          link.href = uri;
+          link.style = "visibility:hidden";
+          link.download = this.selectedModel + ".csv";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
         }
       }
 
@@ -1438,7 +1442,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _setCostPieData() {
-        // for pie chart
         var _costPieData = []
         for (var i=0; i < this.costTableData.length; i++) {
           var item = this.costTableData[i]
@@ -1449,7 +1452,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _setCostResults(e) {
         //this.costInputIndex = e.model.index
-        this.costItems = []
         //console.log(e.model);
         var item = e.model.item
         var inputIndex = e.model.index
@@ -1457,11 +1459,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           if (i === inputIndex) {
             //console.log("values: " + e.target.value + " : " + this.costTableData[i].input)
             this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
+            this.costItems.push({'model': this.selectedModel, 'group': this.costTableData[i].group, 'input': this.costTableData[i].input})
           }
-          //save group name and input(push into an object). if names match, use that input * new otherunitsum for new costResult/totalCost/costPieData.
-          this.costItems.push({'model': this.selectedModel, 'group': this.costTableData[i].group, 'input': this.costTableData[i].input})
+          //save group name and input(push into an object). if names match, use that input * new otherunitsum for new costResult/totalCost/costPieData
+          //this.costItems.push({'model': this.selectedModel, 'group': this.costTableData[i].group, 'input': this.costTableData[i].input})
         }
-        //console.log(this.costItems);
+        console.log(this.costItems);
         this.totalCost = _.sumBy(this.costTableData, function(o) {
           return o.costResult
         })
@@ -1472,7 +1475,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (typeof(this.costItems) !== 'undefined') {
           for (var i=0; i < this.costTableData.length; i++) {
             for (var j=0; j < this.costItems.length; j++) {
-              if (this.costTableData[i].group == this.costItems[j].group) {
+              if (this.costTableData[i].group == this.costItems[j].group && this.selectedModel === this.costItems[j].model) {
                 //console.log(this.costTableData[i].group + " = " + this.costItems[j].group);
                 this.set('costTableData.'+i+'.input', this.costItems[j].input);
                 this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
@@ -1482,7 +1485,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.totalCost = _.sumBy(this.costTableData, function(o) {
             return o.costResult
           })
-          //console.log(this.costTableData);
           this._setCostPieData()
         }
       }
@@ -1562,6 +1564,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.totalMaterialSumDiffUnit = _.round(_.sumBy(this.costTableData, function(o) {
             return o.otherUnitSum
           }), 3)
+          //may or may not be the best place for this:
           this._updateCostValues()
         } else {
           console.log("no data");
@@ -1716,7 +1719,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _getModelData(_selectedModel) {
-        console.log(this.costItems);
         this.viewData = {
              "linearElements": [],
              "planarElements": []
