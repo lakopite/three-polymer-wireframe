@@ -407,7 +407,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template>[[_prettify(item.sum)]]</template>
               <template class="footer">[[_prettify(grandTotalSum)]] [[_specifyUnits(selectedSumField)]]</template>
             </vaadin-grid-column>
-            <vaadin-grid-column hidden$="{{_hideColumn(selectedSumField)}}">
+            <vaadin-grid-column>
               <template class="header">
                 <vaadin-grid-sorter path="otherUnitSum">sum [[selectedSumField]] [[strOtherUnitLabel]]</vaadin-grid-sorter>
               </template>
@@ -775,16 +775,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       //for strOtherUnitLabel
       _strOtherUnitLabel(unitType, unitLabel) {
         if (this.currentModelResp.modelInformation.units === 'imperial') {
+          //length
+          if (this.unitLabel === ' (in)') {
+            this.strOtherUnitLabel = ' (ft)'
+          }
           //mass
-          if (this.unitLabel === ' (lb)') {
+          else if (this.unitLabel === ' (lb)') {
           this.strOtherUnitLabel = ' (ton)'
           //vol
         } else if (this.unitLabel === ' (in\u00B3)') {
           this.strOtherUnitLabel = ' (yd\u00B3)'
         }
       } else if (this.currentModelResp.modelInformation.units === 'metric') {
+        //length
+        if (this.unitLabel === ' (mm)') {
+          this.strOtherUnitLabel = ' (m)'
           //mass
-          if (this.unitLabel === ' (kg)') {
+        } else if (this.unitLabel === ' (kg)') {
             this.strOtherUnitLabel = ' (tonne)'
             //vol
           } else if (this.unitLabel === ' (mm\u00B3)') {
@@ -906,13 +913,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }), 0);
           //for conversion
           if (that.currentModelResp.modelInformation.units === 'imperial') {
-              if (that.selectedSumField.includes('mass')) {
-              this.strOtherUnitSum = _.round(sumByGroup/2000, 0)
-            } else if (that.selectedSumField.includes('vol')) {
-              this.strOtherUnitSum = _.round(sumByGroup/46656, 0)
-            }
+              if (that.selectedSumField.includes('length')) {
+                this.strOtherUnitSum = _.round(sumByGroup/12, 0)
+              } else if (that.selectedSumField.includes('mass')) {
+                this.strOtherUnitSum = _.round(sumByGroup/2000, 0)
+              } else if (that.selectedSumField.includes('vol')) {
+                this.strOtherUnitSum = _.round(sumByGroup/46656, 0)
+              }
             } else if (that.currentModelResp.modelInformation.units === 'metric') {
-              if (that.selectedSumField.includes('mass')) {
+              if (that.selectedSumField.includes('length')) {
+                this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
+              } else if (that.selectedSumField.includes('mass')) {
                 this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
               } else if (that.selectedSumField.includes('vol')) {
                 this.strOtherUnitSum = _.round(sumByGroup/1000000000, 0)
@@ -1014,10 +1025,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             data: []
           }]
         });
-      }
-
-      _hideColumn(_stringDropdown) {
-        return this.selectedSumField.includes('length')
       }
 
       _drawChart() {
@@ -1133,8 +1140,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               return h
             } if (h === 'elemsPerGroup') {
               return "elements per group"
-            } if (h === 'otherUnitSum' && that.selectedSumField.includes('length')) {
-              return ''
             } if (h === 'otherUnitSum') {
               return that.selectedSumField + " sum " + that.strOtherUnitLabel
             }
