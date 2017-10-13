@@ -1457,10 +1457,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
           }
         }
-
-        console.log(this.costItems.length);
         if (this.costItems.length === 0) {
-          //save group name and input(push into an object). if names match, use that input * new otherunitsum for new costResult/totalCost/costPieData
           this.costItems.push({'model': this.selectedModel, 'group': item.group, 'input': item.input})
         } else {
           var found = this.costItems.some(function (el) {
@@ -1469,15 +1466,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           if (!found) {
             this.costItems.push({'model': this.selectedModel, 'group': item.group, 'input': item.input})
           } else if (found) {
-            console.log("this group is already in array--must replace!");
             for (var i=0; i < this.costItems.length; i++) {
-              if (this.costItems[i].group === item.group) {
+              if (this.costItems[i].group === item.group && this.costItems[i].model === this.selectedModel) {
                 this.costItems[i].input = item.input
               }
             }
           }
         }
-        console.log(this.costItems);
         this.totalCost = _.sumBy(this.costTableData, function(o) {
           return o.costResult
         })
