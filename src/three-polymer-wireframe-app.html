@@ -302,7 +302,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
       </div>
       <!-- for numerical aggregations -->
-      <div hidden$="{{_hideCsvButton(selectedView)}}">
+      <div hidden$="{{_hideQuantCsvButton(selectedView)}}">
         <div class="csv-wrapper">
           <div hidden$="[[!showNumericalAggregations]]">
             <div class="csv-button">
@@ -312,7 +312,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
       </div>
       <!-- for string aggregations -->
-      <div hidden$="{{_hideCsvButton(selectedView)}}">
+      <div hidden$="{{_hideQuantCsvButton(selectedView)}}">
         <div class="csv-wrapper">
           <div hidden$="[[!showStringAggregations]]">
             <div class="csv-button">
@@ -321,15 +321,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </div>
         </div>
       </div>
+    <!-- </div>
+    </div>
+    </app-drawer> -->
+      <!-- for cost aggregations -->
+      <div hidden$="{{_hideCostCsvButton(selectedView)}}">
+        <div class="csv-wrapper">
+            <div class="csv-button">
+              <paper-button id="csv-button" on-tap="createCostDataCsv">Export Table to CSV</paper-button>
+            </div>
+        </div>
+      </div>
     </div>
     </div>
+  </div>
+  </div>
     </app-drawer>
   <!-- Main content -->
     <app-header-layout has-scrolling-region>
     <app-header slot="header" medium-tall>
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-        <div main-title>Arup Model QuickView</div>
+        <div main-title>Arup Model QuickView: [[selectedModel]]</div>
         <paper-item>Build Date: 10/13/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
@@ -433,7 +446,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template>[[_prettify(item.sum)]]</template>
               <template class="footer">[[_prettify(grandTotalSum)]] [[_specifyUnits(selectedSumField)]]</template>
             </vaadin-grid-column>
-            <vaadin-grid-column hidden$="{{_hideColumn(selectedSumField)}}">
+            <vaadin-grid-column>
               <template class="header">
                 <vaadin-grid-sorter path="otherUnitSum">sum [[selectedSumField]] [[strOtherUnitLabel]]</vaadin-grid-sorter>
               </template>
@@ -510,7 +523,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </vaadin-grid-column>
         <vaadin-grid-column>
           <template class="header">
-            <vaadin-grid-sorter path="costResult">Cost Amounts</vaadin-grid-sorter>
+            <vaadin-grid-sorter path="costResult">Cost Amount</vaadin-grid-sorter>
           </template>
           <template>[[_prettifyDollar(item.costResult)]]</template>
           <template class="footer">[[_prettifyDollar(totalCost)]]</template>
@@ -868,15 +881,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         measurement = _.toLower(that.selectedContourBy)
         unitType = _.toLower(that.currentModelResp.modelInformation.units)
         if (measurement.includes('area')) {
-          return unitType === 'imperial' ? that.unitLabel = ' (in\u00B2)' : that.unitLabel = ' (mm\u00B2)'
+          return unitType === 'imperial' ? that.numUnitLabel = ' (in\u00B2)' : that.numUnitLabel = ' (mm\u00B2)'
         } else if (measurement.includes('length')) {
-          return unitType === 'imperial' ? that.unitLabel = ' (in)' : that.unitLabel = ' (mm)'
+          return unitType === 'imperial' ? that.numUnitLabel = ' (in)' : that.numUnitLabel = ' (mm)'
         } else if (measurement.includes('mass')) {
-          return unitType === 'imperial' ? that.unitLabel = ' (lb)' : that.unitLabel = ' (kg)'
+          return unitType === 'imperial' ? that.numUnitLabel = ' (lb)' : that.numUnitLabel = ' (kg)'
         } else if (measurement.includes('vol')) {
-          return unitType === 'imperial' ? that.unitLabel = ' (in\u00B3)' : that.unitLabel = ' (mm\u00B3)'
+          return unitType === 'imperial' ? that.numUnitLabel = ' (in\u00B3)' : that.numUnitLabel = ' (mm\u00B3)'
         } else if (measurement.includes('cost')) {
-          return unitType === 'imperial' ? that.unitLabel = ' (USD)' : that.unitLabel = ''
+          return unitType === 'imperial' ? that.numUnitLabel = ' (USD)' : that.numUnitLabel = ''
         } else {
           return ''
         }
@@ -887,13 +900,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         measurement = _.toLower(that.selectedSumField)
         unitType = _.toLower(that.currentModelResp.modelInformation.units)
         if (measurement.includes('length')) {
-          return unitType === 'imperial' ? that.unitLabel =' (in)' : that.unitLabel =' (mm)'
+          return unitType === 'imperial' ? that.strUnitLabel =' (in)' : that.strUnitLabel =' (mm)'
         } else if (measurement.includes('mass')) {
-          return unitType === 'imperial' ? that.unitLabel =' (lb)' : that.unitLabel =' (kg)'
+          return unitType === 'imperial' ? that.strUnitLabel =' (lb)' : that.strUnitLabel =' (kg)'
         } else if (measurement.includes('vol')) {
-          return unitType === 'imperial' ? that.unitLabel =' (in\u00B3)' : that.unitLabel =' (mm\u00B3)'
+          return unitType === 'imperial' ? that.strUnitLabel =' (in\u00B3)' : that.strUnitLabel =' (mm\u00B3)'
         } else if (measurement.includes('cost')) {
-          return unitType === 'imperial' ? that.unitLabel =' (USD)' : that.unitLabel = ''
+          return unitType === 'imperial' ? that.strUnitLabel =' (USD)' : that.strUnitLabel = ''
         } else {
           return ''
         }
@@ -901,19 +914,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _strOtherUnitLabel(unitType, unitLabel) {
         if (this.currentModelResp.modelInformation.units === 'imperial') {
-          //mass
-          if (this.unitLabel === ' (lb)') {
-          this.strOtherUnitLabel = ' (ton)'
-          //vol
-        } else if (this.unitLabel === ' (in\u00B3)') {
-          this.strOtherUnitLabel = ' (yd\u00B3)'
-        }
-      } else if (this.currentModelResp.modelInformation.units === 'metric') {
-          //mass
-          if (this.unitLabel === ' (kg)') {
-            this.strOtherUnitLabel = ' (tonne)'
+            //length
+            if (this.strUnitLabel === ' (in)') {
+              this.strOtherUnitLabel = ' (ft)'
+            }
+            //mass
+            else if (this.strUnitLabel === ' (lb)') {
+            this.strOtherUnitLabel = ' (ton)'
             //vol
-          } else if (this.unitLabel === ' (mm\u00B3)') {
+          } else if (this.strUnitLabel === ' (in\u00B3)') {
+            this.strOtherUnitLabel = ' (yd\u00B3)'
+          }
+        } else if (this.currentModelResp.modelInformation.units === 'metric') {
+          //length
+          if (this.strUnitLabel === ' (mm)') {
+            this.strOtherUnitLabel = ' (m)'
+          }
+          //mass
+          else if (this.strUnitLabel === ' (kg)') {
+            this.strOtherUnitLabel = ' (tonne)'
+          //vol
+        } else if (this.strUnitLabel === ' (mm\u00B3)') {
             this.strOtherUnitLabel = ' (m\u00B3)'
           }
         }
@@ -924,9 +945,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         material = _.toLower(that.material)
         unitType = _.toLower(that.currentModelResp.modelInformation.units)
         if (that.material.includes('conc')) {
-          return unitType === 'imperial' ? that.unitLabel =' (in\u00B3)' : that.unitLabel =' (mm\u00B3)'
+          return unitType === 'imperial' ? that.costUnitLabel =' (in\u00B3)' : that.costUnitLabel =' (mm\u00B3)'
         } else if (that.material.includes('steel')) {
-          return unitType === 'imperial' ? that.unitLabel =' (lb)' : that.unitLabel =' (kg)'
+          return unitType === 'imperial' ? that.costUnitLabel =' (lb)' : that.costUnitLabel =' (kg)'
         } else {
           return ''
         }
@@ -1052,16 +1073,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               }), 0);
               //for conversion
               if (that.currentModelResp.modelInformation.units === 'imperial') {
-                if (that.selectedSumField.includes('mass')) {
-                this.strOtherUnitSum = sumByGroup/2000
-              } else if (that.selectedSumField.includes('vol')) {
-                this.strOtherUnitSum = sumByGroup/46656
-              }
-              } else if (that.currentModelResp.modelInformation.units === 'metric') {
-                if (that.selectedSumField.includes('mass')) {
-                  this.strOtherUnitSum = sumByGroup/1000
+                if (that.selectedSumField.includes('length')) {
+                  this.strOtherUnitSum = _.round(sumByGroup/12, 0)
+                } else if (that.selectedSumField.includes('mass')) {
+                  this.strOtherUnitSum = _.round(sumByGroup/2000, 0)
                 } else if (that.selectedSumField.includes('vol')) {
-                  this.strOtherUnitSum = sumByGroup/1000000000
+                  this.strOtherUnitSum = _.round(sumByGroup/46656, 0)
+                }
+              } else if (that.currentModelResp.modelInformation.units === 'metric') {
+                if (that.selectedSumField.includes('length')) {
+                  this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
+                } else if (that.selectedSumField.includes('mass')) {
+                  this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
+                } else if (that.selectedSumField.includes('vol')) {
+                  this.strOtherUnitSum = _.round(sumByGroup/1000000000, 0)
                 }
               }
               var groupSumDataSetup = {
@@ -1172,12 +1197,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _hideChart(_totalCost) {
         return this.totalCost === 0
-      }
-
-      _hideColumn(_stringDropdown) {
-        if (this.selectedSumField) {
-          return this.selectedSumField.includes('length')
-        }
       }
 
       _initCostChart() {
@@ -1332,7 +1351,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if (h === 'name') {
               return h
             }
-            return h + that.unitLabel
+            return h + that.numUnitLabel
           })
           this.numDataHeaders = headers_ + '\r\n'
           var currentFilters = "Filters:" + '\r\n' +
@@ -1374,12 +1393,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               return h
             } if (h === 'elemsPerGroup') {
               return "elements per group"
-            } if (h === 'otherUnitSum' && that.selectedSumField.includes('length')) {
-              return ''
             } if (h === 'otherUnitSum') {
               return that.selectedSumField + " sum " + that.strOtherUnitLabel
             }
-            return that.selectedSumField + " " + h + that.unitLabel
+            return that.selectedSumField + " " + h + that.strUnitLabel
           })
           this.groupDataHeaders = headers_ + '\r\n';
           var currentFilters = "Filters:" + '\r\n' +
@@ -1407,12 +1424,66 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      _hideMainDropdown(_currentPage) {
-        return this.selectedView == 'aggregations-view' || this.selectedView == 'cost-view';
+      createCostDataCsv() {
+        var rowData = ''
+        if (this.costTableData.length > 0) {
+          for (var i=0; i < this.costTableData.length; i++) {
+            this.costTableHeaders = _.keys(this.costTableData[i])
+            var el = [_.values(this.costTableData[i])] + '\r\n'
+            rowData += el
+          }
+          var that = this;
+          var headers_ = _.map(this.costTableHeaders,function(h) {
+            if (h === 'group') {
+              return h
+            } if (h === 'elemsPerGroup') {
+              return "elements per group"
+            } if (h === 'sum') {
+              return that.material + " sum " + that.costUnitLabel
+            } if (h === 'otherUnitSum') {
+              return that.material + " sum " + that.costOtherUnitLabel
+            } if (h === 'input') {
+              return "cost per " + that.costOtherUnitLabel
+            } if (h === 'costResult') {
+              return "cost amount"
+            }
+          })
+          this.costTableHeaders = headers_ + '\r\n';
+          var currentFilters = "Filters:" + '\r\n' +
+          'min x, ' + this.geometryFilter.xMin + '\r\n' + 'max x, ' + this.geometryFilter.xMax + '\r\n' +
+          'min y, ' + this.geometryFilter.yMin + '\r\n' + 'max y, ' + this.geometryFilter.yMax + '\r\n' +
+          'min z, ' + this.geometryFilter.zMin + '\r\n' + 'max z, ' + this.geometryFilter.zMax
+          var d = new Date();
+          var curr_date = (d.getDate() < 9 ? '0': '') + (d.getDate()+1)
+          var curr_month = (d.getMonth() < 9 ? '0': '') + (d.getMonth()+1)
+          var curr_year = d.getFullYear();
+          var curr_year_formatted = curr_year.toString().substring(2)
+          var curr_hour = (d.getHours() < 9 ? '0': '') + d.getHours()
+          var currMins = (d.getMinutes() < 9 ? '0': '') + d.getMinutes()
+          var timeFormat = curr_year_formatted + curr_month + curr_date + "_" + curr_hour + currMins
+          var downloadStamp = "Downloaded on: " + timeFormat + '\r\n'
+          var csvData = this.costTableHeaders + rowData + '\r\n' + currentFilters + '\r\n' + downloadStamp
+          var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
+          var link = document.createElement("a");
+          link.href = uri;
+          link.style = "visibility:hidden";
+          link.download = this.selectedModel + ".csv";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
       }
 
-      _hideCsvButton(_currentPage) {
-        return this.selectedView == 'model-view' || this.selectedView == 'cost-view';
+      _hideMainDropdown(_currentPage) {
+        return this.selectedView === 'aggregations-view' || this.selectedView === 'cost-view';
+      }
+
+      _hideQuantCsvButton(_currentPage) {
+        return this.selectedView === 'model-view' || this.selectedView === 'cost-view';
+      }
+
+      _hideCostCsvButton(_currentPage) {
+        return this.selectedView !== 'cost-view';
       }
 
       _disableCostTab(_currentMetadataFields, _currentModel, _geoFilter) {
