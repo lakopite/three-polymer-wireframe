@@ -330,7 +330,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView</div>
-        <paper-item>Build Date: 10/12/17</paper-item>
+        <paper-item>Build Date: 10/13/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -1456,16 +1456,40 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           if (i === inputIndex) {
             //console.log("values: " + e.target.value + " : " + this.costTableData[i].input)
             this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
-            console.log(item);
             //if that group and model already there, then overwrite it--otherwise push
-            // for (var j=0; j < this.costItems.length; j++) {
-            //  check that that item's model, group, and info isn't already in there
-            // }
-            this.costItems.push({'model': this.selectedModel, 'group': this.costTableData[i].group, 'input': this.costTableData[i].input})
+            //this.costItems.push({'model': this.selectedModel, 'group': this.costTableData[i].group, 'input': this.costTableData[i].input})
           }
-          //save group name and input(push into an object). if names match, use that input * new otherunitsum for new costResult/totalCost/costPieData
-          //this.costItems.push({'model': this.selectedModel, 'group': this.costTableData[i].group, 'input': this.costTableData[i].input})
         }
+
+        console.log(this.costItems.length);
+        if (this.costItems.length === 0) {
+          //save group name and input(push into an object). if names match, use that input * new otherunitsum for new costResult/totalCost/costPieData
+          this.costItems.push({'model': this.selectedModel, 'group': item.group, 'input': item.input})
+        } else {
+          var found = this.costItems.some(function (el) {
+            return el.group === item.group;
+          });
+          if (!found) {
+            this.costItems.push({'model': this.selectedModel, 'group': item.group, 'input': item.input})
+          } else if (found) {
+            console.log("this group is already in array--must replace!");
+            //replace but el here is not defined
+            
+            //_.replace()
+          }
+        }
+
+        // else if (this.costItems.length > 0) {
+        //   for (var j=0; j < this.costItems.length; j++) {
+        //     if (item.group !== this.costItems[j].group) {
+        //       console.log("not yet in there");
+        //       this.costItems.push({'model': this.selectedModel, 'group': item.group, 'input': item.input})
+        //     } else if (item.group === this.costItems[j].group) {
+        //       console.log("already in there");
+        //     }
+        //   }
+        // }
+
         console.log(this.costItems);
         this.totalCost = _.sumBy(this.costTableData, function(o) {
           return o.costResult
