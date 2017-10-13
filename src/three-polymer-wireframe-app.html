@@ -1448,7 +1448,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _setCostResults(e) {
-        //this.costInputIndex = e.model.index
         //console.log(e.model);
         var item = e.model.item
         var inputIndex = e.model.index
@@ -1456,8 +1455,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           if (i === inputIndex) {
             //console.log("values: " + e.target.value + " : " + this.costTableData[i].input)
             this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
-            //if that group and model already there, then overwrite it--otherwise push
-            //this.costItems.push({'model': this.selectedModel, 'group': this.costTableData[i].group, 'input': this.costTableData[i].input})
           }
         }
 
@@ -1473,23 +1470,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.costItems.push({'model': this.selectedModel, 'group': item.group, 'input': item.input})
           } else if (found) {
             console.log("this group is already in array--must replace!");
-            //replace but el here is not defined
-            
-            //_.replace()
+            for (var i=0; i < this.costItems.length; i++) {
+              if (this.costItems[i].group === item.group) {
+                this.costItems[i].input = item.input
+              }
+            }
           }
         }
-
-        // else if (this.costItems.length > 0) {
-        //   for (var j=0; j < this.costItems.length; j++) {
-        //     if (item.group !== this.costItems[j].group) {
-        //       console.log("not yet in there");
-        //       this.costItems.push({'model': this.selectedModel, 'group': item.group, 'input': item.input})
-        //     } else if (item.group === this.costItems[j].group) {
-        //       console.log("already in there");
-        //     }
-        //   }
-        // }
-
         console.log(this.costItems);
         this.totalCost = _.sumBy(this.costTableData, function(o) {
           return o.costResult
