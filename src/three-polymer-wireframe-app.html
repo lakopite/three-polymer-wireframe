@@ -151,7 +151,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         height: calc(100vh - 192px);
       }
 
-      .data-by-group-table, .numerical-aggregations-table {
+      .cost-by-group-table {
+        height: calc(100vh - 192px);
+        /*this.costPieChart ?  height: 398px : height: calc(100vh - 192px);*/
+      }
+
+      .data-by-group-table, .numerical-aggregations-table, .cost-by-group-table {
         --vaadin-grid-body-row-odd-cell: {
           background-color: #f5f5f5;
         };
@@ -185,7 +190,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         /*height: 50%;*/
       }
 
+<<<<<<< HEAD
       #chart-container {
+=======
+      #sum-chart-container {
+        height: 398px;
+      }
+
+      #cost-chart-container {
+>>>>>>> dev
         height: 398px;
       }
 
@@ -210,10 +223,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         --paper-toast-color: white;
       }
 
+      #cost-tab[disabled] {
+        color: #9E9E9E;
+      }
+
     </style>
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="model-request" method="GET" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="[[baseUrl]]post-model"></iron-ajax>
+    <!-- ?\<iron-ajax headers="{{authHeaders}}" id="remove-upload-request" method="DELETE" content-type="application/json" on-response="handleModelRemoval" url="[[baseUrl]]delete-model"></iron-ajax> -->
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
       <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" value="{{userEmail}}">
@@ -240,14 +258,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-item>Model Options</paper-item>
     </app-toolbar>
     <div class="drawer-list">
+      <!-- <paper-input id="search-input" label="Search Models..." value="{{searchInput}}"></paper-input> -->
       <paper-dropdown-menu label="Model">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
+          <!-- <paper-input id="search-input" label="Search Models..." value="{{searchInput}}" type="text" autofocus minlength="1"></paper-input> -->
+          <!-- REMOVED FROM TEMPLATE BELOW: selected="" filter="{{searchFilter(searchInput)}}"-->
           <template is="dom-repeat" items="[[dataOptions]]">
             <paper-item id="model-dropdown" class="dropdown-item" name="[[item.model]]">[[item.model]]</paper-item>
           </template>
         </paper-listbox>
       </paper-dropdown-menu>
+<<<<<<< HEAD
       <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: [[currentModelResp.modelInformation.user]]<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
+=======
+      <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: {{_uploadedBy(currentModelResp.modelInformation.user)}}<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
+>>>>>>> dev
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
         <paper-dropdown-menu id="main-contour-dropdown" label="Contour">
           <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
@@ -271,13 +296,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min z" class="inline-input" type="number" value="{{geometryFilter.zMin}}" max="[[_computeMax(boundaries.zMax,geometryFilter.zMax)]]" min="[[boundaries.zMin]]"></paper-input>
           <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max z" class="inline-input" type="number" value="{{geometryFilter.zMax}}" max="[[boundaries.zMax]]" min="[[_computeMin(boundaries.zMin,geometryFilter.zMin)]]"></paper-input>
         </div>
+        <!-- for force filter -->
+        <!-- <div hidden$="[[!showNumericalAggregations]]">
+        <div class="horizontal">
+        <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min [[selectedContourBy]]" class="inline-input" type="number" value="[[minResult]]" min="#"></paper-input>
+        <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max [[selectedContourBy]]" class="inline-input" type="number" value="[[maxResult]]" max="#"></paper-input>
+        </div>
+        </div> -->
+        <!-- force filter end -->
         <div class="horizontal">
           <paper-button class="filterBtn" raised disabled$="{{_filtersDisabled}}" id="applyBtn" on-tap="applyFilters" type="number">Apply</paper-button>
           <paper-button class="filterBtn" raised disabled$="{{modelLoading}}" id="resetBtn" on-tap="resetFilters" type="number">Reset</paper-button>
         </div>
       </div>
       <!-- for numerical aggregations -->
-      <div hidden$="{{_hideCsvButton(selectedView)}}">
+      <div hidden$="{{_hideQuantCsvButton(selectedView)}}">
         <div class="csv-wrapper">
           <div hidden$="[[!showNumericalAggregations]]">
             <div class="csv-button">
@@ -287,7 +320,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
       </div>
       <!-- for string aggregations -->
-      <div hidden$="{{_hideCsvButton(selectedView)}}">
+      <div hidden$="{{_hideQuantCsvButton(selectedView)}}">
         <div class="csv-wrapper">
           <div hidden$="[[!showStringAggregations]]">
             <div class="csv-button">
@@ -296,8 +329,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </div>
         </div>
       </div>
+    <!-- </div>
+    </div>
+    </app-drawer> -->
+      <!-- for cost aggregations -->
+      <div hidden$="{{_hideCostCsvButton(selectedView)}}">
+        <div class="csv-wrapper">
+            <div class="csv-button">
+              <paper-button id="csv-button" on-tap="createCostDataCsv">Export Table to CSV</paper-button>
+            </div>
+        </div>
+      </div>
     </div>
     </div>
+  </div>
+  </div>
     </app-drawer>
   <!-- Main content -->
     <app-header-layout has-scrolling-region>
@@ -305,7 +351,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
+<<<<<<< HEAD
         <paper-item>Build Date: 10/12/17</paper-item>
+=======
+        <paper-item>Build Date: 10/13/17</paper-item>
+>>>>>>> dev
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -320,6 +370,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedView}}">
           <paper-tab name="model-view">Model</paper-tab>
           <paper-tab name="aggregations-view">Quantities</paper-tab>
+          <paper-tab name="cost-view" id="cost-tab" disabled$="{{_disableCostTab(metadataFields, currentModelResp, geometryFilter)}}">Cost</paper-tab>
         </paper-tabs>
       </app-toolbar>
     </app-header>
@@ -382,7 +433,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <!-- wrap all string aggregation info -->
         <div id="wrap-str-info">
           <!-- div holds pie chart -->
-          <div id="chart-container"></div>
+          <div id="sum-chart-container"></div>
           <!-- data by group table -->
           <div id="group-data-table-section">
           <vaadin-grid class="data-by-group-table" items="[[groupSumData]]">
@@ -398,7 +449,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <vaadin-grid-sorter path="elemsPerGroup">elements/group</vaadin-grid-sorter>
               </template>
               <template>[[_prettify(item.elemsPerGroup)]]</template>
+<<<<<<< HEAD
               <template class="footer">[[_prettify(totalElements)]]</template>
+=======
+              <template class="footer">[[_prettify(costTotalElements)]]</template>
+>>>>>>> dev
             </vaadin-grid-column>
             <vaadin-grid-column>
               <template class="header">
@@ -432,10 +487,71 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
     </div>
     </div>
+    <!-- Cost Tab -->
+    <div name="cost-view">
+      <div class="str-header">
+        <app-toolbar class="aggregation-toolbar">
+          <div main-title>Cost of [[material]] by Group</div>
+        </app-toolbar>
+      </div>
+      <div id="wrap-cost-info">
+        <!-- to hold cost pie chart -->
+        <div id="cost-chart-container" hidden$="{{_hideChart(totalCost)}}"></div>
+        <!-- cost by group pie chart -->
+        <div id="cost-table-section">
+        <!-- cost by group table -->
+        <vaadin-grid class="cost-by-group-table" items="{{costTableData}}">
+        <vaadin-grid-column>
+          <template class="header">
+            <vaadin-grid-sorter path="group">group</vaadin-grid-sorter>
+          </template>
+          <template>[[item.group]]</template>
+          <template class="footer">Grand Total</template>
+        </vaadin-grid-column>
+        <vaadin-grid-column>
+          <template class="header">
+            <vaadin-grid-sorter path="elemsPerGroup">elements/group</vaadin-grid-sorter>
+          </template>
+          <template>[[_prettify(item.elemsPerGroup)]]</template>
+          <template class="footer">[[_prettify(costTotalElements)]]</template>
+        </vaadin-grid-column>
+          <vaadin-grid-column>
+            <template class="header">
+              <vaadin-grid-sorter path="sum">[[material]] sum [[_costUnitLabels(material, unitType)]]</vaadin-grid-sorter>
+            </template>
+            <template>[[_prettify(item.sum)]]</template>
+            <template class="footer">[[_prettify(totalMaterialSum)]] [[_costUnitLabels(material, unitType)]]</template>
+          </vaadin-grid-column>
+          <vaadin-grid-column>
+            <template class="header">
+              <vaadin-grid-sorter path="otherUnitLabel">[[material]] sum [[costOtherUnitLabel]]</vaadin-grid-sorter>
+            </template>
+            <template>[[_prettify(item.otherUnitSum)]]</template>
+            <template class="footer">[[_prettify(totalMaterialSumDiffUnit)]] [[costOtherUnitLabel]]</template>
+          </vaadin-grid-column>
+          <vaadin-grid-column>
+            <template class="header">Cost/[[costOtherUnitLabel]]</template>
+            <template>
+              <iron-input id="cost-input-[[index]]" prevent-invalid-input allowed-pattern="[.\d]" bind-value="{{item.input}}" on-change="_setCostResults">
+                <input>
+              </iron-input>
+            </template>
+          </vaadin-grid-column>
+        <vaadin-grid-column>
+          <template class="header">
+            <vaadin-grid-sorter path="costResult">Cost Amount</vaadin-grid-sorter>
+          </template>
+          <template>[[_prettifyDollar(item.costResult)]]</template>
+          <template class="footer">[[_prettifyDollar(totalCost)]]</template>
+        </vaadin-grid-column>
+        </vaadin-grid>
+        </div>
+      </div>
+    </div>
     </iron-pages>
     </app-header-layout>
     </app-drawer-layout>
-    </template>
+  </template>
 
   <script>
 
@@ -560,14 +676,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Array,
             value: []
           },
-          pieChart: {
+          costTableData: {
+            type: Array,
+            value: []
+          },
+          costItems: {
+            type: Array,
+            value: []
+          },
+          strPieChart: {
             type: Object
           },
-          pieData: {
+          costPieChart: {
+            type: Object
+          },
+          strPieData: {
             type: Array
           },
-          costCoefficient: {
-            type: Number
+          costPieData: {
+            type: Array
           },
           selectedView: {
             type: String,
@@ -593,10 +720,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_loadingChanged(modelLoading)',
           '_contourPropsChanged(metadataFields)',
           '_getModelData(selectedModel)',
-          '_aggregations(_modelData,selectedContourBy)',
+          '_aggregations(_modelData,selectedContourBy, selectedView)',
           '_getAggregationLabels(_modelData, selectedContourBy)',
           '_getSumByForSelectedSumField(selectedSumField)',
-          '_drawChart(pieData)',
+          '_drawStrChart(strPieData)',
+          '_drawCostChart(costPieData)',
           '_delayChartResize(selectedView, selectedContourBy)'
         ]
       }
@@ -609,12 +737,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.dispatchEvent(new CustomEvent('logout', {bubbles: true, composed: true}))
       }
 
+      _uploadedBy(user) {
+        if (_.isEmpty(user)) {
+          return user = "admin"
+        } else {
+          return user
+        }
+      }
+
       uploadJsonModel() {
         var that = this
         that.$['json-upload-request'].generateRequest();
         that._clearUploadInput()
         this.$.uploadSuccessToast.show({ text: "File has been uploaded successfully!" })
         this.userEmail = ''
+        //console.log(that.dataOptions);
       }
 
       reopenUploadBox(){
@@ -623,6 +760,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       closeToast() {
+        //var toast = Polymer.dom(this.root).querySelector('#validationToast')
         this.$.validationToast.hide()
         this.userEmail = ''
       }
@@ -690,6 +828,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         reader.readAsText(inputFile);
       }
 
+      // handleModelRemoval() {
+      //   this.$['remove-upload-request'].generateRequest();
+      // }
+
       _checkEmailField(userEmail) {
         userEmail = this.jsonUploadPayload.modelInformation.user
         try {
@@ -706,6 +848,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         Polymer.dom(this.root).querySelector('#modelUpload').value = ''
         this._acceptUploadDisabled = true;
       }
+
+      // searchFilter(searchInput) {
+      //   //to clear results of previous search and filter within ALL models in bucket
+      //   this.dataOptions = this.getModelsResp
+      //   searchInput = _.toLower(searchInput)
+      //   var that = this;
+      //   var result = _.filter(that.dataOptions, function(o) {
+      //     return _.toLower(o).indexOf(searchInput) !== -1
+      //   })
+      //   that.dataOptions = _.uniq(_.concat(that.selectedModel, result))
+      //   // console.log("SEARCHING: " + searchInput)
+      //   // console.log("RESULTS:")
+      //   // console.log(that.dataOptions);
+      // }
 
       _isWithinBounds(val, min, max) {
         return val >= min && val <= max
@@ -741,15 +897,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         measurement = _.toLower(that.selectedContourBy)
         unitType = _.toLower(that.currentModelResp.modelInformation.units)
         if (measurement.includes('area')) {
-          return unitType === 'imperial' ? that.unitLabel = ' (in\u00B2)' : that.unitLabel = ' (mm\u00B2)'
+          return unitType === 'imperial' ? that.numUnitLabel = ' (in\u00B2)' : that.numUnitLabel = ' (mm\u00B2)'
         } else if (measurement.includes('length')) {
-          return unitType === 'imperial' ? that.unitLabel = ' (in)' : that.unitLabel = ' (mm)'
+          return unitType === 'imperial' ? that.numUnitLabel = ' (in)' : that.numUnitLabel = ' (mm)'
         } else if (measurement.includes('mass')) {
-          return unitType === 'imperial' ? that.unitLabel = ' (lb)' : that.unitLabel = ' (kg)'
+          return unitType === 'imperial' ? that.numUnitLabel = ' (lb)' : that.numUnitLabel = ' (kg)'
         } else if (measurement.includes('vol')) {
-          return unitType === 'imperial' ? that.unitLabel = ' (in\u00B3)' : that.unitLabel = ' (mm\u00B3)'
+          return unitType === 'imperial' ? that.numUnitLabel = ' (in\u00B3)' : that.numUnitLabel = ' (mm\u00B3)'
         } else if (measurement.includes('cost')) {
-          return unitType === 'imperial' ? that.unitLabel = ' (USD)' : that.unitLabel = ''
+          return unitType === 'imperial' ? that.numUnitLabel = ' (USD)' : that.numUnitLabel = ''
         } else {
           return ''
         }
@@ -760,13 +916,58 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         measurement = _.toLower(that.selectedSumField)
         unitType = _.toLower(that.currentModelResp.modelInformation.units)
         if (measurement.includes('length')) {
+<<<<<<< HEAD
           return unitType === 'imperial' ? that.unitLabel =' (in)' : that.unitLabel =' (mm)'
+=======
+          return unitType === 'imperial' ? that.strUnitLabel =' (in)' : that.strUnitLabel =' (mm)'
+>>>>>>> dev
         } else if (measurement.includes('mass')) {
-          return unitType === 'imperial' ? that.unitLabel =' (lb)' : that.unitLabel =' (kg)'
+          return unitType === 'imperial' ? that.strUnitLabel =' (lb)' : that.strUnitLabel =' (kg)'
         } else if (measurement.includes('vol')) {
-          return unitType === 'imperial' ? that.unitLabel =' (in\u00B3)' : that.unitLabel =' (mm\u00B3)'
+          return unitType === 'imperial' ? that.strUnitLabel =' (in\u00B3)' : that.strUnitLabel =' (mm\u00B3)'
         } else if (measurement.includes('cost')) {
-          return unitType === 'imperial' ? that.unitLabel =' (USD)' : that.unitLabel = ''
+          return unitType === 'imperial' ? that.strUnitLabel =' (USD)' : that.strUnitLabel = ''
+        } else {
+          return ''
+        }
+      }
+
+      _strOtherUnitLabel(unitType, unitLabel) {
+        if (this.currentModelResp.modelInformation.units === 'imperial') {
+            //length
+            if (this.strUnitLabel === ' (in)') {
+              this.strOtherUnitLabel = ' (ft)'
+            }
+            //mass
+            else if (this.strUnitLabel === ' (lb)') {
+            this.strOtherUnitLabel = ' (ton)'
+            //vol
+          } else if (this.strUnitLabel === ' (in\u00B3)') {
+            this.strOtherUnitLabel = ' (yd\u00B3)'
+          }
+        } else if (this.currentModelResp.modelInformation.units === 'metric') {
+          //length
+          if (this.strUnitLabel === ' (mm)') {
+            this.strOtherUnitLabel = ' (m)'
+          }
+          //mass
+          else if (this.strUnitLabel === ' (kg)') {
+            this.strOtherUnitLabel = ' (tonne)'
+          //vol
+        } else if (this.strUnitLabel === ' (mm\u00B3)') {
+            this.strOtherUnitLabel = ' (m\u00B3)'
+          }
+        }
+      }
+
+      _costUnitLabels(material, unitType) {
+        var that = this;
+        material = _.toLower(that.material)
+        unitType = _.toLower(that.currentModelResp.modelInformation.units)
+        if (that.material.includes('conc')) {
+          return unitType === 'imperial' ? that.costUnitLabel =' (in\u00B3)' : that.costUnitLabel =' (mm\u00B3)'
+        } else if (that.material.includes('steel')) {
+          return unitType === 'imperial' ? that.costUnitLabel =' (lb)' : that.costUnitLabel =' (kg)'
         } else {
           return ''
         }
@@ -810,29 +1011,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
           })
         })
-        this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
-          return o.metadata[that.selectedContourBy]
-        }).metadata[this.selectedContourBy], 3)
-        this.maxResult = _.round(_.maxBy(resultFilterInput, function(o) {
-          return o.metadata[that.selectedContourBy]
-        }).metadata[this.selectedContourBy], 3)
-        this.avgResult = _.round(_.meanBy(resultFilterInput, function(o) {
-          return o.metadata[that.selectedContourBy]
-        }), 3);
-        this._getAggregationLabels()
-        this.numericalAggregationsTableData = []
-        var name = [this.getMinLabel, this.getMaxLabel, this.getAvgLabel];
-        var result = [this.minResult, this.maxResult, this.avgResult];
-        for (var i=0; i < name.length; i++) {
-          var setup = {
-            'name': name[i],
-            'result': result[i]
+        if (resultFilterInput.length > 0) {
+          this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
+            return o.metadata[that.selectedContourBy]
+          }).metadata[this.selectedContourBy], 3)
+          this.maxResult = _.round(_.maxBy(resultFilterInput, function(o) {
+            return o.metadata[that.selectedContourBy]
+          }).metadata[this.selectedContourBy], 3)
+          this.avgResult = _.round(_.meanBy(resultFilterInput, function(o) {
+            return o.metadata[that.selectedContourBy]
+          }), 3);
+          this._getAggregationLabels()
+          this.numericalAggregationsTableData = []
+          var name = [this.getMinLabel, this.getMaxLabel, this.getAvgLabel];
+          var result = [this.minResult, this.maxResult, this.avgResult];
+          for (var i=0; i < name.length; i++) {
+            var setup = {
+              'name': name[i],
+              'result': result[i]
+            }
+            this.push('numericalAggregationsTableData', setup)
           }
-          this.push('numericalAggregationsTableData', setup)
+          this.totalResult = _.round(_.sumBy(resultFilterInput, function(o) {
+            return o.metadata[that.selectedContourBy]
+          }), 3);
+        } else {
+          console.log("no data");
+          this.numericalAggregationsTableData = []
+          this.totalResult = 0
         }
-        this.totalResult = _.round(_.sumBy(resultFilterInput, function(o) {
-          return o.metadata[that.selectedContourBy]
-        }), 3);
         this.showNumericalAggregations = true;
       }
 
@@ -843,7 +1050,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         return
       }
-
 
       _stringAggregations() {
         this.showNumericalAggregations = false;
@@ -858,6 +1064,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         })
         // ================ repeated function end ==========================================
         //console.log(resultFilterInput);
+<<<<<<< HEAD
         var resultGroupByName = _.groupBy(resultFilterInput, function(o) {
           return o.metadata[that.selectedContourBy]
         })
@@ -885,9 +1092,42 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
              // to find unique keys with numeric values for dropdown options
              if(_.isNumber(metadataValues[j]) && _numericalMetadataKeys.indexOf(metadataKeys[j]) === -1 && validSumGroups.indexOf(metadataKeys[j]) !== -1) {
                _numericalMetadataKeys.push(metadataKeys[j])
+=======
+        if (resultFilterInput.length > 0) {
+          var resultGroupByName = _.groupBy(resultFilterInput, function(o) {
+            return o.metadata[that.selectedContourBy]
+          })
+          // console.log("RESULTGROUPBYNAME");
+          // console.log(resultGroupByName);
+          this.groupKeys = _.without(_.keys(resultGroupByName), 'undefined')
+          if(typeof this.selectedSumField === 'undefined') {
+            this.allObjectsByGroup = []
+            //console.log("ALL OBJECTS BY GROUP ONCE");
+            //console.log(this.allObjectsByGroup);
+            for (var i = 0; i < this.groupKeys.length; i++) {
+              var groupObjects = resultGroupByName[this.groupKeys[i]]
+              this.push('allObjectsByGroup', groupObjects)
+          }
+          var _numericalMetadataKeys = []
+          var totalGroupObjects = _.flatten(this.allObjectsByGroup)
+          for (var i = 0; i < totalGroupObjects.length; i++) {
+            var metadataObject = totalGroupObjects[i].metadata
+            var metadataValues = _.values(metadataObject)
+            var metadataKeys = _.keys(metadataObject)
+             for (var j = 0; j < metadataKeys.length; j++) {
+              //to include only these in dropdown menu
+              var validSumGroups = ['meta_length', 'length', 'meta_mass', 'mass', 'meta_vol', 'vol', 'volume']
+              //but also do an "includes/contains" because names could vary
+               // to find unique keys with numeric values for dropdown options
+               if(_.isNumber(metadataValues[j]) && _numericalMetadataKeys.indexOf(metadataKeys[j]) === -1 && validSumGroups.indexOf(metadataKeys[j]) !== -1) {
+                 _numericalMetadataKeys.push(metadataKeys[j])
+               }
+               this.set('numericalMetadataKeys', _numericalMetadataKeys.sort())
+>>>>>>> dev
              }
              this.set('numericalMetadataKeys', _numericalMetadataKeys.sort())
            }
+<<<<<<< HEAD
          }
          this.selectedSumField = this.numericalMetadataKeys[0]
        } else {
@@ -960,14 +1200,96 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             _pieData.push([item.group, parseFloat(item.sum)])
             }
           this.pieData = _pieData;
+=======
+           this.selectedSumField = this.numericalMetadataKeys[0]
+         } else {
+           var _groupSumData = [];
+          // console.log(this.groupSumData);
+          this.allObjectsByGroupDupe = []
+          // console.log("ALL OBJECTS BY GROUP SECOND");
+          // console.log(this.allObjectsByGroupDupe);
+          for (var i = 0; i < this.groupKeys.length; i++) {
+            //reusing var groupObjects below (was local variable in previous loop for numericalMetadataKeys)
+            var groupObjects = resultGroupByName[this.groupKeys[i]]
+              var elemsPerGroup = groupObjects.length
+              var sumByGroup = _.round(_.sumBy(groupObjects, function(o) {
+                return o.metadata[that.selectedSumField]
+              }), 0)
+              var minByGroup = _.round(_.minBy(groupObjects, function(o) {
+                return o.metadata[that.selectedSumField]
+              }).metadata[that.selectedSumField], 0)
+              var maxByGroup = _.round(_.maxBy(groupObjects, function(o) {
+                return o.metadata[that.selectedSumField]
+              }).metadata[that.selectedSumField], 0)
+              var avgByGroup = _.round(_.meanBy(groupObjects, function(o) {
+                return o.metadata[that.selectedSumField]
+              }), 0);
+              //for conversion
+              if (that.currentModelResp.modelInformation.units === 'imperial') {
+                if (that.selectedSumField.includes('length')) {
+                  this.strOtherUnitSum = _.round(sumByGroup/12, 0)
+                } else if (that.selectedSumField.includes('mass')) {
+                  this.strOtherUnitSum = _.round(sumByGroup/2000, 0)
+                } else if (that.selectedSumField.includes('vol')) {
+                  this.strOtherUnitSum = _.round(sumByGroup/46656, 0)
+                }
+              } else if (that.currentModelResp.modelInformation.units === 'metric') {
+                if (that.selectedSumField.includes('length')) {
+                  this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
+                } else if (that.selectedSumField.includes('mass')) {
+                  this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
+                } else if (that.selectedSumField.includes('vol')) {
+                  this.strOtherUnitSum = _.round(sumByGroup/1000000000, 0)
+                }
+              }
+              var groupSumDataSetup = {
+                'group': this.groupKeys[i],
+                'elemsPerGroup': elemsPerGroup,
+                'sum': sumByGroup,
+                'otherUnitSum': this.strOtherUnitSum,
+                'min' : minByGroup,
+                'max' : maxByGroup,
+                'avg' : avgByGroup
+              }
+              _groupSumData.push(groupSumDataSetup)
+              this.push('allObjectsByGroupDupe', groupObjects)
+            }
+            this.set('groupSumData',_.sortBy(_groupSumData, [function(o) { return o.group }]))
+            //   //for strOtherUnitLabel
+            this._strOtherUnitLabel()
+            // for chart total sum by group
+            this.totalElements = _.round(_.sumBy(this.groupSumData, function(o) {
+              return o.elemsPerGroup
+            }), 0)
+            this.grandTotalSum = _.round(_.sumBy(this.groupSumData, function(o) {
+              return o.sum
+            }), 0)
+            this.grandTotalOtherUnitSum = _.round(_.sumBy(this.groupSumData, function(o) {
+              return o.otherUnitSum
+            }), 3)
+            // for pie chart
+            var _strPieData = []
+            for (var i=0; i < this.groupSumData.length; i++) {
+              var item = this.groupSumData[i]
+              _strPieData.push([item.group, parseFloat(item.sum)])
+              }
+            this.strPieData = _strPieData;
+          }
+        } else {
+          console.log("no data");
+          this.groupSumData = []
+          this.grandTotalSum = 0
+          this.grandTotalOtherUnitSum = 0
+          this.strPieData = []
+>>>>>>> dev
         }
-        //log unit type
-        //console.log(this.currentModelResp.modelInformation.units)
         this.showStringAggregations = true;
       }
 
-
-      _aggregations(_modelData, selectedContourBy) {
+      _aggregations(_modelData, selectedContourBy, _currentPage) {
+        if(this.selectedView === 'cost-view') {
+          this._disableCostTab()
+        }
         if (this._isNumberField(_modelData, selectedContourBy)) {
           this._numericalAggregations();
           return
@@ -994,9 +1316,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      _initChart() {
-        var chartdiv = Polymer.dom(this.root).querySelector("#chart-container")
-        this.pieChart = Highcharts.chart(chartdiv, {
+      _initStrChart() {
+        var chartdiv = Polymer.dom(this.root).querySelector("#sum-chart-container")
+        this.strPieChart = Highcharts.chart(chartdiv, {
         chart: {
             plotBackgroundColor: null,
             plotBorderWidth: null,
@@ -1027,9 +1349,47 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
       }
 
-      _drawChart() {
-        var chartdiv = Polymer.dom(this.root).querySelector("#chart-container")
-        this.pieChart = Highcharts.chart(chartdiv, {
+      _hideChart(_totalCost) {
+        return this.totalCost === 0
+      }
+
+      _initCostChart() {
+        var chartdiv = Polymer.dom(this.root).querySelector("#cost-chart-container")
+        this.costPieChart = Highcharts.chart(chartdiv, {
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: 'Cost by Group'
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: false
+                },
+                showInLegend: true
+            }
+        },
+        series: [{
+            name: 'Cost',
+            colorByPoint: true,
+            data: []
+          }]
+        });
+      }
+
+      _drawStrChart() {
+        var chartdiv = Polymer.dom(this.root).querySelector("#sum-chart-container")
+        //console.log(this.strPieData);
+        this.strPieChart = Highcharts.chart(chartdiv, {
         chart: {
             plotBackgroundColor: null,
             plotBorderWidth: null,
@@ -1066,23 +1426,70 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     '#f15c80', '#e4d354', '#2b908f', '#f45b5b', '#91e8e1', '#2f7ed8', '#0d233a', '#8bbc21', '#910000', '#1aadce',
                     '#492970', '#f28f43', '#77a1e5', '#c42525', '#a6c96a', '#4572A7', '#AA4643', '#89A54E', '#80699B', '#3D96AE',
                     '#DB843D', '#92A8CD', '#A47D7C', '#B5CA92'],
-            data: this.pieData
+            data: this.strPieData
           }]
         });
-        //console.log(this.pieChart.series[0].userOptions.data);
+        //console.log(this.strPieChart.series[0].userOptions.data);
+      }
+
+      _drawCostChart() {
+        var chartdiv = Polymer.dom(this.root).querySelector("#cost-chart-container")
+        //console.log(this.strPieData);
+        this.costPieChart = Highcharts.chart(chartdiv, {
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: 'Cost by Group',
+            align: 'right'
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: false
+                },
+                showInLegend: true
+            }
+        },
+        legend: {
+          layout: 'vertical',
+          align: 'right',
+          verticalAlign: 'top',
+          y: 40,
+        },
+        series: [{
+            name: 'Sum',
+            colorByPoint: true,
+            colors: ['#7cb5ec', '#434348', '#90ed7d', '#f7a35c', '#8085e9',
+                    '#f15c80', '#e4d354', '#2b908f', '#f45b5b', '#91e8e1', '#2f7ed8', '#0d233a', '#8bbc21', '#910000', '#1aadce',
+                    '#492970', '#f28f43', '#77a1e5', '#c42525', '#a6c96a', '#4572A7', '#AA4643', '#89A54E', '#80699B', '#3D96AE',
+                    '#DB843D', '#92A8CD', '#A47D7C', '#B5CA92'],
+            data: this.costPieData
+          }]
+        });
+        //console.log(this.strPieChart.series[0].userOptions.data);
       }
 
       _delayChartResize() {
         var that = this;
         setTimeout(function() {
-          that.pieChart.reflow()
+          that.strPieChart.reflow()
         }, 0)
       }
 
       ready() {
         super.ready();
         this.$['get-models-request'].generateRequest();
-        this._initChart();
+        this._initStrChart();
+        this._initCostChart();
       }
 
       createNumericalCsv() {
@@ -1098,7 +1505,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if (h === 'name') {
               return h
             }
-            return h + that.unitLabel
+            return h + that.numUnitLabel
           })
           this.numDataHeaders = headers_ + '\r\n'
           var currentFilters = "Filters:" + '\r\n' +
@@ -1143,7 +1550,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             } if (h === 'otherUnitSum') {
               return that.selectedSumField + " sum " + that.strOtherUnitLabel
             }
-            return that.selectedSumField + " " + h + that.unitLabel
+            return that.selectedSumField + " " + h + that.strUnitLabel
           })
           this.groupDataHeaders = headers_ + '\r\n';
           var currentFilters = "Filters:" + '\r\n' +
@@ -1165,6 +1572,59 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           link.href = uri;
           link.style = "visibility:hidden";
           link.download = this.selectedModel + ".csv";
+<<<<<<< HEAD
+=======
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }
+
+      createCostDataCsv() {
+        var rowData = ''
+        if (this.costTableData.length > 0) {
+          for (var i=0; i < this.costTableData.length; i++) {
+            this.costTableHeaders = _.keys(this.costTableData[i])
+            var el = [_.values(this.costTableData[i])] + '\r\n'
+            rowData += el
+          }
+          var that = this;
+          var headers_ = _.map(this.costTableHeaders,function(h) {
+            if (h === 'group') {
+              return h
+            } if (h === 'elemsPerGroup') {
+              return "elements per group"
+            } if (h === 'sum') {
+              return that.material + " sum " + that.costUnitLabel
+            } if (h === 'otherUnitSum') {
+              return that.material + " sum " + that.costOtherUnitLabel
+            } if (h === 'input') {
+              return "cost per " + that.costOtherUnitLabel
+            } if (h === 'costResult') {
+              return "cost amount"
+            }
+          })
+          this.costTableHeaders = headers_ + '\r\n';
+          var currentFilters = "Filters:" + '\r\n' +
+          'min x, ' + this.geometryFilter.xMin + '\r\n' + 'max x, ' + this.geometryFilter.xMax + '\r\n' +
+          'min y, ' + this.geometryFilter.yMin + '\r\n' + 'max y, ' + this.geometryFilter.yMax + '\r\n' +
+          'min z, ' + this.geometryFilter.zMin + '\r\n' + 'max z, ' + this.geometryFilter.zMax
+          var d = new Date();
+          var curr_date = (d.getDate() < 9 ? '0': '') + (d.getDate()+1)
+          var curr_month = (d.getMonth() < 9 ? '0': '') + (d.getMonth()+1)
+          var curr_year = d.getFullYear();
+          var curr_year_formatted = curr_year.toString().substring(2)
+          var curr_hour = (d.getHours() < 9 ? '0': '') + d.getHours()
+          var currMins = (d.getMinutes() < 9 ? '0': '') + d.getMinutes()
+          var timeFormat = curr_year_formatted + curr_month + curr_date + "_" + curr_hour + currMins
+          var downloadStamp = "Downloaded on: " + timeFormat + '\r\n'
+          var csvData = this.costTableHeaders + rowData + '\r\n' + currentFilters + '\r\n' + downloadStamp
+          var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
+          var link = document.createElement("a");
+          link.href = uri;
+          link.style = "visibility:hidden";
+          link.download = this.selectedModel + ".csv";
+>>>>>>> dev
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -1172,11 +1632,184 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _hideMainDropdown(_currentPage) {
-        return this.selectedView == 'aggregations-view';
+        return this.selectedView === 'aggregations-view' || this.selectedView === 'cost-view';
       }
 
-      _hideCsvButton(_currentPage) {
-        return this.selectedView == 'model-view'
+      _hideQuantCsvButton(_currentPage) {
+        return this.selectedView === 'model-view' || this.selectedView === 'cost-view';
+      }
+
+      _hideCostCsvButton(_currentPage) {
+        return this.selectedView !== 'cost-view';
+      }
+
+      _disableCostTab(_currentMetadataFields, _currentModel, _geoFilter) {
+        if (!_.isEmpty(this.geometryFilter) && this.metadataFields.includes('material')) {
+          var payloadElems = this.currentModelResp.payload
+          // NOTE this only includes "material" NOT "material_type"
+          for (var i=0; i < payloadElems.length; i++) {
+            this.material = _.toLower(payloadElems[i].metadata.material)
+            // go through payload elements and their metadata keys
+            //later use includes method for "material"
+            if (_.toLower(payloadElems[i].metadata.material) === 'concrete' && _.has(payloadElems[i], 'metadata.volume') ||  _.has(payloadElems[i], 'metadata.vol') ||  _.has(payloadElems[i], 'metadata.meta_volume') ||
+                _.toLower(payloadElems[i].metadata.material) === 'steel' && _.has(payloadElems[i], 'metadata.mass')) {
+              // console.log("material cost for: " + this.material)
+              // console.log("does it include 'conc': " + this.material.includes('conc'))
+              // console.log("does it include 'steel': " + this.material.includes('steel'))
+              this._costAggregations()
+              return false
+            } else {
+              //console.log("cost-tab should be DISABLED!");
+            }
+          }
+        }
+        return true
+      }
+
+      _setCostPieData() {
+        var _costPieData = []
+        for (var i=0; i < this.costTableData.length; i++) {
+          var item = this.costTableData[i]
+          _costPieData.push([item.group, parseFloat(item.costResult)])
+          }
+        this.costPieData = _costPieData;
+      }
+
+      _setCostResults(e) {
+        //console.log(e.model);
+        var item = e.model.item
+        var inputIndex = e.model.index
+        for (var i=0; i < this.costTableData.length; i++) {
+          if (i === inputIndex) {
+            //console.log("values: " + e.target.value + " : " + this.costTableData[i].input)
+            this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
+          }
+        }
+        if (this.costItems.length === 0) {
+          this.costItems.push({'model': this.selectedModel, 'group': item.group, 'input': item.input})
+        } else {
+          var found = this.costItems.some(function (el) {
+            return el.group === item.group;
+          });
+          if (!found) {
+            this.costItems.push({'model': this.selectedModel, 'group': item.group, 'input': item.input})
+          } else if (found) {
+            for (var i=0; i < this.costItems.length; i++) {
+              if (this.costItems[i].group === item.group && this.costItems[i].model === this.selectedModel) {
+                this.costItems[i].input = item.input
+              }
+            }
+          }
+        }
+        this.totalCost = _.sumBy(this.costTableData, function(o) {
+          return o.costResult
+        })
+        this._setCostPieData()
+      }
+
+      _updateCostValues() {
+        if (typeof(this.costItems) !== 'undefined') {
+          for (var i=0; i < this.costTableData.length; i++) {
+            for (var j=0; j < this.costItems.length; j++) {
+              if (this.costTableData[i].group == this.costItems[j].group && this.selectedModel === this.costItems[j].model) {
+                //console.log(this.costTableData[i].group + " = " + this.costItems[j].group);
+                this.set('costTableData.'+i+'.input', this.costItems[j].input);
+                this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
+              }
+            }
+          }
+          this.totalCost = _.sumBy(this.costTableData, function(o) {
+            return o.costResult
+          })
+          this._setCostPieData()
+        }
+      }
+
+      _costAggregations() {
+        var that = this
+        // ================ repeated function start ==========================================
+        var resultFilterInput = _.filter(that._modelData.linearElements, function(o) {
+          return _.every(o.vertices, function(j) {
+            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+              that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
+              that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
+          })
+        })
+        if (resultFilterInput.length > 0) {
+          // ================ repeated function end ==========================================
+          var groupsForMaterial = _.groupBy(resultFilterInput, function(o) {
+            return o.metadata.propertyname
+          })
+          //console.log(groupsForMaterial);
+          // ================ repeated pattern for CODE end ==========================================
+          var unitType = this.currentModelResp.modelInformation.units
+          // console.log(unitType);
+          var _costTableData = []
+          // console.log(this.costTableData);
+          var groupKeys = _.keys(groupsForMaterial)
+          var allObjectsByMaterialGroup = []
+          if (this.material === 'concrete') {
+            for (var i=0; i < groupKeys.length; i++) {
+              var groupObjects = groupsForMaterial[groupKeys[i]];
+              var elemsPerGroup = groupObjects.length
+              allObjectsByMaterialGroup.push(groupObjects)
+              var sumByGroup = _.sumBy(groupObjects, function(o) {
+                return o.metadata.volume
+              })
+              var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/46656, 3) : _.round(sumByGroup/1000000000, 3)
+              this.costOtherUnitLabel = unitType === 'imperial' ? '(yd\u00B3)' : '(m\u00B3)'
+              var costTableDataSetup = {
+                'group': groupKeys[i],
+                'elemsPerGroup': elemsPerGroup,
+                'sum': sumByGroup,
+                'otherUnitSum': _otherUnitSum,
+                'input': 0
+              }
+              costTableDataSetup['costResult'] = costTableDataSetup.otherUnitSum * costTableDataSetup.input;
+              _costTableData.push(costTableDataSetup)
+            }
+            this.set('costTableData', _.sortBy(_costTableData, [function(o) { return o.group }]))
+          } else if (this.material === 'steel') {
+            for (var i=0; i < groupKeys.length; i++) {
+              var groupObjects = groupsForMaterial[groupKeys[i]];
+              var elemsPerGroup = groupObjects.length
+              allObjectsByMaterialGroup.push(groupObjects)
+              var sumByGroup = _.sumBy(groupObjects, function(o) {
+                return o.metadata.mass
+              })
+              var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/2000, 3) : _.round(sumByGroup/1000, 3)
+              this.costOtherUnitLabel = unitType === 'imperial' ? ' (ton)' : ' (tonne)'
+              var costTableDataSetup = {
+                'group': groupKeys[i],
+                'elemsPerGroup': elemsPerGroup,
+                'sum': sumByGroup,
+                'otherUnitSum': _otherUnitSum,
+                'input': 0
+              }
+              costTableDataSetup['costResult'] = costTableDataSetup.otherUnitSum * costTableDataSetup.input;
+              _costTableData.push(costTableDataSetup)
+            }
+            this.set('costTableData', _.sortBy(_costTableData, [function(o) { return o.group }]))
+          }
+          this.costTotalElements = _.round(_.sumBy(this.costTableData, function(o) {
+           return o.elemsPerGroup
+          }), 0)
+          this.totalMaterialSum = _.round(_.sumBy(this.costTableData, function(o) {
+            return o.sum
+          }), 3)
+          this.totalMaterialSumDiffUnit = _.round(_.sumBy(this.costTableData, function(o) {
+            return o.otherUnitSum
+          }), 3)
+          //may or may not be the best place for this:
+          this._updateCostValues()
+        } else {
+          console.log("no data");
+          this.costTableData = []
+          this.costTotalElements = 0
+          this.totalMaterialSum = 0
+          this.totalMaterialSumDiffUnit = 0
+          this.totalCost = 0
+        }
       }
 
       //Ensure that the geometry input is within boundaries and is compatible with its input sibling
@@ -1198,14 +1831,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _boundariesChanged(boundaries) {
         this.resetFilters();
+        //console.log(this.boundaries)
       }
 
       _loadingChanged(modelLoading) {
+        //console.log(modelLoading)
         this.checkValidInput();
       }
 
       _contourPropsChanged(metadataFields) {
-        this.metadataFields = this.metadataFields.sort()
+        this.metadataFields = this.metadataFields.sort();
         if (this.metadataFields.indexOf(this.selectedContourBy) === -1) {
           this.selectedContourBy = undefined;
           if (this.metadataFields.length > 0) {
@@ -1249,7 +1884,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       resetFilters() {
         this.geometryFilter = _.cloneDeep(this.boundaries);
         this.checkValidInput();
-        this._aggregations(this._modelData, this.selectedContourBy);
+        this._aggregations(this._modelData, this.selectedContourBy, this.selectedView);
+        //reset filter selection to the model boundaries
+        //console.log(this.geometryFilter)
+        //console.log(this.boundaries)
       }
 
       applyFilters() {
@@ -1261,11 +1899,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'zMin': parseFloat(this.geometryFilter.zMin),
           'zMax': parseFloat(this.geometryFilter.zMax)
         }
+<<<<<<< HEAD
         this._aggregations(this._modelData, this.selectedContourBy)
+=======
+        this._aggregations(this._modelData, this.selectedContourBy, this.selectedView);
+>>>>>>> dev
       }
 
       _initData(dataOptions_) {
         this.set('dataOptions', dataOptions_);
+        //console.log(this.dataOptions)
         if (this.dataOptions.length > 0) {
           this.set('selectedModel', this.dataOptions[0].model)
         }
@@ -1290,6 +1933,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleDataResponse(event, response) {
         this.currentModelResp = response.response
+        var costTab = Polymer.dom(this.root).querySelector("#cost-tab")
+        if (costTab.disabled && this.selectedView === 'cost-view') {
+          this.selectedView = 'model-view'
+        }
         if (this.currentModelResp && this.currentModelResp.modelInformation.name === this.selectedModel && "payload" in this.currentModelResp) {
           this.appLoading = false;
           this.set('_modelData', {
