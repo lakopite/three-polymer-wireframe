@@ -1617,7 +1617,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               var sumByGroup = _.sumBy(groupObjects, function(o) {
                 return o.metadata.volume
               })
-              var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/46656, 3) : _.round(sumByGroup/1000000000, 3)
+              var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/46656, 0) : _.round(sumByGroup/1000000000, 0)
               this.costOtherUnitLabel = unitType === 'imperial' ? '(yd\u00B3)' : '(m\u00B3)'
               var costTableDataSetup = {
                 'group': groupKeys[i],
@@ -1638,7 +1638,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               var sumByGroup = _.sumBy(groupObjects, function(o) {
                 return o.metadata.mass
               })
-              var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/2000, 3) : _.round(sumByGroup/1000, 3)
+              var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/2000, 0) : _.round(sumByGroup/1000, 0)
               this.costOtherUnitLabel = unitType === 'imperial' ? ' (ton)' : ' (tonne)'
               var costTableDataSetup = {
                 'group': groupKeys[i],
