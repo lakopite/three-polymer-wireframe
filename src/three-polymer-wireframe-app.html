@@ -343,7 +343,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 10/13/17</paper-item>
+        <paper-item>Build Date: 10/16/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -475,12 +475,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <div name="cost-view">
       <div class="str-header">
         <app-toolbar class="aggregation-toolbar">
-          <div main-title>Cost of [[material]] by Group</div>
+          <div main-title>Cost of [[_capitalize(material)]] by Group</div>
         </app-toolbar>
       </div>
       <div id="wrap-cost-info">
-        <!-- to hold cost pie chart -->
-        <div id="cost-chart-container" hidden$="{{_hideChart(totalCost)}}"></div>
         <!-- cost by group pie chart -->
         <div id="cost-table-section">
         <!-- cost by group table -->
@@ -514,7 +512,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <template class="footer">[[_prettify(totalMaterialSumDiffUnit)]] [[costOtherUnitLabel]]</template>
           </vaadin-grid-column>
           <vaadin-grid-column>
-            <template class="header">Cost/[[costOtherUnitLabel]]</template>
+            <template class="header">Cost/[[costOtherUnitLabel]]<iron-input id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" bind-value="{{item.input}}"><input></iron-input><button id="apply-all-btn" on-tap="_applyAllCostResults">Apply all</button></template>
             <template>
               <iron-input id="cost-input-[[index]]" prevent-invalid-input allowed-pattern="[.\d]" bind-value="{{item.input}}" on-change="_setCostResults">
                 <input>
@@ -529,6 +527,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <template class="footer">[[_prettifyDollar(totalCost)]]</template>
         </vaadin-grid-column>
         </vaadin-grid>
+        <!-- to hold cost pie chart -->
+        <div id="cost-chart-container" hidden$="{{_hideChart(totalCost)}}"></div>
         </div>
       </div>
     </div>
@@ -857,6 +857,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _prettifyDollar(n) {
         return typeof(n) !== 'undefined' ? n.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : ""
+      }
+
+      _capitalize(str) {
+        return typeof(str) !== 'undefined' ? _.capitalize(str) : ""
       }
 
       _dropdownUnitLabel(item, unitType) {
@@ -1518,6 +1522,45 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.costPieData = _costPieData;
       }
 
+      _applyAllCostResults() {
+        //make DRY!
+        var applyAllVal = Polymer.dom(this.root).querySelector('#apply-all-input').value;
+        for (var i=0; i < this.costTableData.length; i++) {
+            this.set('costTableData.'+i+'.input', applyAllVal)
+            this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
+        }
+        if (this.costItems.length === 0) {
+        for (var i=0; i < this.costTableData.length; i++) {
+            this.costItems.push({'model': this.selectedModel, 'group': this.costTableData[i].group, 'input': this.costTableData[i].input})
+          }
+        } else {
+          for (var i=0; i < this.costTableData.length; i++) {
+            for (var j=0; j < this.costItems.length; j++) {
+              if (this.costTableData[i].group === this.costItems[j].group && this.costItems[j].model === this.selectedModel) {
+                this.set('costItems.'+j+'.input', this.costTableData[i].input);
+              }
+            }
+          }
+          var costItemGroups = []
+          _.forEach(this.costItems, function(o) {
+             costItemGroups.push(o.group)
+          })
+          console.log(costItemGroups);
+          for (var i=0; i < this.costTableData.length; i++) {
+          if (costItemGroups.indexOf(this.costTableData[i].group) === -1) {
+            this.costItems.push({'model': this.selectedModel, 'group': this.costTableData[i].group, 'input': this.costTableData[i].input})
+            }
+          }
+        }
+        console.log(this.costTableData);
+        console.log(this.costItems);
+        this.totalCost = _.sumBy(this.costTableData, function(o) {
+          return o.costResult
+        })
+        this._setCostPieData()
+        //make #apply-all-input.value = 0
+      }
+
       _setCostResults(e) {
         //console.log(e.model);
         var item = e.model.item
@@ -1544,6 +1587,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
           }
         }
+        console.log(this.costItems);
         this.totalCost = _.sumBy(this.costTableData, function(o) {
           return o.costResult
         })
@@ -1599,7 +1643,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               var sumByGroup = _.sumBy(groupObjects, function(o) {
                 return o.metadata.volume
               })
-              var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/46656, 3) : _.round(sumByGroup/1000000000, 3)
+              var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/46656, 0) : _.round(sumByGroup/1000000000, 0)
               this.costOtherUnitLabel = unitType === 'imperial' ? '(yd\u00B3)' : '(m\u00B3)'
               var costTableDataSetup = {
                 'group': groupKeys[i],
@@ -1620,7 +1664,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               var sumByGroup = _.sumBy(groupObjects, function(o) {
                 return o.metadata.mass
               })
-              var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/2000, 3) : _.round(sumByGroup/1000, 3)
+              var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/2000, 0) : _.round(sumByGroup/1000, 0)
               this.costOtherUnitLabel = unitType === 'imperial' ? ' (ton)' : ' (tonne)'
               var costTableDataSetup = {
                 'group': groupKeys[i],
