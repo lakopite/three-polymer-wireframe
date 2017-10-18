@@ -153,7 +153,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       .cost-by-group-table {
         height: calc(100vh - 192px);
-        /*this.costPieChart ?  height: 398px : height: calc(100vh - 192px);*/
+        /*this.costPieChart ?  height: calc(100vh - 590) : height: calc(100vh - 192px);*/
       }
 
       .data-by-group-table, .numerical-aggregations-table, .cost-by-group-table {
@@ -230,9 +230,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <!-- ?\<iron-ajax headers="{{authHeaders}}" id="remove-upload-request" method="DELETE" content-type="application/json" on-response="handleModelRemoval" url="[[baseUrl]]delete-model"></iron-ajax> -->
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
-      <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" value="{{userEmail}}">
-        <div slot="suffix">@arup.com</div>
-      </paper-input>
+      <iron-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" bind-value="{{userEmail}}" on-change="_checkEmailField">
+        <input>@arup.com
+      </iron-input>
       <iron-input>
       <input id="modelUpload" type="file" on-change="handleJsonUpload"></input>
       </iron-input>
@@ -800,12 +800,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
               }
             //if it does not get stuck on any errors above, it'll make it to the below
+            if (that.flipUploadSwitch === true) {
+              that._acceptUploadDisabled = false
+            } else {
+              //this won't work
               that._checkEmailField()
-            } catch (err) {
-                that._clearUploadInput()
-                var toast = Polymer.dom(that.root).querySelector('#validationToast')
-                toast.show({ text: "File could not be uploaded because " + err })
-                Polymer.dom(that.root).querySelector('#addModelDialog').close();
+              if (that.flipUploadSwitch === true) {
+                that._acceptUploadDisabled = false
+              }
+            }
+          } catch (err) {
+              that._clearUploadInput()
+              var toast = Polymer.dom(that.root).querySelector('#validationToast')
+              toast.show({ text: "File could not be uploaded because " + err })
             }
           }
         })(inputFile);
@@ -816,18 +823,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       //   this.$['remove-upload-request'].generateRequest();
       // }
 
-      _checkEmailField(userEmail) {
-        userEmail = this.jsonUploadPayload.modelInformation.user
-        try {
-          if (_.isEmpty(userEmail)) {
-            throw "you must include your email"
-          }
-          this._acceptUploadDisabled = false;
-        } catch (err) {
-          throw err
+      _checkEmailField() {
+        console.log(this.userEmail);
+        if (_.isEmpty(this.userEmail)) {
+          this.flipUploadSwitch = false
+        } else {
+          this.flipUploadSwitch = true
         }
+        console.log(this.flipUploadSwitch);
       }
-      //clear upload input and disable accept button
+
       _clearUploadInput() {
         Polymer.dom(this.root).querySelector('#modelUpload').value = ''
         this._acceptUploadDisabled = true;
@@ -1543,6 +1548,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return o.costResult
         })
         this._setCostPieData()
+        console.log(this.costItems);
       }
 
       _setCostResults(e) {
