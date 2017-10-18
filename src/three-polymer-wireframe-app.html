@@ -1526,18 +1526,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.costItems.push({'model': this.selectedModel, 'group': this.costTableData[i].group, 'input': this.costTableData[i].input})
           }
         } else {
+          //if group already in costItems, overwrite input value
           for (var i=0; i < this.costTableData.length; i++) {
             for (var j=0; j < this.costItems.length; j++) {
               if (this.costTableData[i].group === this.costItems[j].group && this.costItems[j].model === this.selectedModel) {
                 this.set('costItems.'+j+'.input', this.costTableData[i].input);
               }
             }
-          }
+          }//if group not there, push onto costItems
           var costItemGroups = []
           _.forEach(this.costItems, function(o) {
              costItemGroups.push(o.group)
           })
-          console.log(costItemGroups);
           for (var i=0; i < this.costTableData.length; i++) {
           if (costItemGroups.indexOf(this.costTableData[i].group) === -1) {
             this.costItems.push({'model': this.selectedModel, 'group': this.costTableData[i].group, 'input': this.costTableData[i].input})
