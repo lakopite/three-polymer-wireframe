@@ -151,11 +151,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         height: calc(100vh - 192px);
       }
 
-      .cost-by-group-table {
-        height: calc(100vh - 192px);
-        /*this.costPieChart ?  height: calc(100vh - 590) : height: calc(100vh - 192px);*/
-      }
-
       .data-by-group-table, .numerical-aggregations-table, .cost-by-group-table {
         --vaadin-grid-body-row-odd-cell: {
           background-color: #f5f5f5;
@@ -194,8 +189,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         height: 398px;
       }
 
-      #cost-chart-container {
-        height: 398px;
+      #cost-table-section {
+        height: calc(100vh - 189px);
       }
 
       #csv-button {
@@ -483,7 +478,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </app-toolbar>
       </div>
       <div id="wrap-cost-info">
-        <!-- cost by group pie chart -->
         <div id="cost-table-section">
         <!-- cost by group table -->
         <vaadin-grid class="cost-by-group-table" items="{{costTableData}}">
@@ -534,7 +528,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </vaadin-grid-column>
         </vaadin-grid>
         <!-- to hold cost pie chart -->
-        <div id="cost-chart-container" hidden$="{{_hideChart(totalCost)}}"></div>
+        <div id="cost-chart-container" ></div>
         </div>
       </div>
     </div>
@@ -1199,9 +1193,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
       }
 
-      _hideChart(_totalCost) {
-        return this.totalCost === 0
-      }
+      // _hideChart(_totalCost) {
+      //   return this.totalCost === 0
+      // }
 
       _initCostChart() {
         var chartdiv = Polymer.dom(this.root).querySelector("#cost-chart-container")
