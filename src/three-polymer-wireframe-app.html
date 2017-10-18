@@ -153,7 +153,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       .cost-by-group-table {
         height: calc(100vh - 192px);
-        /*this.costPieChart ?  height: 398px : height: calc(100vh - 192px);*/
+        /*this.costPieChart ?  height: calc(100vh - 590) : height: calc(100vh - 192px);*/
       }
 
       .data-by-group-table, .numerical-aggregations-table, .cost-by-group-table {
@@ -230,9 +230,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <!-- ?\<iron-ajax headers="{{authHeaders}}" id="remove-upload-request" method="DELETE" content-type="application/json" on-response="handleModelRemoval" url="[[baseUrl]]delete-model"></iron-ajax> -->
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
-      <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" value="{{userEmail}}">
-        <div slot="suffix">@arup.com</div>
-      </paper-input>
+      <iron-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" bind-value="{{userEmail}}" on-change="_checkEmailField">
+        <input>@arup.com
+      </iron-input>
       <iron-input>
       <input id="modelUpload" type="file" on-change="handleJsonUpload"></input>
       </iron-input>
@@ -343,7 +343,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
+<<<<<<< HEAD
         <paper-item>Build Date: 10/16/17</paper-item>
+=======
+        <paper-item>Build Date: 10/18/17</paper-item>
+>>>>>>> dev
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -388,8 +392,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <vaadin-grid class="numerical-aggregations-table" items="[[numericalAggregationsTableData]]">
           <vaadin-grid-column>
             <template class="header">Name</template>
-            <template>[[item.name]] [[_numericalAggUnitLabels(selectedContourBy)]]</template>
-            <template class="footer">Grand Total: [[_prettify(totalResult)]] [[_numericalAggUnitLabels(selectedContourBy)]]</template>
+            <template>[[item.name]] [[_quantUnitLabels(selectedContourBy)]]</template>
+            <template class="footer">Grand Total: [[_prettify(totalResult)]] [[_quantUnitLabels(selectedContourBy)]]</template>
           </vaadin-grid-column>
           <vaadin-grid-column>
             <template class="header">Result</template>
@@ -413,7 +417,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <paper-dropdown-menu class="aggregation-toolbar" id="sum-field-dropdown" label="Select Sum Field">
             <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
               <template is="dom-repeat" items="[[numericalMetadataKeys]]">
-                <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
+                <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
               </template>
             </paper-listbox>
           </paper-dropdown-menu>
@@ -441,10 +445,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </vaadin-grid-column>
             <vaadin-grid-column>
               <template class="header">
-                <vaadin-grid-sorter path="sum">sum [[selectedSumField]] [[_specifyUnits(selectedSumField)]]</vaadin-grid-sorter>
+                <vaadin-grid-sorter path="sum">sum [[selectedSumField]] [[_quantUnitLabels(selectedSumField)]]</vaadin-grid-sorter>
               </template>
               <template>[[_prettify(item.sum)]]</template>
-              <template class="footer">[[_prettify(grandTotalSum)]] [[_specifyUnits(selectedSumField)]]</template>
+              <template class="footer">[[_prettify(grandTotalSum)]] [[_quantUnitLabels(selectedSumField)]]</template>
             </vaadin-grid-column>
             <vaadin-grid-column>
               <template class="header">
@@ -455,15 +459,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </vaadin-grid-column>
             <!-- NUMERICAL AGGREGATIONS WITHIN STRING AGGREGATION TABLE-->
             <vaadin-grid-column>
-              <template class="header">min [[selectedSumField]] [[_specifyUnits(selectedSumField)]]</template>
+              <template class="header">min [[selectedSumField]] [[_quantUnitLabels(selectedSumField)]]</template>
               <template>[[_prettify(item.min)]]</template>
             </vaadin-grid-column>
             <vaadin-grid-column>
-              <template class="header">max [[selectedSumField]] [[_specifyUnits(selectedSumField)]]</template>
+              <template class="header">max [[selectedSumField]] [[_quantUnitLabels(selectedSumField)]]</template>
               <template>[[_prettify(item.max)]]</template>
             </vaadin-grid-column>
             <vaadin-grid-column>
-              <template class="header">avg [[selectedSumField]] [[_specifyUnits(selectedSumField)]]</template>
+              <template class="header">avg [[selectedSumField]] [[_quantUnitLabels(selectedSumField)]]</template>
               <template>[[_prettify(item.avg)]]</template>
             </vaadin-grid-column>
           </vaadin-grid>
@@ -475,7 +479,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <div name="cost-view">
       <div class="str-header">
         <app-toolbar class="aggregation-toolbar">
-          <div main-title>Cost of [[material]] by Group</div>
+          <div main-title>Cost of [[_capitalize(material)]] by Group</div>
         </app-toolbar>
       </div>
       <div id="wrap-cost-info">
@@ -512,7 +516,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <template class="footer">[[_prettify(totalMaterialSumDiffUnit)]] [[costOtherUnitLabel]]</template>
           </vaadin-grid-column>
           <vaadin-grid-column>
-            <template class="header">Cost/[[costOtherUnitLabel]]</template>
+            <template class="header">Cost/[[costOtherUnitLabel]]<iron-input id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" bind-value="{{item.input}}"><input></iron-input><button id="apply-all-btn" on-tap="_applyAllCostResults">Apply all</button></template>
             <template>
               <iron-input id="cost-input-[[index]]" prevent-invalid-input allowed-pattern="[.\d]" bind-value="{{item.input}}" on-change="_setCostResults">
                 <input>
@@ -800,12 +804,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
               }
             //if it does not get stuck on any errors above, it'll make it to the below
+            if (that.flipUploadSwitch === true) {
+              that._acceptUploadDisabled = false
+            } else {
+              //this won't work
               that._checkEmailField()
-            } catch (err) {
-                that._clearUploadInput()
-                var toast = Polymer.dom(that.root).querySelector('#validationToast')
-                toast.show({ text: "File could not be uploaded because " + err })
-                Polymer.dom(that.root).querySelector('#addModelDialog').close();
+              if (that.flipUploadSwitch === true) {
+                that._acceptUploadDisabled = false
+              }
+            }
+          } catch (err) {
+              that._clearUploadInput()
+              var toast = Polymer.dom(that.root).querySelector('#validationToast')
+              toast.show({ text: "File could not be uploaded because " + err })
             }
           }
         })(inputFile);
@@ -816,18 +827,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       //   this.$['remove-upload-request'].generateRequest();
       // }
 
-      _checkEmailField(userEmail) {
-        userEmail = this.jsonUploadPayload.modelInformation.user
-        try {
-          if (_.isEmpty(userEmail)) {
-            throw "you must include your email"
-          }
-          this._acceptUploadDisabled = false;
-        } catch (err) {
-          throw err
+      _checkEmailField() {
+        console.log(this.userEmail);
+        if (_.isEmpty(this.userEmail)) {
+          this.flipUploadSwitch = false
+        } else {
+          this.flipUploadSwitch = true
+          this.handleJsonUpload()
         }
       }
-      //clear upload input and disable accept button
+
       _clearUploadInput() {
         Polymer.dom(this.root).querySelector('#modelUpload').value = ''
         this._acceptUploadDisabled = true;
@@ -859,83 +868,74 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return typeof(n) !== 'undefined' ? n.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : ""
       }
 
+      _capitalize(str) {
+        return typeof(str) !== 'undefined' ? _.capitalize(str) : ""
+      }
+
       _dropdownUnitLabel(item, unitType) {
         var that = this;
         item = _.toLower(item)
-        unitType = _.toLower(that.currentModelResp.modelInformation.units)
+        var unitType = _.toLower(that.currentModelResp.modelInformation.units)
         if (item.includes('area')) {
           return unitType === 'imperial' ? item + ' (in\u00B2)' : item + ' (mm\u00B2)'
         } else if (item.includes('length')) {
-          return unitType === 'imperial' ? item + ' (in)' : item + ' (mm)'
+            return unitType === 'imperial' ? item + ' (in)' : item + ' (mm)'
         } else if (item.includes('mass')) {
-          return unitType === 'imperial' ? item + ' (lb)' : item + ' (kg)'
+            return unitType === 'imperial' ? item + ' (lb)' : item + ' (kg)'
         } else if (item.includes('vol')) {
-          return unitType === 'imperial' ? item + ' (in\u00B3)' : item + ' (mm\u00B3)'
+            return unitType === 'imperial' ? item + ' (in\u00B3)' : item + ' (mm\u00B3)'
         } else {
-          return item
-        }
+            return item
+          }
       }
 
-      _numericalAggUnitLabels(measurement, unitType) {
-        var that = this;
-        measurement = _.toLower(that.selectedContourBy)
-        unitType = _.toLower(that.currentModelResp.modelInformation.units)
-        if (measurement.includes('area')) {
-          return unitType === 'imperial' ? that.numUnitLabel = ' (in\u00B2)' : that.numUnitLabel = ' (mm\u00B2)'
-        } else if (measurement.includes('length')) {
-          return unitType === 'imperial' ? that.numUnitLabel = ' (in)' : that.numUnitLabel = ' (mm)'
-        } else if (measurement.includes('mass')) {
-          return unitType === 'imperial' ? that.numUnitLabel = ' (lb)' : that.numUnitLabel = ' (kg)'
-        } else if (measurement.includes('vol')) {
-          return unitType === 'imperial' ? that.numUnitLabel = ' (in\u00B3)' : that.numUnitLabel = ' (mm\u00B3)'
-        } else if (measurement.includes('cost')) {
-          return unitType === 'imperial' ? that.numUnitLabel = ' (USD)' : that.numUnitLabel = ''
-        } else {
-          return ''
-        }
-      }
-
-      _specifyUnits(measurement, unitType) {
-        var that = this;
-        measurement = _.toLower(that.selectedSumField)
-        unitType = _.toLower(that.currentModelResp.modelInformation.units)
-        if (measurement.includes('length')) {
-          return unitType === 'imperial' ? that.strUnitLabel =' (in)' : that.strUnitLabel =' (mm)'
-        } else if (measurement.includes('mass')) {
-          return unitType === 'imperial' ? that.strUnitLabel =' (lb)' : that.strUnitLabel =' (kg)'
-        } else if (measurement.includes('vol')) {
-          return unitType === 'imperial' ? that.strUnitLabel =' (in\u00B3)' : that.strUnitLabel =' (mm\u00B3)'
-        } else if (measurement.includes('cost')) {
-          return unitType === 'imperial' ? that.strUnitLabel =' (USD)' : that.strUnitLabel = ''
-        } else {
-          return ''
+      _quantUnitLabels(measurement, unitType) {
+      	var that = this;
+        measurement = _.toLower(measurement)
+        unitType = _.toLower(this.currentModelResp.modelInformation.units)
+        if (unitType === 'imperial') {
+        	if (measurement.includes('area')) {
+          	return ' (in\u00B2)'
+          } else if (measurement.includes('length')) {
+              return ' (in)'
+          } else if (measurement.includes('mass')) {
+          	 return ' (lb)'
+          } else if (measurement.includes('vol')) {
+              return ' (in\u00B3)'
+          } else {
+              return ''
+            }
+        } else if (unitType === 'metric') {
+        	if (measurement.includes('area')) {
+          	return ' (mm\u00B2)'
+          } else if (measurement.includes('length')) {
+              return ' (mm)'
+          } else if (measurement.includes('mass')) {
+              return ' (kg)'
+          } else if (measurement.includes('vol')) {
+              return ' (mm\u00B3)'
+          } else {
+             return ''
+           }
         }
       }
 
       _strOtherUnitLabel(unitType, unitLabel) {
         if (this.currentModelResp.modelInformation.units === 'imperial') {
-            //length
-            if (this.strUnitLabel === ' (in)') {
+            if (this._quantUnitLabels(this.selectedSumField) === ' (in)') {
               this.strOtherUnitLabel = ' (ft)'
+            } else if (this._quantUnitLabels(this.selectedSumField) === ' (lb)') {
+              this.strOtherUnitLabel = ' (ton)'
+            } else if (this._quantUnitLabels(this.selectedSumField) === ' (in\u00B3)') {
+              this.strOtherUnitLabel = ' (yd\u00B3)'
             }
-            //mass
-            else if (this.strUnitLabel === ' (lb)') {
-            this.strOtherUnitLabel = ' (ton)'
-            //vol
-          } else if (this.strUnitLabel === ' (in\u00B3)') {
-            this.strOtherUnitLabel = ' (yd\u00B3)'
-          }
         } else if (this.currentModelResp.modelInformation.units === 'metric') {
-          //length
-          if (this.strUnitLabel === ' (mm)') {
-            this.strOtherUnitLabel = ' (m)'
-          }
-          //mass
-          else if (this.strUnitLabel === ' (kg)') {
-            this.strOtherUnitLabel = ' (tonne)'
-          //vol
-        } else if (this.strUnitLabel === ' (mm\u00B3)') {
-            this.strOtherUnitLabel = ' (m\u00B3)'
+          if (this._quantUnitLabels(this.selectedSumField) === ' (mm)') {
+              this.strOtherUnitLabel = ' (m)'
+          } else if (this._quantUnitLabels(this.selectedSumField) === ' (kg)') {
+              this.strOtherUnitLabel = ' (tonne)'
+          } else if (this._quantUnitLabels(this.selectedSumField) === ' (mm\u00B3)') {
+              this.strOtherUnitLabel = ' (m\u00B3)'
           }
         }
       }
@@ -1376,7 +1376,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if (h === 'name') {
               return h
             }
-            return h + that.numUnitLabel
+            return h + that._quantUnitLabels(that.selectedContourBy)
           })
           this.numDataHeaders = headers_ + '\r\n'
           var currentFilters = "Filters:" + '\r\n' +
@@ -1421,7 +1421,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             } if (h === 'otherUnitSum') {
               return that.selectedSumField + " sum " + that.strOtherUnitLabel
             }
-            return that.selectedSumField + " " + h + that.strUnitLabel
+            return that.selectedSumField + " " + h + that._quantUnitLabels(that.selectedSumField)
           })
           this.groupDataHeaders = headers_ + '\r\n';
           var currentFilters = "Filters:" + '\r\n' +
@@ -1540,6 +1540,43 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.costPieData = _costPieData;
       }
 
+      _applyAllCostResults() {
+        //make DRY!
+        var applyAllVal = Polymer.dom(this.root).querySelector('#apply-all-input').value;
+        for (var i=0; i < this.costTableData.length; i++) {
+            this.set('costTableData.'+i+'.input', applyAllVal)
+            this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
+        }
+        if (this.costItems.length === 0) {
+        for (var i=0; i < this.costTableData.length; i++) {
+            this.costItems.push({'model': this.selectedModel, 'group': this.costTableData[i].group, 'input': this.costTableData[i].input})
+          }
+        } else {
+          //if group already in costItems, overwrite input value
+          for (var i=0; i < this.costTableData.length; i++) {
+            for (var j=0; j < this.costItems.length; j++) {
+              if (this.costTableData[i].group === this.costItems[j].group && this.costItems[j].model === this.selectedModel) {
+                this.set('costItems.'+j+'.input', this.costTableData[i].input);
+              }
+            }
+          }//if group not there, push onto costItems
+          var costItemGroups = []
+          _.forEach(this.costItems, function(o) {
+             costItemGroups.push(o.group)
+          })
+          for (var i=0; i < this.costTableData.length; i++) {
+          if (costItemGroups.indexOf(this.costTableData[i].group) === -1) {
+            this.costItems.push({'model': this.selectedModel, 'group': this.costTableData[i].group, 'input': this.costTableData[i].input})
+            }
+          }
+        }
+        this.totalCost = _.sumBy(this.costTableData, function(o) {
+          return o.costResult
+        })
+        this._setCostPieData()
+        console.log(this.costItems);
+      }
+
       _setCostResults(e) {
         //console.log(e.model);
         var item = e.model.item
@@ -1566,6 +1603,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
           }
         }
+        console.log(this.costItems);
         this.totalCost = _.sumBy(this.costTableData, function(o) {
           return o.costResult
         })
