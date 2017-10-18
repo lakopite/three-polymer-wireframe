@@ -223,6 +223,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: #9E9E9E;
       }
 
+      #apply-all-div {
+        display: inline-block;
+      }
+
     </style>
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="model-request" method="GET" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
@@ -512,7 +516,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <template class="footer">[[_prettify(totalMaterialSumDiffUnit)]] [[costOtherUnitLabel]]</template>
           </vaadin-grid-column>
           <vaadin-grid-column>
-            <template class="header">Cost/[[costOtherUnitLabel]]<iron-input id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" bind-value="{{item.input}}"><input></iron-input><button id="apply-all-btn" on-tap="_applyAllCostResults">Apply all</button></template>
+            <template class="header">Cost/[[costOtherUnitLabel]]<div id ="apply-all-div"><iron-input id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" bind-value="{{applyToAll}}"><input></iron-input>
+              <button id="apply-all-btn" on-tap="_applyAllCostResults">Apply all</button></div>
+            </template>
             <template>
               <iron-input id="cost-input-[[index]]" prevent-invalid-input allowed-pattern="[.\d]" bind-value="{{item.input}}" on-change="_setCostResults">
                 <input>
@@ -827,10 +833,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         console.log(this.userEmail);
         if (_.isEmpty(this.userEmail)) {
           this.flipUploadSwitch = false
-        } else {
+        } else if (!_.isEmpty(this.userEmail)){
           this.flipUploadSwitch = true
-          this.handleJsonUpload()
         }
+        this.handleJsonUpload()
+        console.log("flipUploadSwitch");
+        console.log(this.flipUploadSwitch);
       }
 
       _clearUploadInput() {
@@ -1515,10 +1523,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _applyAllCostResults() {
-        //make DRY!
-        var applyAllVal = Polymer.dom(this.root).querySelector('#apply-all-input').value;
+        //make DRY!...somehow
         for (var i=0; i < this.costTableData.length; i++) {
-            this.set('costTableData.'+i+'.input', applyAllVal)
+            this.set('costTableData.'+i+'.input', this.applyToAll)
             this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
         }
         if (this.costItems.length === 0) {
@@ -1533,7 +1540,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.set('costItems.'+j+'.input', this.costTableData[i].input);
               }
             }
-          }//if group not there, push onto costItems
+          } //if group not there, push onto costItems
           var costItemGroups = []
           _.forEach(this.costItems, function(o) {
              costItemGroups.push(o.group)
@@ -1549,6 +1556,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         })
         this._setCostPieData()
         console.log(this.costItems);
+        this.applyToAll = ''
       }
 
       _setCostResults(e) {
@@ -1633,7 +1641,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               var sumByGroup = _.sumBy(groupObjects, function(o) {
                 return o.metadata.volume
               })
-              var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/46656, 0) : _.round(sumByGroup/1000000000, 0)
+              var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/46656, 2) : _.round(sumByGroup/1000000000, 2)
               this.costOtherUnitLabel = unitType === 'imperial' ? '(yd\u00B3)' : '(m\u00B3)'
               var costTableDataSetup = {
                 'group': groupKeys[i],
@@ -1654,7 +1662,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               var sumByGroup = _.sumBy(groupObjects, function(o) {
                 return o.metadata.mass
               })
-              var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/2000, 0) : _.round(sumByGroup/1000, 0)
+              var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/2000, 2) : _.round(sumByGroup/1000, 2)
               this.costOtherUnitLabel = unitType === 'imperial' ? ' (ton)' : ' (tonne)'
               var costTableDataSetup = {
                 'group': groupKeys[i],
