@@ -179,6 +179,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       #wrap-str-info {
         @apply(--layout-vertical);
         overflow-x:hidden;
+        height: calc(100vh - 192px);
+        overflow-y: hidden;
+      }
+
+      #wrap-cost-info {
+        height: calc(100vh - 192px);
+        overflow-y: hidden;
       }
 
       #group-data-table-section {
@@ -824,15 +831,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       // }
 
       _checkEmailField() {
-        console.log(this.userEmail);
         if (_.isEmpty(this.userEmail)) {
           this.flipUploadSwitch = false
         } else if (!_.isEmpty(this.userEmail)){
           this.flipUploadSwitch = true
         }
         this.handleJsonUpload()
-        console.log("flipUploadSwitch");
-        console.log(this.flipUploadSwitch);
       }
 
       _clearUploadInput() {
@@ -986,7 +990,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return o.metadata[that.selectedContourBy]
           }), 3);
         } else {
-          console.log("no data");
           this.numericalAggregationsTableData = []
           this.totalResult = 0
         }
@@ -1121,7 +1124,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.strPieData = _strPieData;
           }
         } else {
-          console.log("no data");
           this.groupSumData = []
           this.grandTotalSum = 0
           this.grandTotalOtherUnitSum = 0
@@ -1549,7 +1551,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return o.costResult
         })
         this._setCostPieData()
-        console.log(this.costItems);
         this.applyToAll = ''
       }
 
@@ -1579,7 +1580,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
           }
         }
-        console.log(this.costItems);
         this.totalCost = _.sumBy(this.costTableData, function(o) {
           return o.costResult
         })
@@ -1682,7 +1682,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           //may or may not be the best place for this:
           this._updateCostValues()
         } else {
-          console.log("no data");
           this.costTableData = []
           this.costTotalElements = 0
           this.totalMaterialSum = 0
