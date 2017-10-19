@@ -184,20 +184,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       #wrap-cost-info {
-        height: calc(100vh - 192px);
-        overflow-y: hidden;
-      }
-
-      #group-data-table-section {
-        /*height: 50%;*/
+        /*height: calc(100vh - 192px);*/
+        /*overflow-y: hidden;*/
       }
 
       #sum-chart-container {
         height: 398px;
       }
 
-      #cost-table-section {
-        height: calc(100vh - 189px);
+      .cost-by-group-table {
+        height: 630px;
+      }
+
+      #cost-chart-container {
+        height: 398px;
       }
 
       #csv-button {
@@ -349,7 +349,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 10/18/17</paper-item>
+        <paper-item>Build Date: 10/19/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
