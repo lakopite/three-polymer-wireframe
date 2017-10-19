@@ -431,7 +431,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <!-- data by group table -->
           <div id="group-data-table-section">
           <vaadin-grid class="data-by-group-table" items="[[groupSumData]]">
-            <vaadin-grid-column>
+            <vaadin-grid-column width="200px">
               <template class="header">
                 <vaadin-grid-sorter path="group">group</vaadin-grid-sorter>
               </template>
@@ -488,7 +488,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <div id="cost-table-section">
         <!-- cost by group table -->
         <vaadin-grid class="cost-by-group-table" items="{{costTableData}}">
-        <vaadin-grid-column>
+        <vaadin-grid-column width="200px">
           <template class="header">
             <vaadin-grid-sorter path="group">group</vaadin-grid-sorter>
           </template>
@@ -518,7 +518,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </vaadin-grid-column>
           <vaadin-grid-column>
             <template class="header">Cost/[[costOtherUnitLabel]]<div id ="apply-all-div"><iron-input id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" bind-value="{{applyToAll}}"><input></iron-input>
-              <button id="apply-all-btn" on-tap="_applyAllCostResults">Apply all</button></div>
+              <br><button id="apply-all-btn" on-tap="_applyAllCostResults">Apply all</button></div>
             </template>
             <template>
               <iron-input id="cost-input-[[index]]" prevent-invalid-input allowed-pattern="[.\d]" bind-value="{{item.input}}" on-change="_setCostResults">
@@ -1489,13 +1489,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _disableCostTab(_currentMetadataFields, _currentModel, _geoFilter) {
         if (!_.isEmpty(this.geometryFilter) && this.metadataFields.includes('material')) {
           var payloadElems = this.currentModelResp.payload
-          // NOTE this only includes "material" NOT "material_type"
           for (var i=0; i < payloadElems.length; i++) {
-            this.material = _.toLower(payloadElems[i].metadata.material)
+            this.material = _.toLower(payloadElems[i].metadata.material) || _.toLower(payloadElems[i].metadata.material_type)
             // go through payload elements and their metadata keys
-            //later use includes method for "material"
-            if (_.toLower(payloadElems[i].metadata.material) === 'concrete' && _.has(payloadElems[i], 'metadata.volume') ||  _.has(payloadElems[i], 'metadata.vol') ||  _.has(payloadElems[i], 'metadata.meta_volume') ||
-                _.toLower(payloadElems[i].metadata.material) === 'steel' && _.has(payloadElems[i], 'metadata.mass')) {
+            if (this.material === 'concrete' && _.has(payloadElems[i], 'metadata.volume') ||  _.has(payloadElems[i], 'metadata.vol') ||  _.has(payloadElems[i], 'metadata.meta_volume') ||
+                this.material === 'steel' && _.has(payloadElems[i], 'metadata.mass')||  _.has(payloadElems[i], 'metadata.meta_mass')) {
               // console.log("material cost for: " + this.material)
               // console.log("does it include 'conc': " + this.material.includes('conc'))
               // console.log("does it include 'steel': " + this.material.includes('steel'))
@@ -1547,6 +1545,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
           }
         }
+        console.log(this.costItems);
         this.totalCost = _.sumBy(this.costTableData, function(o) {
           return o.costResult
         })
@@ -1580,6 +1579,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
           }
         }
+        console.log(this.costItems);
         this.totalCost = _.sumBy(this.costTableData, function(o) {
           return o.costResult
         })
@@ -1633,7 +1633,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               var elemsPerGroup = groupObjects.length
               allObjectsByMaterialGroup.push(groupObjects)
               var sumByGroup = _.sumBy(groupObjects, function(o) {
-                return o.metadata.volume
+                return o.metadata.volume || o.metadata.vol || o.metadata.meta_vol || o.metadata.metada_volume
               })
               var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/46656, 2) : _.round(sumByGroup/1000000000, 2)
               this.costOtherUnitLabel = unitType === 'imperial' ? '(yd\u00B3)' : '(m\u00B3)'
@@ -1654,7 +1654,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               var elemsPerGroup = groupObjects.length
               allObjectsByMaterialGroup.push(groupObjects)
               var sumByGroup = _.sumBy(groupObjects, function(o) {
-                return o.metadata.mass
+                return o.metadata.mass || o.metadata.meta_mass
               })
               var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/2000, 2) : _.round(sumByGroup/1000, 2)
               this.costOtherUnitLabel = unitType === 'imperial' ? ' (ton)' : ' (tonne)'
