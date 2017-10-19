@@ -1338,6 +1338,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this._initCostChart();
       }
 
+      _dateTimeFormat() {
+        var d = new Date();
+        var curr_date = (d.getDate() < 9 ? '0': '') + (d.getDate()+1)
+        var curr_month = (d.getMonth() < 9 ? '0': '') + (d.getMonth()+1)
+        var curr_year = d.getFullYear();
+        var curr_year_formatted = curr_year.toString().substring(2)
+        var curr_hour = (d.getHours() < 9 ? '0': '') + d.getHours()
+        var currMins = (d.getMinutes() < 9 ? '0': '') + d.getMinutes()
+        var timeFormat = curr_year_formatted + curr_month + curr_date + "_" + curr_hour + currMins
+        return "Downloaded on: " + timeFormat + '\r\n'
+      }
+
+      _currentFilters() {
+        return "Filters:" + '\r\n' +
+        'min x, ' + this.geometryFilter.xMin + '\r\n' + 'max x, ' + this.geometryFilter.xMax + '\r\n' +
+        'min y, ' + this.geometryFilter.yMin + '\r\n' + 'max y, ' + this.geometryFilter.yMax + '\r\n' +
+        'min z, ' + this.geometryFilter.zMin + '\r\n' + 'max z, ' + this.geometryFilter.zMax
+      }
+
       createNumericalCsv() {
         var rowData = ''
         if (this.numericalAggregationsTableData.length > 0) {
@@ -1354,20 +1373,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return h + that._quantUnitLabels(that.selectedContourBy)
           })
           this.numDataHeaders = headers_ + '\r\n'
-          var currentFilters = "Filters:" + '\r\n' +
-          'min x, ' + this.geometryFilter.xMin + '\r\n' + 'max x, ' + this.geometryFilter.xMax + '\r\n' +
-          'min y, ' + this.geometryFilter.yMin + '\r\n' + 'max y, ' + this.geometryFilter.yMax + '\r\n' +
-          'min z, ' + this.geometryFilter.zMin + '\r\n' + 'max z, ' + this.geometryFilter.zMax
-          var d = new Date();
-          var curr_date = (d.getDate() < 9 ? '0': '') + (d.getDate()+1)
-          var curr_month = (d.getMonth() < 9 ? '0': '') + (d.getMonth()+1)
-          var curr_year = d.getFullYear();
-          var curr_year_formatted = curr_year.toString().substring(2)
-          var curr_hour = (d.getHours() < 9 ? '0': '') + d.getHours()
-          var currMins = (d.getMinutes() < 9 ? '0': '') + d.getMinutes()
-          var timeFormat = curr_year_formatted + curr_month + curr_date + "_" + curr_hour + currMins
-          var downloadStamp = "Downloaded on: " + timeFormat + '\r\n'
-          var csvData = this.numDataHeaders + rowData + '\r\n' + currentFilters + '\r\n' + downloadStamp
+          var csvData = this.numDataHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + this._dateTimeFormat()
           var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
           var link = document.createElement("a");
           link.href = uri;
@@ -1399,20 +1405,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return that.selectedSumField + " " + h + that._quantUnitLabels(that.selectedSumField)
           })
           this.groupDataHeaders = headers_ + '\r\n';
-          var currentFilters = "Filters:" + '\r\n' +
-          'min x, ' + this.geometryFilter.xMin + '\r\n' + 'max x, ' + this.geometryFilter.xMax + '\r\n' +
-          'min y, ' + this.geometryFilter.yMin + '\r\n' + 'max y, ' + this.geometryFilter.yMax + '\r\n' +
-          'min z, ' + this.geometryFilter.zMin + '\r\n' + 'max z, ' + this.geometryFilter.zMax
-          var d = new Date();
-          var curr_date = (d.getDate() < 9 ? '0': '') + (d.getDate()+1)
-          var curr_month = (d.getMonth() < 9 ? '0': '') + (d.getMonth()+1)
-          var curr_year = d.getFullYear();
-          var curr_year_formatted = curr_year.toString().substring(2)
-          var curr_hour = (d.getHours() < 9 ? '0': '') + d.getHours()
-          var currMins = (d.getMinutes() < 9 ? '0': '') + d.getMinutes()
-          var timeFormat = curr_year_formatted + curr_month + curr_date + "_" + curr_hour + currMins
-          var downloadStamp = "Downloaded on: " + timeFormat + '\r\n'
-          var csvData = this.groupDataHeaders + rowData + '\r\n' + currentFilters + '\r\n' + downloadStamp
+          var csvData = this.groupDataHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + this._dateTimeFormat()
           var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
           var link = document.createElement("a");
           link.href = uri;
@@ -1449,20 +1442,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
           })
           this.costTableHeaders = headers_ + '\r\n';
-          var currentFilters = "Filters:" + '\r\n' +
-          'min x, ' + this.geometryFilter.xMin + '\r\n' + 'max x, ' + this.geometryFilter.xMax + '\r\n' +
-          'min y, ' + this.geometryFilter.yMin + '\r\n' + 'max y, ' + this.geometryFilter.yMax + '\r\n' +
-          'min z, ' + this.geometryFilter.zMin + '\r\n' + 'max z, ' + this.geometryFilter.zMax
-          var d = new Date();
-          var curr_date = (d.getDate() < 9 ? '0': '') + (d.getDate()+1)
-          var curr_month = (d.getMonth() < 9 ? '0': '') + (d.getMonth()+1)
-          var curr_year = d.getFullYear();
-          var curr_year_formatted = curr_year.toString().substring(2)
-          var curr_hour = (d.getHours() < 9 ? '0': '') + d.getHours()
-          var currMins = (d.getMinutes() < 9 ? '0': '') + d.getMinutes()
-          var timeFormat = curr_year_formatted + curr_month + curr_date + "_" + curr_hour + currMins
-          var downloadStamp = "Downloaded on: " + timeFormat + '\r\n'
-          var csvData = this.costTableHeaders + rowData + '\r\n' + currentFilters + '\r\n' + downloadStamp
+          var csvData = this.costTableHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + this._dateTimeFormat()
           var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
           var link = document.createElement("a");
           link.href = uri;
