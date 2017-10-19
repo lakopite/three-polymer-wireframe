@@ -1020,7 +1020,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (resultFilterInput.length > 0) {
           var resultGroupByName = _.groupBy(resultFilterInput, function(o) {
             if (that.selectedContourBy === 'propertyname_1') {
-              return o.metadata.propertyname_0 + "_" + o.metadata.propertyname_1
+              return o.metadata.propertyname_0 + " (" + o.metadata.propertyname_1 + ")"
             }
             return o.metadata[that.selectedContourBy]
           })
