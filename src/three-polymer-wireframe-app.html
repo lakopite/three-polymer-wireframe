@@ -179,13 +179,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       #wrap-str-info {
         @apply(--layout-vertical);
         overflow-x:hidden;
-        height: calc(100vh - 192px);
-        overflow-y: hidden;
-      }
-
-      #wrap-cost-info {
-        height: calc(100vh - 192px);
-        overflow-y: hidden;
       }
 
       #group-data-table-section {
@@ -831,12 +824,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       // }
 
       _checkEmailField() {
+        console.log(this.userEmail);
         if (_.isEmpty(this.userEmail)) {
           this.flipUploadSwitch = false
         } else if (!_.isEmpty(this.userEmail)){
           this.flipUploadSwitch = true
         }
         this.handleJsonUpload()
+        console.log("flipUploadSwitch");
+        console.log(this.flipUploadSwitch);
       }
 
       _clearUploadInput() {
@@ -955,34 +951,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      //for strOtherUnitLabel
-      _strOtherUnitLabel(unitType, unitLabel) {
-        if (this.currentModelResp.modelInformation.units === 'imperial') {
-          //length
-          if (this.unitLabel === ' (in)') {
-            this.strOtherUnitLabel = ' (ft)'
-          }
-          //mass
-          else if (this.unitLabel === ' (lb)') {
-          this.strOtherUnitLabel = ' (ton)'
-          //vol
-        } else if (this.unitLabel === ' (in\u00B3)') {
-          this.strOtherUnitLabel = ' (yd\u00B3)'
-        }
-      } else if (this.currentModelResp.modelInformation.units === 'metric') {
-        //length
-        if (this.unitLabel === ' (mm)') {
-          this.strOtherUnitLabel = ' (m)'
-          //mass
-        } else if (this.unitLabel === ' (kg)') {
-            this.strOtherUnitLabel = ' (tonne)'
-            //vol
-          } else if (this.unitLabel === ' (mm\u00B3)') {
-            this.strOtherUnitLabel = ' (m\u00B3)'
-          }
-        }
-      }
-
       _numericalAggregations() {
         this.showStringAggregations = false;
         var that = this;
@@ -1018,6 +986,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return o.metadata[that.selectedContourBy]
           }), 3);
         } else {
+          console.log("no data");
           this.numericalAggregationsTableData = []
           this.totalResult = 0
         }
@@ -1044,10 +1013,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           })
         })
         // ================ repeated function end ==========================================
+        //console.log(resultFilterInput);
         if (resultFilterInput.length > 0) {
           var resultGroupByName = _.groupBy(resultFilterInput, function(o) {
             return o.metadata[that.selectedContourBy]
           })
+          // console.log("RESULTGROUPBYNAME");
+          // console.log(resultGroupByName);
           this.groupKeys = _.without(_.keys(resultGroupByName), 'undefined')
           if(typeof this.selectedSumField === 'undefined') {
             this.allObjectsByGroup = []
@@ -1073,11 +1045,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                }
                this.set('numericalMetadataKeys', _numericalMetadataKeys.sort())
              }
-             this.set('numericalMetadataKeys', _numericalMetadataKeys.sort())
            }
            this.selectedSumField = this.numericalMetadataKeys[0]
          } else {
            var _groupSumData = [];
+          // console.log(this.groupSumData);
           this.allObjectsByGroupDupe = []
           // console.log("ALL OBJECTS BY GROUP SECOND");
           // console.log(this.allObjectsByGroupDupe);
@@ -1149,6 +1121,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.strPieData = _strPieData;
           }
         } else {
+          console.log("no data");
           this.groupSumData = []
           this.grandTotalSum = 0
           this.grandTotalOtherUnitSum = 0
@@ -1521,6 +1494,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             //later use includes method for "material"
             if (_.toLower(payloadElems[i].metadata.material) === 'concrete' && _.has(payloadElems[i], 'metadata.volume') ||  _.has(payloadElems[i], 'metadata.vol') ||  _.has(payloadElems[i], 'metadata.meta_volume') ||
                 _.toLower(payloadElems[i].metadata.material) === 'steel' && _.has(payloadElems[i], 'metadata.mass')) {
+              // console.log("material cost for: " + this.material)
+              // console.log("does it include 'conc': " + this.material.includes('conc'))
+              // console.log("does it include 'steel': " + this.material.includes('steel'))
               this._costAggregations()
               return false
             } else {
@@ -1573,6 +1549,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return o.costResult
         })
         this._setCostPieData()
+        console.log(this.costItems);
+        this.applyToAll = ''
       }
 
       _setCostResults(e) {
@@ -1601,6 +1579,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
           }
         }
+        console.log(this.costItems);
         this.totalCost = _.sumBy(this.costTableData, function(o) {
           return o.costResult
         })
@@ -1640,8 +1619,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var groupsForMaterial = _.groupBy(resultFilterInput, function(o) {
             return o.metadata.propertyname
           })
+          //console.log(groupsForMaterial);
+          // ================ repeated pattern for CODE end ==========================================
           var unitType = this.currentModelResp.modelInformation.units
+          // console.log(unitType);
           var _costTableData = []
+          // console.log(this.costTableData);
           var groupKeys = _.keys(groupsForMaterial)
           var allObjectsByMaterialGroup = []
           if (this.material === 'concrete') {
@@ -1696,8 +1679,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.totalMaterialSumDiffUnit = _.round(_.sumBy(this.costTableData, function(o) {
             return o.otherUnitSum
           }), 3)
+          //may or may not be the best place for this:
           this._updateCostValues()
         } else {
+          console.log("no data");
           this.costTableData = []
           this.costTotalElements = 0
           this.totalMaterialSum = 0
