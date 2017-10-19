@@ -1019,6 +1019,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         //console.log(resultFilterInput);
         if (resultFilterInput.length > 0) {
           var resultGroupByName = _.groupBy(resultFilterInput, function(o) {
+            if (that.selectedContourBy === 'propertyname_1') {
+              return o.metadata.propertyname_0 + "_" + o.metadata.propertyname_1
+            }
             return o.metadata[that.selectedContourBy]
           })
           // console.log("RESULTGROUPBYNAME");
@@ -1059,6 +1062,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           for (var i = 0; i < this.groupKeys.length; i++) {
             //reusing var groupObjects below (was local variable in previous loop for numericalMetadataKeys)
             var groupObjects = resultGroupByName[this.groupKeys[i]]
+            console.log(groupObjects);
+            console.log(this.groupKeys[i]);
               var elemsPerGroup = groupObjects.length
               var sumByGroup = _.round(_.sumBy(groupObjects, function(o) {
                 return o.metadata[that.selectedSumField]
