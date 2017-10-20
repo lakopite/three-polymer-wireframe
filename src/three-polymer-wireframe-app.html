@@ -511,7 +511,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </vaadin-grid-column>
           <vaadin-grid-column>
             <template class="header">
-              <vaadin-grid-sorter path="otherUnitLabel">[[material]] sum [[costOtherUnitLabel]]</vaadin-grid-sorter>
+              <vaadin-grid-sorter path="otherUnitSum">[[material]] sum [[costOtherUnitLabel]]</vaadin-grid-sorter>
             </template>
             <template>[[_prettify(item.otherUnitSum)]]</template>
             <template class="footer">[[_prettify(totalMaterialSumDiffUnit)]] [[costOtherUnitLabel]]</template>
@@ -1614,7 +1614,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               var elemsPerGroup = groupObjects.length
               allObjectsByMaterialGroup.push(groupObjects)
               var sumByGroup = _.sumBy(groupObjects, function(o) {
-                return o.metadata.volume || o.metadata.vol || o.metadata.meta_vol || o.metadata.metada_volume
+                return o.metadata.volume
               })
               var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/46656, 2) : _.round(sumByGroup/1000000000, 2)
               this.costOtherUnitLabel = unitType === 'imperial' ? '(yd\u00B3)' : '(m\u00B3)'
@@ -1635,7 +1635,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               var elemsPerGroup = groupObjects.length
               allObjectsByMaterialGroup.push(groupObjects)
               var sumByGroup = _.sumBy(groupObjects, function(o) {
-                return o.metadata.mass || o.metadata.meta_mass
+                return o.metadata.mass
               })
               var _otherUnitSum = unitType === 'imperial' ? _.round(sumByGroup/2000, 2) : _.round(sumByGroup/1000, 2)
               this.costOtherUnitLabel = unitType === 'imperial' ? ' (ton)' : ' (tonne)'
