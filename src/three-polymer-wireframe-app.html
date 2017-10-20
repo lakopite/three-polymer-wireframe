@@ -231,6 +231,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       .secondary-item {
         font-size: .7em;
+        color: grey;
       }
 
     </style>
@@ -272,7 +273,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <template is="dom-repeat" items="[[dataOptions]]">
             <paper-item id="model-dropdown" class="dropdown-item" name="[[item.model]]">
             <paper-item-body two-line>
-              <div>[[_formatModelName(item.model)]]</div>
+              <div class="primary-item">[[_formatModelName(item.model)]]</div>
               <div secondary class="secondary-item">[[_formatModelTimeStamp(item.model)]]</div>
             </paper-item-body>
           </paper-item>
