@@ -392,7 +392,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <app-toolbar class="aggregation-toolbar">
             <div main-title>Aggregations</div>
           </app-toolbar>
-          <paper-dropdown-menu id="num-contour-dropdown" label="Contour">
+          <paper-dropdown-menu id="num-contour-dropdown" label="Select Contour">
             <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
               <template is="dom-repeat" items="[[metadataFields]]">
                 <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
@@ -419,7 +419,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <app-toolbar class="aggregation-toolbar">
             <div main-title>Data by Group</div>
           </app-toolbar>
-          <paper-dropdown-menu id="str-contour-dropdown" label="Contour">
+          <paper-dropdown-menu id="str-contour-dropdown" label="Select Contour">
             <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
               <template is="dom-repeat" items="[[metadataFields]]">
                 <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
@@ -486,14 +486,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </div>
         </div>
     </div>
-    </div>
+  </div>
     <!-- Cost Tab -->
     <div name="cost-view">
       <div class="num-wrapper">
         <app-toolbar class="aggregation-toolbar">
           <div main-title>Cost of [[_capitalize(material)]] by Group</div>
         </app-toolbar>
-        <paper-dropdown-menu id="cost-group" label="group/subgroup">
+        <paper-dropdown-menu id="cost-group" label="Select Group/Subgroup">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedCostGroup}}">
           <template is="dom-repeat" items="[[costGroups]]">
             <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
