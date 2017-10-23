@@ -746,6 +746,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.dispatchEvent(new CustomEvent('logout', {bubbles: true, composed: true}))
       }
 
+      //the below 2 functions will have to be altered when backend is adjusted to auto timestamp
       _formatModelName(modelName) {
         var displayName = ""
         var arr = modelName.split("_")
@@ -912,15 +913,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _prettify(n) {
-        return typeof(n) !== 'undefined' ? parseFloat(n).toLocaleString() : ""
+        return typeof n !== 'undefined' ? parseFloat(n).toLocaleString() : ""
       }
 
       _prettifyDollar(n) {
-        return typeof(n) !== 'undefined' ? n.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : ""
+        return typeof n !== 'undefined' ? n.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : ""
       }
 
       _capitalize(str) {
-        return typeof(str) !== 'undefined' ? _.capitalize(str) : ""
+        return typeof str !== 'undefined' ? _.capitalize(str) : ""
       }
 
       _dropdownUnitLabel(item, unitType) {
