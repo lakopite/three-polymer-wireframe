@@ -489,7 +489,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </div>
     <!-- Cost Tab -->
     <div name="cost-view">
-      <div class="str-header">
+      <div class="num-wrapper">
         <app-toolbar class="aggregation-toolbar">
           <div main-title>Cost of [[_capitalize(material)]] by Group</div>
         </app-toolbar>
@@ -1072,7 +1072,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           })
         })
         // ================ repeated function end ==========================================
-        //console.log(resultFilterInput);
         if (resultFilterInput.length > 0) {
           var resultGroupByName = _.groupBy(resultFilterInput, function(o) {
             if (that.selectedContourBy === 'propertyname_1') {
@@ -1624,7 +1623,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _updateCostValues() {
-        if (typeof(this.costItems) !== 'undefined') {
+        if (typeof this.costItems !== 'undefined') {
           for (var i=0; i < this.costTableData.length; i++) {
             for (var j=0; j < this.costItems.length; j++) {
               if (this.costTableData[i].group == this.costItems[j].group && this.selectedModel === this.costItems[j].model) {
@@ -1659,7 +1658,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               this.push('costGroups', this.metadataFields[i])
             };
           }
-          if (typeof(this.selectedCostGroup) === 'undefined') {
+          if (typeof this.selectedCostGroup === 'undefined') {
             this.selectedCostGroup = this.costGroups[0]
           }
           var groupsForMaterial = _.groupBy(resultFilterInput, function(o) {
