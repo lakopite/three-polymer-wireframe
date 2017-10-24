@@ -1829,8 +1829,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _initData(dataOptions_) {
-        this.set('dataOptions', dataOptions_);
-        //console.log(this.dataOptions)
+        //this.set('dataOptions', dataOptions_)
+        //sort by date
+        this.set('dataOptions', _.sortBy(dataOptions_, [function(o) { return o.s3_attributes.uploadTime}]));
         if (this.dataOptions.length > 0) {
           this.set('selectedModel', this.dataOptions[0].model)
         }
