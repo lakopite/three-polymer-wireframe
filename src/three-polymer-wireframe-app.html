@@ -281,6 +281,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </template>
         </paper-listbox>
       </paper-dropdown-menu>
+      <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
       <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: {{_uploadedBy(currentModelResp.modelInformation.user)}}<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
         <paper-dropdown-menu id="main-contour-dropdown" label="Contour">
@@ -777,6 +778,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         } else {
          return ''
         }
+      }
+
+      _shareModelEmail(message) {
+        var email = '';
+        var subject = "Arup Model Quickview link has been shared with you";
+        var link = document.createElement("a");
+        link.href =  window.location.hostname + '#' + this.selectedModel;
+        // the below new line isn't working and link isn't being displayed as link. check path stuff and trent's code
+        var emailBody = 'View Arup Model Quickview link: ' + '\r\n' + link.href;
+        document.location = "mailto:"+email+"?subject="+subject+"&body="+emailBody;
       }
 
       _uploadedBy(user) {
