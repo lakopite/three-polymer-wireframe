@@ -748,6 +748,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.dispatchEvent(new CustomEvent('logout', {bubbles: true, composed: true}))
       }
 
+      _shareModelEmail(message) {
+          var email = '';
+          var subject = "Arup Model Quickview link has been shared with you";
+          var link = document.createElement("a");
+          link.href =  window.location.pathname + '#' + this.selectedModel;
+          // the below new line isn't working and link isn't being displayed as link. check path stuff and trent's code
+          var emailBody = 'View Arup Model Quickview link: ' + '\r\n' + link.href;
+          document.location = "mailto:"+email+"?subject="+subject+"&body="+emailBody;
+      }
+
       //the below 2 functions will have to be altered when backend is adjusted to auto timestamp
       _formatModelName(modelName) {
         var displayName = ""
@@ -755,7 +765,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var letters = /^[A-Za-z]+$/;
         if (arr.length === 1) {
           return arr.toString()
-          // for dev site:
+          // for dev/feat site:
         } else if (arr[0] === '7json-uploader-testing' || arr[0] === '0-Test-Model-D' || arr[0] === 'planar-test') {
           return arr[0]
         } else {
@@ -778,16 +788,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         } else {
          return ''
         }
-      }
-
-      _shareModelEmail(message) {
-        var email = '';
-        var subject = "Arup Model Quickview link has been shared with you";
-        var link = document.createElement("a");
-        link.href =  window.location.pathname + '#' + this.selectedModel;
-        // the below new line isn't working and link isn't being displayed as link. check path stuff and trent's code
-        var emailBody = 'View Arup Model Quickview link: ' + link.href;
-        document.location = "mailto:"+email+"?subject="+subject+"&body="+emailBody;
       }
 
       _uploadedBy(user) {
@@ -1020,13 +1020,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _numericalAggregations() {
         this.showStringAggregations = false;
         var that = this;
-        var resultFilterInput = _.filter(that._modelData.linearElements, function(o) {
-          return _.every(o.vertices, function(j) {
-            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+        if (_.isEmpty(this.currentModelResp.payload.planarElements)) {
+          var resultFilterInput = _.filter(that._modelData.linearElements, function(o) {
+            return _.every(o.vertices, function(j) {
+              return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
               that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
               that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
+            })
           })
-        })
+        } else if (_.isEmpty(this.currentModelResp.payload.linearElements)) {
+          var resultFilterInput = _.filter(that._modelData.planarElements, function(o) {
+            return _.every(o.vertices, function(j) {
+              return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+              that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
+              that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
+            })
+          })
+        }
         if (resultFilterInput.length > 0) {
           this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
             return o.metadata[that.selectedContourBy]
@@ -1077,13 +1087,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.showNumericalAggregations = false;
         var that = this
         // ================ repeated function start ==========================================
-        var resultFilterInput = _.filter(that._modelData.linearElements, function(o) {
-          return _.every(o.vertices, function(j) {
-            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+        if (_.isEmpty(this.currentModelResp.payload.planarElements)) {
+          var resultFilterInput = _.filter(that._modelData.linearElements, function(o) {
+            return _.every(o.vertices, function(j) {
+              return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
               that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
               that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
+            })
           })
-        })
+        } else if (_.isEmpty(this.currentModelResp.payload.linearElements)) {
+          var resultFilterInput = _.filter(that._modelData.planarElements, function(o) {
+            return _.every(o.vertices, function(j) {
+              return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+              that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
+              that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
+            })
+          })
+        }
         // ================ repeated function end ==========================================
         if (resultFilterInput.length > 0) {
           var resultGroupByName = _.groupBy(resultFilterInput, function(o) {
@@ -1111,10 +1131,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var metadataKeys = _.keys(metadataObject)
              for (var j = 0; j < metadataKeys.length; j++) {
               //to include only these in dropdown menu
-              var validSumGroups = ['meta_length', 'length', 'meta_mass', 'mass', 'meta_vol', 'vol', 'volume']
+              //var validSumGroups = ['meta_length', 'length', 'meta_mass', 'mass', 'meta_vol', 'vol', 'volume']
+              var ignoreSumGroups = ['area', 'beamnum', 'density']
               //but also do an "includes/contains" because names could vary
                // to find unique keys with numeric values for dropdown options
-               if(_.isNumber(metadataValues[j]) && _numericalMetadataKeys.indexOf(metadataKeys[j]) === -1 && validSumGroups.indexOf(metadataKeys[j]) !== -1) {
+               //&& validSumGroups.indexOf(metadataKeys[j]) !== -1
+               if(_.isNumber(metadataValues[j]) && _numericalMetadataKeys.indexOf(metadataKeys[j]) === -1 && ignoreSumGroups.indexOf(metadataKeys[j]) === -1) {
                  _numericalMetadataKeys.push(metadataKeys[j])
                }
                this.set('numericalMetadataKeys', _numericalMetadataKeys.sort())
@@ -1269,6 +1291,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _hideShareBtn(_model) {
         return typeof this.selectedModel === 'undefined'
       }
+
       // _hideChart(_totalCost) {
       //   return this.totalCost === 0
       // }
@@ -1542,7 +1565,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _disableCostTab(_currentMetadataFields, _currentModel, _geoFilter) {
         if (!_.isEmpty(this.geometryFilter) && this.metadataFields.includes('material')) {
-          var payloadElems = this.currentModelResp.payload
+          var payloadElems = this.currentModelResp.payload.linearElements || this.currentModelResp.payload.planarElements
           for (var i=0; i < payloadElems.length; i++) {
             this.material = _.toLower(payloadElems[i].metadata.material) || _.toLower(payloadElems[i].metadata.material_type)
             // go through payload elements and their metadata keys
@@ -1659,13 +1682,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _costAggregations() {
         var that = this
         // ================ repeated function start ==========================================
-        var resultFilterInput = _.filter(that._modelData.linearElements, function(o) {
-          return _.every(o.vertices, function(j) {
-            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+        if (_.isEmpty(this.currentModelResp.payload.planarElements)) {
+          var resultFilterInput = _.filter(that._modelData.linearElements, function(o) {
+            return _.every(o.vertices, function(j) {
+              return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
               that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
               that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
+            })
           })
-        })
+        } else if (_.isEmpty(this.currentModelResp.payload.linearElements)) {
+          var resultFilterInput = _.filter(that._modelData.planarElements, function(o) {
+            return _.every(o.vertices, function(j) {
+              return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+              that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
+              that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
+            })
+          })
+        }
+        console.log(resultFilterInput);
         if (resultFilterInput.length > 0) {
           // ================ repeated function end ==========================================
           this.costGroups = []
@@ -1794,11 +1828,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _isNumberField(_modelData, selectedContourBy) {
-        return !_.isEmpty(_modelData.linearElements) && this.selectedContourBy && _.isNumber(_modelData.linearElements[0].metadata[this.selectedContourBy])
+          return !_.isEmpty(_modelData.linearElements)  && this.selectedContourBy && _.isNumber(_modelData.linearElements[0].metadata[this.selectedContourBy]) || !_.isEmpty(_modelData.planarElements)  && this.selectedContourBy && _.isNumber(_modelData.planarElements[0].metadata[this.selectedContourBy])
       }
 
       _isStringField(_modelData, selectedContourBy) {
-        return !_.isEmpty(_modelData.linearElements) && typeof this.selectedContourBy !== 'undefined' && !_.isNumber(_modelData.linearElements[0].metadata[this.selectedContourBy])
+        return !_.isEmpty(_modelData.linearElements) && typeof this.selectedContourBy !== 'undefined' && !_.isNumber(_modelData.linearElements[0].metadata[this.selectedContourBy]) || !_.isEmpty(_modelData.planarElements) && typeof this.selectedContourBy !== 'undefined' && !_.isNumber(_modelData.planarElements[0].metadata[this.selectedContourBy])
       }
 
       isLoadingState(modelLoading, appLoading) {
@@ -1892,10 +1926,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (this.currentModelResp && this.currentModelResp.modelInformation.name === this.selectedModel && "payload" in this.currentModelResp) {
           this.appLoading = false;
           this.set('_modelData', {
-            'linearElements': this.currentModelResp.payload,
-            'planarElements': []
-            // 'linearElements': this.currentModelResp.payload.linearElements,
-            // 'planarElements': this.currentModelResp.payload.planarElements
+            'linearElements': this.currentModelResp.payload.linearElements,
+            'planarElements': this.currentModelResp.payload.planarElements
           });
           //set selectedSumField to undefined in order to trigger stringAggregtions initialization
           this.selectedSumField = undefined
