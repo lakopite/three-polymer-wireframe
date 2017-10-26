@@ -1266,6 +1266,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
       }
 
+      _hideShareBtn(_model) {
+        return typeof this.selectedModel === 'undefined'
+      }
       // _hideChart(_totalCost) {
       //   return this.totalCost === 0
       // }
