@@ -753,7 +753,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var subject = "Arup Model Quickview link has been shared with you";
           var link = document.createElement("a");
           link.href =  window.location.pathname + '#' + this.selectedModel;
-          // the below new line isn't working and link isn't being displayed as link. check path stuff and trent's code
           var emailBody = 'View Arup Model Quickview link: ' + '\r\n' + link.href;
           document.location = "mailto:"+email+"?subject="+subject+"&body="+emailBody;
       }
