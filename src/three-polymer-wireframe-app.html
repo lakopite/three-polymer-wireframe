@@ -760,34 +760,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       //the below 2 functions will have to be altered when backend is adjusted to auto timestamp
       _formatModelName(modelName) {
-        var displayName = ""
-        var arr = modelName.split("_")
-        var letters = /^[A-Za-z]+$/;
-        if (arr.length === 1) {
-          return arr.toString()
-          // for dev/feat site:
-        } else if (arr[0] === '7json-uploader-testing' || arr[0] === '0-Test-Model-D' || arr[0] === 'planar-test') {
-          return arr[0]
-        } else {
-          for (var i=0; i < arr.length; i++) {
-            if (arr[i].match(letters)) {
-              displayName += "_" + arr[i]
-            }
-         }
-         return displayName.slice(1)
-       }
+        var arr = modelName.split("_");
+        return _.join(_.filter(arr,function(s) {
+          return isNaN(s)
+        }),' ')
       }
 
       _formatModelTimeStamp(modelName) {
         var arr = modelName.split("_")
-        var numbers = /^[0-9]+$/;
-        if (arr[0].match(numbers) && arr[1].match(numbers)) {
-          return arr[0] + "_" + arr[1]
-        } else if (arr[0].match(numbers)) {
-         return arr[0]
-        } else {
-         return ''
+        if (arr.length > 2) {
+          if (!isNaN(arr[arr.length-1]) && !isNaN(arr[arr.length-2])) {
+            return arr[arr.length-2] + " " + arr[arr.length-1]
+          }
         }
+        return ""
       }
 
       _uploadedBy(user) {
