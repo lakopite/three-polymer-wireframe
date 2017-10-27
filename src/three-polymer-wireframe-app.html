@@ -772,6 +772,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           if (!isNaN(arr[arr.length-1]) && !isNaN(arr[arr.length-2])) {
             return arr[arr.length-2] + " " + arr[arr.length-1]
           }
+          if (!isNaN(arr[0]) && !isNaN(arr[1])) {
+            return arr[0] + " " + arr[1]
+          }
+          if (!isNaN(arr[0])) {
+            return arr[0]
+          }
         }
         return ""
       }
