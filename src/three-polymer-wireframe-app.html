@@ -361,7 +361,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 10/26/17</paper-item>
+        <paper-item>Build Date: 10/27/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -1556,12 +1556,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _disableCostTab(_currentMetadataFields, _currentModel, _geoFilter) {
         if (!_.isEmpty(this.geometryFilter) && this.metadataFields.includes('material')) {
-          var payloadElems = this.currentModelResp.payload.linearElements || this.currentModelResp.payload.planarElements
+          if (_.isEmpty(this.currentModelResp.payload.planarElements)) {
+            var payloadElems = this.currentModelResp.payload.linearElements
+          } else if (_.isEmpty(this.currentModelResp.payload.linearElements)) {
+            var payloadElems = this.currentModelResp.payload.planarElements
+          }
           for (var i=0; i < payloadElems.length; i++) {
-            this.material = _.toLower(payloadElems[i].metadata.material) || _.toLower(payloadElems[i].metadata.material_type)
+            this.material = _.toLower(payloadElems[i].metadata.material)
             // go through payload elements and their metadata keys
             if (this.material === 'concrete' && _.has(payloadElems[i], 'metadata.volume') ||  _.has(payloadElems[i], 'metadata.vol') ||  _.has(payloadElems[i], 'metadata.meta_volume') ||
-                this.material === 'steel' && _.has(payloadElems[i], 'metadata.mass')||  _.has(payloadElems[i], 'metadata.meta_mass')) {
+                this.material === 'steel' && _.has(payloadElems[i], 'metadata.mass') ||  _.has(payloadElems[i], 'metadata.meta_mass')) {
               // console.log("material cost for: " + this.material)
               // console.log("does it include 'conc': " + this.material.includes('conc'))
               // console.log("does it include 'steel': " + this.material.includes('steel'))
@@ -1909,6 +1913,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleDataResponse(event, response) {
         this.currentModelResp = response.response
+        console.log(this.currentModelResp);
         var costTab = Polymer.dom(this.root).querySelector("#cost-tab")
         if (costTab.disabled && this.selectedView === 'cost-view') {
           this.selectedView = 'model-view'
