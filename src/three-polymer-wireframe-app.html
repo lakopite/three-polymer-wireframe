@@ -216,11 +216,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: #eeff41;
       }
 
-      #uploadSuccessToast {
-        /*--paper-toast-background-color: green;
-        --paper-toast-color: white;*/
-      }
-
       #cost-tab[disabled] {
         color: #9E9E9E;
       }
@@ -284,7 +279,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
       <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: {{_uploadedBy(currentModelResp.modelInformation.user)}}<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
-        <paper-dropdown-menu id="main-contour-dropdown" label="Contour">
+        <paper-dropdown-menu id="main-contour-dropdown" label="Select Contour">
           <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
             <template is="dom-repeat" items="[[metadataFields]]">
               <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
@@ -361,7 +356,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 10/27/17</paper-item>
+        <paper-item>Build Date: 10/31/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -753,7 +748,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var subject = "Arup Model Quickview link has been shared with you";
           var link = document.createElement("a");
           link.href =  window.location.pathname + '#' + this.selectedModel;
-          var emailBody = 'View Arup Model Quickview link: ' + '\r\n' + link.href;
+          var emailBody = 'Visit Arup Model Quickview link: ' + '\r\n' + link.href;
           document.location = "mailto:"+email+"?subject="+subject+"&body="+emailBody;
       }
 
@@ -1027,6 +1022,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
             })
           })
+        } else if (!_.isEmpty(this.currentModelResp.payload.linearElements) && !_.isEmpty(this.currentModelResp.payload.planarElements)) {
+          //
         }
         if (resultFilterInput.length > 0) {
           this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
@@ -1094,6 +1091,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
             })
           })
+        } else if (!_.isEmpty(this.currentModelResp.payload.linearElements) && !_.isEmpty(this.currentModelResp.payload.planarElements)) {
+          //
         }
         // ================ repeated function end ==========================================
         if (resultFilterInput.length > 0) {
@@ -1558,14 +1557,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (!_.isEmpty(this.geometryFilter) && this.metadataFields.includes('material')) {
           if (_.isEmpty(this.currentModelResp.payload.planarElements)) {
             var payloadElems = this.currentModelResp.payload.linearElements
+            console.log(payloadElems);
           } else if (_.isEmpty(this.currentModelResp.payload.linearElements)) {
             var payloadElems = this.currentModelResp.payload.planarElements
+            console.log(payloadElems);
+          } else if (!_.isEmpty(this.currentModelResp.payload.linearElements) && !_.isEmpty(this.currentModelResp.payload.planarElements)) {
+            for (var i=0; i < this.currentModelResp.payload.linearElements.length; i++) {
+              this.currentModelResp.payload.planarElements.push(this.currentModelResp.payload.linearElements[i])
+            }
+            var payloadElems = this.currentModelResp.payload.planarElements
+            console.log(payloadElems);
           }
           for (var i=0; i < payloadElems.length; i++) {
             this.material = _.toLower(payloadElems[i].metadata.material)
+            console.log(payloadElems[i]);
             // go through payload elements and their metadata keys
             if (this.material === 'concrete' && _.has(payloadElems[i], 'metadata.volume') ||  _.has(payloadElems[i], 'metadata.vol') ||  _.has(payloadElems[i], 'metadata.meta_volume') ||
-                this.material === 'steel' && _.has(payloadElems[i], 'metadata.mass') ||  _.has(payloadElems[i], 'metadata.meta_mass')) {
+                this.material === 'steel' && _.has(payloadElems[i], 'metadata.mass') || _.has(payloadElems[i], 'metadata.meta_mass')) {
               // console.log("material cost for: " + this.material)
               // console.log("does it include 'conc': " + this.material.includes('conc'))
               // console.log("does it include 'steel': " + this.material.includes('steel'))
@@ -1631,7 +1639,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         for (var i=0; i < this.costTableData.length; i++) {
           if (i === inputIndex) {
             //console.log("values: " + e.target.value + " : " + this.costTableData[i].input)
-            this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
+            this.set('costTableData.'+i+'.costResult', this.costTableData[i].input * this.costTableData[i].otherUnitSum);
           }
         }
         if (this.costItems.length === 0) {
@@ -1693,6 +1701,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
             })
           })
+        } else if (!_.isEmpty(this.currentModelResp.payload.linearElements) && !_.isEmpty(this.currentModelResp.payload.planarElements)) {
+          //
         }
         if (resultFilterInput.length > 0) {
           // ================ repeated function end ==========================================
@@ -1913,7 +1923,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleDataResponse(event, response) {
         this.currentModelResp = response.response
-        console.log(this.currentModelResp);
+        //console.log(this.currentModelResp);
+        //console.log("has both kinds of elements: ");
+        console.log(!_.isEmpty(this.currentModelResp.payload.linearElements) && !_.isEmpty(this.currentModelResp.payload.planarElements))
         var costTab = Polymer.dom(this.root).querySelector("#cost-tab")
         if (costTab.disabled && this.selectedView === 'cost-view') {
           this.selectedView = 'model-view'
@@ -1955,8 +1967,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var resp = response.response;
         if ("success" in resp) {
           this.$['get-models-request'].generateRequest();
+          this.$.uploadSuccessToast.show({ text: "Upload successful!"})
         }
       }
+
     }
 
     window.customElements.define(ThreePolymerWireframe.is, ThreePolymerWireframe);
