@@ -450,7 +450,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <vaadin-grid-sorter path="elemsPerGroup">elements/group</vaadin-grid-sorter>
               </template>
               <template>[[_prettify(item.elemsPerGroup)]]</template>
-              <template class="footer">[[_prettify(costTotalElements)]]</template>
+              <template class="footer">[[_prettify(totalElements)]]</template>
             </vaadin-grid-column>
             <vaadin-grid-column>
               <template class="header">
@@ -1202,6 +1202,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.totalElements = _.round(_.sumBy(this.groupSumData, function(o) {
               return o.elemsPerGroup
             }), 0)
+            console.log(this.totalElements);
             this.grandTotalSum = _.round(_.sumBy(this.groupSumData, function(o) {
               return o.sum
             }), 1)
