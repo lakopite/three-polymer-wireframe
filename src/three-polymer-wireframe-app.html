@@ -1006,24 +1006,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _numericalAggregations() {
         this.showStringAggregations = false;
         var that = this;
+        this.linearNumFilterResult = _.filter(that._modelData.linearElements, function(o) {
+          return _.every(o.vertices, function(j) {
+            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+            that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
+            that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
+          })
+        })
+        this.planarNumFilterResult = _.filter(that._modelData.planarElements, function(o) {
+          return _.every(o.vertices, function(j) {
+            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+            that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
+            that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
+          })
+        })
         if (_.isEmpty(this.currentModelResp.payload.planarElements)) {
-          var resultFilterInput = _.filter(that._modelData.linearElements, function(o) {
-            return _.every(o.vertices, function(j) {
-              return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-              that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-              that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-            })
-          })
+          var resultFilterInput = this.linearNumFilterResult
+          console.log(resultFilterInput);
         } else if (_.isEmpty(this.currentModelResp.payload.linearElements)) {
-          var resultFilterInput = _.filter(that._modelData.planarElements, function(o) {
-            return _.every(o.vertices, function(j) {
-              return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-              that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-              that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-            })
-          })
+          var resultFilterInput = this.planarNumFilterResult
+          console.log((resultFilterInput));
         } else if (!_.isEmpty(this.currentModelResp.payload.linearElements) && !_.isEmpty(this.currentModelResp.payload.planarElements)) {
-          //
+          var resultFilterInput = _.concat(this.linearNumFilterResult, this.planarNumFilterResult)
+          console.log(resultFilterInput);
         }
         if (resultFilterInput.length > 0) {
           this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
@@ -1075,24 +1080,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.showNumericalAggregations = false;
         var that = this
         // ================ repeated function start ==========================================
+        this.linearStringFilterResult = _.filter(that._modelData.linearElements, function(o) {
+          return _.every(o.vertices, function(j) {
+            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+            that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
+            that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
+          })
+        })
+        this.planarStringFilterResult = _.filter(that._modelData.planarElements, function(o) {
+          return _.every(o.vertices, function(j) {
+            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+            that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
+            that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
+          })
+        })
         if (_.isEmpty(this.currentModelResp.payload.planarElements)) {
-          var resultFilterInput = _.filter(that._modelData.linearElements, function(o) {
-            return _.every(o.vertices, function(j) {
-              return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-              that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-              that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-            })
-          })
+          var resultFilterInput = this.linearStringFilterResult
+          console.log(resultFilterInput);
         } else if (_.isEmpty(this.currentModelResp.payload.linearElements)) {
-          var resultFilterInput = _.filter(that._modelData.planarElements, function(o) {
-            return _.every(o.vertices, function(j) {
-              return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-              that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-              that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-            })
-          })
+          var resultFilterInput = this.planarStringFilterResult
+          console.log(resultFilterInput);
         } else if (!_.isEmpty(this.currentModelResp.payload.linearElements) && !_.isEmpty(this.currentModelResp.payload.planarElements)) {
-          //
+          var resultFilterInput = _.concat(this.linearStringFilterResult, this.planarStringFilterResult)
+          console.log(resultFilterInput);
         }
         // ================ repeated function end ==========================================
         if (resultFilterInput.length > 0) {
@@ -1562,15 +1572,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var payloadElems = this.currentModelResp.payload.planarElements
             console.log(payloadElems);
           } else if (!_.isEmpty(this.currentModelResp.payload.linearElements) && !_.isEmpty(this.currentModelResp.payload.planarElements)) {
-            for (var i=0; i < this.currentModelResp.payload.linearElements.length; i++) {
-              this.currentModelResp.payload.planarElements.push(this.currentModelResp.payload.linearElements[i])
-            }
-            var payloadElems = this.currentModelResp.payload.planarElements
+            var payloadElems = _.concat(this.currentModelResp.payload.linearElements, this.currentModelResp.payload.planarElements)
             console.log(payloadElems);
           }
           for (var i=0; i < payloadElems.length; i++) {
             this.material = _.toLower(payloadElems[i].metadata.material)
-            console.log(payloadElems[i]);
+            //console.log(payloadElems[i]);
             // go through payload elements and their metadata keys
             if (this.material === 'concrete' && _.has(payloadElems[i], 'metadata.volume') ||  _.has(payloadElems[i], 'metadata.vol') ||  _.has(payloadElems[i], 'metadata.meta_volume') ||
                 this.material === 'steel' && _.has(payloadElems[i], 'metadata.mass') || _.has(payloadElems[i], 'metadata.meta_mass')) {
@@ -1685,24 +1692,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _costAggregations() {
         var that = this
         // ================ repeated function start ==========================================
+        this.linearCostFilterResult = _.filter(that._modelData.linearElements, function(o) {
+          return _.every(o.vertices, function(j) {
+            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+            that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
+            that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
+          })
+        })
+        this.planarCostFilterResult = _.filter(that._modelData.planarElements, function(o) {
+          return _.every(o.vertices, function(j) {
+            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+            that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
+            that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
+          })
+        })
         if (_.isEmpty(this.currentModelResp.payload.planarElements)) {
-          var resultFilterInput = _.filter(that._modelData.linearElements, function(o) {
-            return _.every(o.vertices, function(j) {
-              return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-              that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-              that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-            })
-          })
+          var resultFilterInput = this.linearCostFilterResult
+          console.log(resultFilterInput);
         } else if (_.isEmpty(this.currentModelResp.payload.linearElements)) {
-          var resultFilterInput = _.filter(that._modelData.planarElements, function(o) {
-            return _.every(o.vertices, function(j) {
-              return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-              that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-              that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-            })
-          })
+          var resultFilterInput = this.planarCostFilterResult
+          console.log(resultFilterInput);
         } else if (!_.isEmpty(this.currentModelResp.payload.linearElements) && !_.isEmpty(this.currentModelResp.payload.planarElements)) {
-          //
+          var resultFilterInput = _.concat(this.linearCostFilterResult, this.planarCostFilterResult)
+          console.log(resultFilterInput);
         }
         if (resultFilterInput.length > 0) {
           // ================ repeated function end ==========================================
