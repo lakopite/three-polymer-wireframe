@@ -1116,6 +1116,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           console.log(resultFilterInput);
         }
         // ================ repeated function end ==========================================
+        // //reevaluate metadataFields
+        // console.log(resultFilterInput);
+        // var recalcMetadataKeys = []
+        // _.forEach(resultFilterInput, function(o) {
+        //   recalcMetadataKeys.push(_.keys(o.metadata))
+        // });
+        // this.metadataFields = _.uniq(_.flattenDeep(recalcMetadataKeys));
+        // console.log(this.metadataFields);
         if (resultFilterInput.length > 0) {
           var resultGroupByName = _.groupBy(resultFilterInput, function(o) {
             if (that.selectedContourBy === 'propertyname_1') {
@@ -1906,7 +1914,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'zMin': parseFloat(this.geometryFilter.zMin),
           'zMax': parseFloat(this.geometryFilter.zMax)
         }
-        console.log(this.metadataFields);
+        //reevaluate metadataFields
+        // var recalcMetadataKeys = []
+        // if (this.showNumericalAggregations) {
+        //   var resultFilterInput = _.concat(this.linearNumFilterResult, this.planarNumFilterResult)
+        // } else if (this.showNumericalAggregations) {
+        //   var resultFilterInput = _.concat(this.linearStringFilterResult, this.planarStringFilterResult)
+        // } else if (this.selectedView === 'cost-view') {
+        //   var resultFilterInput = _.concat(this.linearCostFilterResult, this.planarCostFilterResult)
+        // }
+        // _.forEach(resultFilterInput, function(o) {
+        //   recalcMetadataKeys.push(_.keys(o.metadata))
+        // });
+        // this.metadataFields = _.uniq(_.flattenDeep(recalcMetadataKeys));
+        // console.log(this.metadataFields);
+
         this._aggregations(this._modelData, this.selectedContourBy, this.selectedView);
       }
 
