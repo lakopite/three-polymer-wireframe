@@ -281,7 +281,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
         <paper-dropdown-menu id="main-contour-dropdown" label="Select Contour">
           <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-            <template is="dom-repeat" items="[[metadataFields]]">
+            <template is="dom-repeat" items="{{metadataFields}}">
               <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
             </template>
           </paper-listbox>
@@ -391,7 +391,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </app-toolbar>
           <paper-dropdown-menu id="num-contour-dropdown" label="Select Contour">
             <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-              <template is="dom-repeat" items="[[metadataFields]]">
+              <template is="dom-repeat" items="{{metadataFields}}">
                 <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
               </template>
             </paper-listbox>
@@ -418,7 +418,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </app-toolbar>
           <paper-dropdown-menu id="str-contour-dropdown" label="Select Contour">
             <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-              <template is="dom-repeat" items="[[metadataFields]]">
+              <template is="dom-repeat" items="{{metadataFields}}">
                 <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
               </template>
             </paper-listbox>
@@ -1030,6 +1030,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var resultFilterInput = _.concat(this.linearNumFilterResult, this.planarNumFilterResult)
           console.log(resultFilterInput);
         }
+        //reevaluate metadataFields
+        console.log(resultFilterInput);
+        var recalcMetadataKeys = []
+        _.forEach(resultFilterInput, function(o) {
+          recalcMetadataKeys.push(_.keys(o.metadata))
+        });
+        this.metadataFields = _.uniq(_.flattenDeep(recalcMetadataKeys));
+        console.log(this.metadataFields);
         if (resultFilterInput.length > 0) {
           this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
             return o.metadata[that.selectedContourBy]
@@ -1044,6 +1052,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
           })
           this.avgResult =  _.round(_.mean(_average), 3);
+          this._getAggregationLabels()
           this.numericalAggregationsTableData = []
           var name = [this.getMinLabel, this.getMaxLabel, this.getAvgLabel];
           var result = [this.minResult, this.maxResult, this.avgResult];
@@ -1065,7 +1074,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _getSumByForSelectedSumField(_selectedSumField) {
-        this.numericalMetadataKeys = this.numericalMetadataKeys
         if (typeof this.selectedSumField !== 'undefined') {
           this._stringAggregations();
         }
@@ -1898,6 +1906,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'zMin': parseFloat(this.geometryFilter.zMin),
           'zMax': parseFloat(this.geometryFilter.zMax)
         }
+        console.log(this.metadataFields);
         this._aggregations(this._modelData, this.selectedContourBy, this.selectedView);
       }
 
@@ -1944,7 +1953,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       handleDataResponse(event, response) {
         this.currentModelResp = response.response
         //console.log(this.currentModelResp);
-        //console.log("has both kinds of elements: ");
+        console.log("has both kinds of elements: ");
         console.log(!_.isEmpty(this.currentModelResp.payload.linearElements) && !_.isEmpty(this.currentModelResp.payload.planarElements))
         var costTab = Polymer.dom(this.root).querySelector("#cost-tab")
         if (costTab.disabled && this.selectedView === 'cost-view') {
