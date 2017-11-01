@@ -1037,10 +1037,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.maxResult = _.round(_.maxBy(resultFilterInput, function(o) {
             return o.metadata[that.selectedContourBy]
           }).metadata[this.selectedContourBy], 3)
-          this.avgResult = _.round(_.meanBy(resultFilterInput, function(o) {
-            return o.metadata[that.selectedContourBy]
-          }), 3);
-          this._getAggregationLabels()
+          // this.avgResult = _.round(_.meanBy(resultFilterInput, function(o) {
+          //     return o.metadata[that.selectedContourBy]
+          // }), 3);
+
+          var _average = []
+          var average = _.forEach(resultFilterInput, function(o) {
+            if (o.metadata[that.selectedContourBy] !== undefined) {
+              _average.push(o.metadata[that.selectedContourBy])
+            }
+          })
+          this.avgResult =  _.round(_.mean(_average), 3);
+          console.log(this.avgResult);
+
+
           this.numericalAggregationsTableData = []
           var name = [this.getMinLabel, this.getMaxLabel, this.getAvgLabel];
           var result = [this.minResult, this.maxResult, this.avgResult];
@@ -1202,7 +1212,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.totalElements = _.round(_.sumBy(this.groupSumData, function(o) {
               return o.elemsPerGroup
             }), 0)
-            console.log(this.totalElements);
             this.grandTotalSum = _.round(_.sumBy(this.groupSumData, function(o) {
               return o.sum
             }), 1)
