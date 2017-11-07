@@ -356,7 +356,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 11/07/17</paper-item>
+        <paper-item>Build Date: 11/06/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -1021,17 +1021,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           })
         })
         var resultFilterInput = _.concat(this.linearNumFilterResult, this.planarNumFilterResult)
-        console.log(resultFilterInput);
-        console.log(this.selectedContourBy);
-        console.log(this.selectedSumField);
-        // reevaluate metadataFields if geoFilters change (BUGGY)
-        console.log(resultFilterInput);
-          var recalcMetadataKeys = []
-          _.forEach(resultFilterInput, function(o) {
-            recalcMetadataKeys.push(_.keys(o.metadata))
-          });
-          this.metadataFields = _.uniq(_.flattenDeep(recalcMetadataKeys));
-          console.log(this.metadataFields);
         if (resultFilterInput.length > 0) {
           this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
             return o.metadata[that.selectedContourBy]
@@ -1069,7 +1058,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _getSumByForSelectedSumField(_selectedSumField) {
         if (typeof this.selectedSumField !== 'undefined') {
-          this._stringAggregations();
+          return this._stringAggregations();
         }
         return
       }
@@ -1101,14 +1090,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         })
         var resultFilterInput = _.concat(this.linearStringFilterResult, this.planarStringFilterResult)
         // ================ repeated function end ==========================================
-        //reevaluate metadataFields when geofilters change
-          console.log(resultFilterInput);
-          var recalcMetadataKeys = []
-          _.forEach(resultFilterInput, function(o) {
-            recalcMetadataKeys.push(_.keys(o.metadata))
-          });
-          this.metadataFields = _.uniq(_.flattenDeep(recalcMetadataKeys));
-          console.log(this.metadataFields);
         if (resultFilterInput.length > 0) {
           // ==================================================================
           var resultGroupByName = _.groupBy(resultFilterInput, function(o) {
@@ -1117,8 +1098,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
             return o.metadata[that.selectedContourBy]
           })
-          // console.log("RESULTGROUPBYNAME");
-          // console.log(resultGroupByName);
           this.groupKeys = _.without(_.keys(resultGroupByName), 'undefined')
           // console.log(this.groupKeys)
           this.allObjectsByGroup = []
