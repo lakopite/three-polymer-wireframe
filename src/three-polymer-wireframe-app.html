@@ -1024,14 +1024,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         console.log(resultFilterInput);
         console.log(this.selectedContourBy);
         console.log(this.selectedSumField);
-        // reevaluate metadataFields if geoFilters change (BUGGY)
         console.log(resultFilterInput);
-        // var recalcMetadataKeys = []
-        // _.forEach(resultFilterInput, function(o) {
-        //   recalcMetadataKeys.push(_.keys(o.metadata))
-        // });
-        // this.metadataFields = _.uniq(_.flattenDeep(recalcMetadataKeys));
-        // console.log(this.metadataFields);
         if (resultFilterInput.length > 0) {
           this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
             return o.metadata[that.selectedContourBy]
@@ -1081,6 +1074,89 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return
       }
 
+      _setStringPieData() {
+        var _strPieData = []
+        for (var i=0; i < this.groupSumData.length; i++) {
+          var item = this.groupSumData[i]
+          _strPieData.push([item.group, parseFloat(item.sum)])
+          }
+        this.strPieData = _strPieData;
+      }
+
+      createStringTableData() {
+        var that = this;
+        var _groupSumData = [];
+       // console.log(this.groupSumData);
+         this.allObjectsByGroup = []
+         console.log(this.allObjectsByGroup);
+         for (var i = 0; i < this.groupKeys.length; i++) {
+         //reusing var groupObjects below (was local variable in previous loop for numericalMetadataKeys)
+           var groupObjects = this.resultGroupByName[this.groupKeys[i]]
+           var elemsPerGroup = groupObjects.length
+           var sumByGroup = _.round(_.sumBy(groupObjects, function(o) {
+             return o.metadata[that.selectedSumField]
+           }), 0)
+           console.log(this.selectedSumField);
+           console.log(sumByGroup);
+           var minByGroup = _.round(_.minBy(groupObjects, function(o) {
+             return o.metadata[that.selectedSumField]
+           }).metadata[that.selectedSumField], 0)
+           var maxByGroup = _.round(_.maxBy(groupObjects, function(o) {
+             return o.metadata[that.selectedSumField]
+           }).metadata[that.selectedSumField], 0)
+           var _average = []
+           var average = _.forEach(groupObjects, function(o) {
+             if (typeof o.metadata[that.selectedSumField] !== 'undefined') {
+               _average.push(o.metadata[that.selectedSumField])
+             }
+           })
+           var avgByGroup =  _.round(_.mean(_average), 3);
+           //for conversion
+           if (that.currentModelResp.modelInformation.units === 'imperial') {
+             if (that.selectedSumField.includes('length')) {
+               this.strOtherUnitSum = _.round(sumByGroup/12, 0)
+             } else if (that.selectedSumField.includes('mass')) {
+               this.strOtherUnitSum = _.round(sumByGroup/2000, 0)
+             } else if (that.selectedSumField.includes('vol')) {
+               this.strOtherUnitSum = _.round(sumByGroup/46656, 0)
+             }
+           } else if (that.currentModelResp.modelInformation.units === 'metric') {
+             if (that.selectedSumField.includes('length')) {
+               this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
+             } else if (that.selectedSumField.includes('mass')) {
+               this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
+             } else if (that.selectedSumField.includes('vol')) {
+               this.strOtherUnitSum = _.round(sumByGroup/1000000000, 0)
+             }
+           }
+           var groupSumDataSetup = {
+             'group': this.groupKeys[i],
+             'elemsPerGroup': elemsPerGroup,
+             'sum': sumByGroup,
+             'otherUnitSum': this.strOtherUnitSum,
+             'min' : minByGroup,
+             'max' : maxByGroup,
+             'avg' : avgByGroup
+           }
+           _groupSumData.push(groupSumDataSetup)
+           this.push('allObjectsByGroup', groupObjects)
+         }
+         this.set('groupSumData',_.sortBy(_groupSumData, [function(o) { return o.group }]))
+         //   //for strOtherUnitLabel
+         this._strOtherUnitLabel()
+         // for chart total sum by group
+         this.totalElements = _.round(_.sumBy(this.groupSumData, function(o) {
+           return o.elemsPerGroup
+         }), 0)
+         this.grandTotalSum = _.round(_.sumBy(this.groupSumData, function(o) {
+           return o.sum
+         }), 1)
+         this.grandTotalOtherUnitSum = _.round(_.sumBy(this.groupSumData, function(o) {
+           return o.otherUnitSum
+         }), 1)
+         this._setStringPieData()
+      }
+
       _stringAggregations() {
         this.showNumericalAggregations = false;
         var that = this
@@ -1101,30 +1177,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         })
         var resultFilterInput = _.concat(this.linearStringFilterResult, this.planarStringFilterResult)
         // ================ repeated function end ==========================================
-        //reevaluate metadataFields when geofilters change
-        // console.log(resultFilterInput);
-        // var recalcMetadataKeys = []
-        // _.forEach(resultFilterInput, function(o) {
-        //   recalcMetadataKeys.push(_.keys(o.metadata))
-        // });
-        // this.metadataFields = _.uniq(_.flattenDeep(recalcMetadataKeys));
-        // console.log(this.metadataFields);
         if (resultFilterInput.length > 0) {
           // ==================================================================
-          var resultGroupByName = _.groupBy(resultFilterInput, function(o) {
-            if (that.selectedContourBy === 'propertyname_1') {
-              return o.metadata.propertyname_1 + " (" + o.metadata.propertyname_0 + ")"
-            }
+          this.resultGroupByName = _.groupBy(resultFilterInput, function(o) {
+          if (that.selectedContourBy === 'propertyname_1') {
+            return o.metadata.propertyname_1 + " (" + o.metadata.propertyname_0 + ")"
+          }
             return o.metadata[that.selectedContourBy]
           })
           // console.log("RESULTGROUPBYNAME");
           // console.log(resultGroupByName);
-          this.groupKeys = _.without(_.keys(resultGroupByName), 'undefined')
+          this.groupKeys = _.without(_.keys(this.resultGroupByName), 'undefined')
           // console.log(this.groupKeys)
           this.allObjectsByGroup = []
           console.log(this.allObjectsByGroup);
           for (var i = 0; i < this.groupKeys.length; i++) {
-            var groupObjects = resultGroupByName[this.groupKeys[i]]
+            var groupObjects = this.resultGroupByName[this.groupKeys[i]]
             this.push('allObjectsByGroup', groupObjects)
           }
           var _numericalMetadataKeys = []
@@ -1146,96 +1214,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               this.set('numericalMetadataKeys', _numericalMetadataKeys.sort())
             }
           }
-          if(typeof this.selectedSumField === 'undefined' || !_.includes(this.numericalMetadataKeys,this.selectedSumField)) {
-            // var that=this;
-            // setTimeout(function() {
-            //   that.set('selectedSumField',that.numericalMetadataKeys[0])
-            //   that.createChartAndTable()
-            // },0)
-           this.set('selectedSumField',this.numericalMetadataKeys[0])
+          if(typeof this.selectedSumField === 'undefined' || !_.includes(this.numericalMetadataKeys, this.selectedSumField)) {
+            var that=this;
+            setTimeout(function() {
+              that.set('selectedSumField',that.numericalMetadataKeys[0])
+              that.createStringTableData()
+            },0)
+          //  this.set('selectedSumField',this.numericalMetadataKeys[0])
          } else {
-           var _groupSumData = [];
-          // console.log(this.groupSumData);
-          this.allObjectsByGroup = []
-          console.log(this.allObjectsByGroup);
-          for (var i = 0; i < this.groupKeys.length; i++) {
-            //reusing var groupObjects below (was local variable in previous loop for numericalMetadataKeys)
-            var groupObjects = resultGroupByName[this.groupKeys[i]]
-            //does not work properly
-              // if (_.forEach(groupObjects, function(o) {
-              //   o.metadata[that.selectedSumField] === 'undefined'
-              // })) {
-              //   this.selectedSumField = this.numericalMetadataKeys[0]
-              // }
-              var elemsPerGroup = groupObjects.length
-              var sumByGroup = _.round(_.sumBy(groupObjects, function(o) {
-                return o.metadata[that.selectedSumField]
-              }), 0)
-              console.log(this.selectedSumField);
-              console.log(sumByGroup);
-              var minByGroup = _.round(_.minBy(groupObjects, function(o) {
-                return o.metadata[that.selectedSumField]
-              }).metadata[that.selectedSumField], 0)
-              var maxByGroup = _.round(_.maxBy(groupObjects, function(o) {
-                return o.metadata[that.selectedSumField]
-              }).metadata[that.selectedSumField], 0)
-              var _average = []
-              var average = _.forEach(groupObjects, function(o) {
-                if (typeof o.metadata[that.selectedSumField] !== 'undefined') {
-                  _average.push(o.metadata[that.selectedSumField])
-                }
-              })
-              var avgByGroup =  _.round(_.mean(_average), 3);
-              //for conversion
-              if (that.currentModelResp.modelInformation.units === 'imperial') {
-                if (that.selectedSumField.includes('length')) {
-                  this.strOtherUnitSum = _.round(sumByGroup/12, 0)
-                } else if (that.selectedSumField.includes('mass')) {
-                  this.strOtherUnitSum = _.round(sumByGroup/2000, 0)
-                } else if (that.selectedSumField.includes('vol')) {
-                  this.strOtherUnitSum = _.round(sumByGroup/46656, 0)
-                }
-              } else if (that.currentModelResp.modelInformation.units === 'metric') {
-                if (that.selectedSumField.includes('length')) {
-                  this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
-                } else if (that.selectedSumField.includes('mass')) {
-                  this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
-                } else if (that.selectedSumField.includes('vol')) {
-                  this.strOtherUnitSum = _.round(sumByGroup/1000000000, 0)
-                }
-              }
-              var groupSumDataSetup = {
-                'group': this.groupKeys[i],
-                'elemsPerGroup': elemsPerGroup,
-                'sum': sumByGroup,
-                'otherUnitSum': this.strOtherUnitSum,
-                'min' : minByGroup,
-                'max' : maxByGroup,
-                'avg' : avgByGroup
-              }
-              _groupSumData.push(groupSumDataSetup)
-              this.push('allObjectsByGroup', groupObjects)
-            }
-            this.set('groupSumData',_.sortBy(_groupSumData, [function(o) { return o.group }]))
-            //   //for strOtherUnitLabel
-            this._strOtherUnitLabel()
-            // for chart total sum by group
-            this.totalElements = _.round(_.sumBy(this.groupSumData, function(o) {
-              return o.elemsPerGroup
-            }), 0)
-            this.grandTotalSum = _.round(_.sumBy(this.groupSumData, function(o) {
-              return o.sum
-            }), 1)
-            this.grandTotalOtherUnitSum = _.round(_.sumBy(this.groupSumData, function(o) {
-              return o.otherUnitSum
-            }), 1)
-            // for pie chart
-            var _strPieData = []
-            for (var i=0; i < this.groupSumData.length; i++) {
-              var item = this.groupSumData[i]
-              _strPieData.push([item.group, parseFloat(item.sum)])
-              }
-            this.strPieData = _strPieData;
+           // ==================================================================
+           this.createStringTableData()
           }
           // ==================================================================
         } else {
