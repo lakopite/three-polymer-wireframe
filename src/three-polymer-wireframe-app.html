@@ -1083,7 +1083,47 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.strPieData = _strPieData;
       }
 
-      createStringTableData() {
+      _generateNumMetadataKeys() {
+        var that = this;
+        var resultFilterInput = _.concat(this.linearStringFilterResult, this.planarStringFilterResult)
+        this.resultGroupByName = _.groupBy(resultFilterInput, function(o) {
+        if (that.selectedContourBy === 'propertyname_1') {
+          return o.metadata.propertyname_1 + " (" + o.metadata.propertyname_0 + ")"
+        }
+          return o.metadata[that.selectedContourBy]
+        })
+        // console.log("RESULTGROUPBYNAME");
+        // console.log(resultGroupByName);
+        this.groupKeys = _.without(_.keys(this.resultGroupByName), 'undefined')
+        // console.log(this.groupKeys)
+        this.allObjectsByGroup = []
+        console.log(this.allObjectsByGroup);
+        for (var i = 0; i < this.groupKeys.length; i++) {
+          var groupObjects = this.resultGroupByName[this.groupKeys[i]]
+          this.push('allObjectsByGroup', groupObjects)
+        }
+        var _numericalMetadataKeys = []
+        var totalGroupObjects = _.flatten(this.allObjectsByGroup)
+        for (var i = 0; i < totalGroupObjects.length; i++) {
+          var metadataObject = totalGroupObjects[i].metadata
+          var metadataValues = _.values(metadataObject)
+          var metadataKeys = _.keys(metadataObject)
+          for (var j = 0; j < metadataKeys.length; j++) {
+            //to include only these in dropdown menu
+            //var validSumGroups = ['meta_length', 'length', 'meta_mass', 'mass', 'meta_vol', 'vol', 'volume']
+            var ignoreSumGroups = ['area', 'beamnum', 'density', 'shellnum']
+            //but also do an "includes/contains" because names could vary
+            // to find unique keys with numeric values for dropdown options
+            //&& validSumGroups.indexOf(metadataKeys[j]) !== -1
+            if(_.isNumber(metadataValues[j]) && _numericalMetadataKeys.indexOf(metadataKeys[j]) === -1 && ignoreSumGroups.indexOf(metadataKeys[j]) === -1) {
+              _numericalMetadataKeys.push(metadataKeys[j])
+            }
+            this.set('numericalMetadataKeys', _numericalMetadataKeys.sort())
+          }
+        }
+      }
+
+      _createStringTableData() {
         var that = this;
         var _groupSumData = [];
        // console.log(this.groupSumData);
@@ -1160,7 +1200,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _stringAggregations() {
         this.showNumericalAggregations = false;
         var that = this
-        // ================ repeated function start ==========================================
         this.linearStringFilterResult = _.filter(that._modelData.linearElements, function(o) {
           return _.every(o.vertices, function(j) {
             return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
@@ -1176,56 +1215,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           })
         })
         var resultFilterInput = _.concat(this.linearStringFilterResult, this.planarStringFilterResult)
-        // ================ repeated function end ==========================================
         if (resultFilterInput.length > 0) {
-          // ==================================================================
-          this.resultGroupByName = _.groupBy(resultFilterInput, function(o) {
-          if (that.selectedContourBy === 'propertyname_1') {
-            return o.metadata.propertyname_1 + " (" + o.metadata.propertyname_0 + ")"
-          }
-            return o.metadata[that.selectedContourBy]
-          })
-          // console.log("RESULTGROUPBYNAME");
-          // console.log(resultGroupByName);
-          this.groupKeys = _.without(_.keys(this.resultGroupByName), 'undefined')
-          // console.log(this.groupKeys)
-          this.allObjectsByGroup = []
-          console.log(this.allObjectsByGroup);
-          for (var i = 0; i < this.groupKeys.length; i++) {
-            var groupObjects = this.resultGroupByName[this.groupKeys[i]]
-            this.push('allObjectsByGroup', groupObjects)
-          }
-          var _numericalMetadataKeys = []
-          var totalGroupObjects = _.flatten(this.allObjectsByGroup)
-          for (var i = 0; i < totalGroupObjects.length; i++) {
-            var metadataObject = totalGroupObjects[i].metadata
-            var metadataValues = _.values(metadataObject)
-            var metadataKeys = _.keys(metadataObject)
-            for (var j = 0; j < metadataKeys.length; j++) {
-              //to include only these in dropdown menu
-              //var validSumGroups = ['meta_length', 'length', 'meta_mass', 'mass', 'meta_vol', 'vol', 'volume']
-              var ignoreSumGroups = ['area', 'beamnum', 'density', 'shellnum']
-              //but also do an "includes/contains" because names could vary
-              // to find unique keys with numeric values for dropdown options
-              //&& validSumGroups.indexOf(metadataKeys[j]) !== -1
-              if(_.isNumber(metadataValues[j]) && _numericalMetadataKeys.indexOf(metadataKeys[j]) === -1 && ignoreSumGroups.indexOf(metadataKeys[j]) === -1) {
-                _numericalMetadataKeys.push(metadataKeys[j])
-              }
-              this.set('numericalMetadataKeys', _numericalMetadataKeys.sort())
-            }
-          }
+          this._generateNumMetadataKeys()
           if(typeof this.selectedSumField === 'undefined' || !_.includes(this.numericalMetadataKeys, this.selectedSumField)) {
             var that=this;
             setTimeout(function() {
               that.set('selectedSumField',that.numericalMetadataKeys[0])
-              that.createStringTableData()
+              that._createStringTableData()
             },0)
-          //  this.set('selectedSumField',this.numericalMetadataKeys[0])
          } else {
-           // ==================================================================
-           this.createStringTableData()
+           this._createStringTableData()
           }
-          // ==================================================================
         } else {
           this.groupSumData = []
           this.grandTotalSum = 0
@@ -1575,16 +1575,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _disableCostTab(_currentMetadataFields, _currentModel, _geoFilter) {
         if (!_.isEmpty(this.geometryFilter) && this.metadataFields.includes('material')) {
-          if (_.isEmpty(this.currentModelResp.payload.planarElements)) {
-            var payloadElems = this.currentModelResp.payload.linearElements
-            console.log(payloadElems);
-          } else if (_.isEmpty(this.currentModelResp.payload.linearElements)) {
-            var payloadElems = this.currentModelResp.payload.planarElements
-            console.log(payloadElems);
-          } else if (!_.isEmpty(this.currentModelResp.payload.linearElements) && !_.isEmpty(this.currentModelResp.payload.planarElements)) {
-            var payloadElems = _.concat(this.currentModelResp.payload.linearElements, this.currentModelResp.payload.planarElements)
-            console.log(payloadElems);
-          }
+          var payloadElems = _.concat(this.currentModelResp.payload.linearElements, this.currentModelResp.payload.planarElements)
+          console.log(payloadElems);
           for (var i=0; i < payloadElems.length; i++) {
             this.material = _.toLower(payloadElems[i].metadata.material)
             //console.log(payloadElems[i]);
@@ -1614,7 +1606,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _applyAllCostResults() {
-        //make DRY!...somehow
         for (var i=0; i < this.costTableData.length; i++) {
             this.set('costTableData.'+i+'.input', this.applyToAll)
             this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
@@ -1701,7 +1692,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _costAggregations() {
         var that = this
-        // ================ repeated function start ==========================================
         this.linearCostFilterResult = _.filter(that._modelData.linearElements, function(o) {
           return _.every(o.vertices, function(j) {
             return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
@@ -1718,7 +1708,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         })
         var resultFilterInput = _.concat(this.linearCostFilterResult, this.planarCostFilterResult)
         if (resultFilterInput.length > 0) {
-          // ================ repeated function end ==========================================
           this.costGroups = []
           for (var i=0; i < this.metadataFields.length; i++) {
             if (this.metadataFields[i].includes('propertyname')) {
