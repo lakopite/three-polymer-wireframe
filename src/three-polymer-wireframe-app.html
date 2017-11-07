@@ -1026,12 +1026,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         console.log(this.selectedSumField);
         // reevaluate metadataFields if geoFilters change (BUGGY)
         console.log(resultFilterInput);
-          var recalcMetadataKeys = []
-          _.forEach(resultFilterInput, function(o) {
-            recalcMetadataKeys.push(_.keys(o.metadata))
-          });
-          this.metadataFields = _.uniq(_.flattenDeep(recalcMetadataKeys));
-          console.log(this.metadataFields);
+        // var recalcMetadataKeys = []
+        // _.forEach(resultFilterInput, function(o) {
+        //   recalcMetadataKeys.push(_.keys(o.metadata))
+        // });
+        // this.metadataFields = _.uniq(_.flattenDeep(recalcMetadataKeys));
+        // console.log(this.metadataFields);
         if (resultFilterInput.length > 0) {
           this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
             return o.metadata[that.selectedContourBy]
@@ -1102,13 +1102,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var resultFilterInput = _.concat(this.linearStringFilterResult, this.planarStringFilterResult)
         // ================ repeated function end ==========================================
         //reevaluate metadataFields when geofilters change
-          console.log(resultFilterInput);
-          var recalcMetadataKeys = []
-          _.forEach(resultFilterInput, function(o) {
-            recalcMetadataKeys.push(_.keys(o.metadata))
-          });
-          this.metadataFields = _.uniq(_.flattenDeep(recalcMetadataKeys));
-          console.log(this.metadataFields);
+        // console.log(resultFilterInput);
+        // var recalcMetadataKeys = []
+        // _.forEach(resultFilterInput, function(o) {
+        //   recalcMetadataKeys.push(_.keys(o.metadata))
+        // });
+        // this.metadataFields = _.uniq(_.flattenDeep(recalcMetadataKeys));
+        // console.log(this.metadataFields);
         if (resultFilterInput.length > 0) {
           // ==================================================================
           var resultGroupByName = _.groupBy(resultFilterInput, function(o) {
@@ -1122,7 +1122,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.groupKeys = _.without(_.keys(resultGroupByName), 'undefined')
           // console.log(this.groupKeys)
           this.allObjectsByGroup = []
-          console.log("ALL OBJECTS BY GROUP ONCE");
           console.log(this.allObjectsByGroup);
           for (var i = 0; i < this.groupKeys.length; i++) {
             var groupObjects = resultGroupByName[this.groupKeys[i]]
@@ -1147,8 +1146,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               this.set('numericalMetadataKeys', _numericalMetadataKeys.sort())
             }
           }
-          if(typeof this.selectedSumField === 'undefined') {
-           this.selectedSumField = this.numericalMetadataKeys[0]
+          if(typeof this.selectedSumField === 'undefined' || !_.includes(this.numericalMetadataKeys,this.selectedSumField)) {
+            // var that=this;
+            // setTimeout(function() {
+            //   that.set('selectedSumField',that.numericalMetadataKeys[0])
+            //   that.createChartAndTable()
+            // },0)
+           this.set('selectedSumField',this.numericalMetadataKeys[0])
          } else {
            var _groupSumData = [];
           // console.log(this.groupSumData);
@@ -1157,15 +1161,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           for (var i = 0; i < this.groupKeys.length; i++) {
             //reusing var groupObjects below (was local variable in previous loop for numericalMetadataKeys)
             var groupObjects = resultGroupByName[this.groupKeys[i]]
-              if (_.forEach(groupObjects, function(o) {
-                o.metadata[that.selectedSumField] === 'undefined'
-              })) {
-                this.selectedSumField = this.numericalMetadataKeys[0]
-              }
+            //does not work properly
+              // if (_.forEach(groupObjects, function(o) {
+              //   o.metadata[that.selectedSumField] === 'undefined'
+              // })) {
+              //   this.selectedSumField = this.numericalMetadataKeys[0]
+              // }
               var elemsPerGroup = groupObjects.length
               var sumByGroup = _.round(_.sumBy(groupObjects, function(o) {
                 return o.metadata[that.selectedSumField]
               }), 0)
+              console.log(this.selectedSumField);
+              console.log(sumByGroup);
               var minByGroup = _.round(_.minBy(groupObjects, function(o) {
                 return o.metadata[that.selectedSumField]
               }).metadata[that.selectedSumField], 0)
