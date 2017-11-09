@@ -1226,7 +1226,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         console.log(resultFilterInput);
         if (resultFilterInput.length > 0) {
           this._generateNumMetadataKeys()
-          if(typeof this.selectedSumField === 'undefined' || !_.includes(this.numericalMetadataKeys, this.selectedSumField)) {
+          console.log(this.numericalMetadataKeys);
+          if (typeof this.selectedSumField === 'undefined' || !_.includes(this.numericalMetadataKeys, this.selectedSumField)) {
             var that = this;
             setTimeout(function() {
               that.set('selectedSumField', that.numericalMetadataKeys[0])
