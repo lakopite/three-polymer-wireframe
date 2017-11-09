@@ -356,7 +356,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 11/08/17</paper-item>
+        <paper-item>Build Date: 11/09/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -1003,10 +1003,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      _generatenumDropdownOptions() {
+      _generateNumDropdownOptions() {
         // using numDropdownOptions not metadataFields to not mess with metadataFields
         this.numDropdownOptions = []
-        var resultFilterInput = _.concat(this.linearFilterResult, this.planarFilterResult)
+        var resultFilterInput = _.concat(this.linearNumFilterResult, this.planarNumFilterResult)
         for (var i=0; i < resultFilterInput.length; i++) {
           var keys = _.keys(resultFilterInput[i].metadata);
           for (var j=0; j < keys.length; j++) {
@@ -1020,22 +1020,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _numericalAggregations() {
         this.showStringAggregations = false;
         var that = this;
-        this.linearFilterResult = _.filter(that._modelData.linearElements, function(o) {
+        this.linearNumFilterResult = _.filter(that._modelData.linearElements, function(o) {
           return _.every(o.vertices, function(j) {
             return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
             that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
             that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
           })
         })
-        this.planarFilterResult = _.filter(that._modelData.planarElements, function(o) {
+        this.planarNumFilterResult = _.filter(that._modelData.planarElements, function(o) {
           return _.every(o.vertices, function(j) {
             return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
             that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
             that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
           })
         })
-        var resultFilterInput = _.concat(this.linearFilterResult, this.planarFilterResult)
-        this._generatenumDropdownOptions()
+        var resultFilterInput = _.concat(this.linearNumFilterResult, this.planarNumFilterResult)
+        console.log(resultFilterInput);
+        this._generateNumDropdownOptions()
         if (resultFilterInput.length > 0 && _.includes(this.numDropdownOptions, this.selectedContourBy)) {
           this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
             return o.metadata[that.selectedContourBy]
@@ -1096,7 +1097,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _generateNumMetadataKeys() {
         var that = this;
-        var resultFilterInput = _.concat(this.linearFilterResult, this.planarFilterResult)
+        var resultFilterInput = _.concat(this.linearStringFilterResult, this.planarStringFilterResult)
         this.resultGroupByName = _.groupBy(resultFilterInput, function(o) {
         if (that.selectedContourBy === 'propertyname_1') {
           return o.metadata.propertyname_1 + " (" + o.metadata.propertyname_0 + ")"
@@ -1206,7 +1207,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _stringAggregations() {
         this.showNumericalAggregations = false;
         var that = this
-        var resultFilterInput = _.concat(this.linearFilterResult, this.planarFilterResult)
+        this.linearStringFilterResult = _.filter(that._modelData.linearElements, function(o) {
+          return _.every(o.vertices, function(j) {
+            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+            that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
+            that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
+          })
+        })
+        this.planarStringFilterResult = _.filter(that._modelData.planarElements, function(o) {
+          return _.every(o.vertices, function(j) {
+            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+            that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
+            that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
+          })
+        })
+        var resultFilterInput = _.concat(this.linearStringFilterResult, this.planarStringFilterResult)
         console.log(this.numericalMetadataKeys);
         console.log(resultFilterInput);
         if (resultFilterInput.length > 0) {
@@ -1222,6 +1237,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         } else {
           this.groupSumData = []
+          this.totalElements = 0
           this.grandTotalSum = 0
           this.grandTotalOtherUnitSum = 0
           this.strPieData = []
