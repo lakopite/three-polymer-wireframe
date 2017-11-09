@@ -141,7 +141,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         --paper-spinner-layer-4-color: #FFF;
       }
 
-      #sum-field-dropdown {
+      #sumFieldDropDown {
         --paper-input-container-label: {
           font-size:20px;
         }
@@ -423,7 +423,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               </template>
             </paper-listbox>
           </paper-dropdown-menu>
-          <paper-dropdown-menu class="aggregation-toolbar" id="sum-field-dropdown" label="Select Sum Field">
+          <paper-dropdown-menu class="aggregation-toolbar" id="sumFieldDropDown" label="Select Sum Field">
             <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
               <template is="dom-repeat" items="{{numericalMetadataKeys}}">
                 <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
@@ -1212,7 +1212,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.showNumericalAggregations = false;
         this._resultFilterInput()
         console.log(this.numDropdownOptions);
-        if (this._resultFilterInput() .length > 0) {
+        this._generateNumDropdownOptions()
+        if (this._resultFilterInput().length > 0) {
           this._generateNumMetadataKeys()
           if (typeof this.selectedSumField === 'undefined' || !_.includes(this.numericalMetadataKeys, this.selectedSumField)) {
             var that = this;
@@ -1222,11 +1223,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             },0)
          } else {
            if (!_.includes(this.numDropdownOptions, this.selectedContourBy)) {
-            console.log("disable sum field");
-            //only disables after doing a numerical aggregation
-            Polymer.dom(this.root).querySelector("#sum-field-dropdown").disabled = true
+            this.$.sumFieldDropDown.disabled = true
           } else if (_.includes(this.numDropdownOptions, this.selectedContourBy)) {
-            Polymer.dom(this.root).querySelector("#sum-field-dropdown").disabled = false
+            this.$.sumFieldDropDown.disabled = false
           }
            this._createStringTableData()
           }
