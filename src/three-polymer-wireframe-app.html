@@ -1210,7 +1210,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _stringAggregations() {
         this.showNumericalAggregations = false;
-        var that = this
         this._resultFilterInput()
         console.log(this.numDropdownOptions);
         if (this._resultFilterInput() .length > 0) {
@@ -1222,6 +1221,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               that._createStringTableData()
             },0)
          } else {
+           if (!_.includes(this.numDropdownOptions, this.selectedContourBy)) {
+            console.log("disable sum field");
+            //only disables after doing a numerical aggregation
+            Polymer.dom(this.root).querySelector("#sum-field-dropdown").disabled = true
+          } else if (_.includes(this.numDropdownOptions, this.selectedContourBy)) {
+            Polymer.dom(this.root).querySelector("#sum-field-dropdown").disabled = false
+          }
            this._createStringTableData()
           }
         } else {
