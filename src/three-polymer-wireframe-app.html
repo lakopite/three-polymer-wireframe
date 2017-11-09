@@ -1003,12 +1003,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
+      _resultFilterInput() {
+        var that = this;
+        this.linearFilterResult = _.filter(that._modelData.linearElements, function(o) {
+          return _.every(o.vertices, function(j) {
+            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+            that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
+            that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
+          })
+        })
+        this.planarFilterResult = _.filter(that._modelData.planarElements, function(o) {
+          return _.every(o.vertices, function(j) {
+            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+            that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
+            that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
+          })
+        })
+        return _.concat(this.linearFilterResult, this.planarFilterResult)
+      }
+
       _generateNumDropdownOptions() {
         // using numDropdownOptions not metadataFields to not mess with metadataFields
         this.numDropdownOptions = []
-        var resultFilterInput = _.concat(this.linearNumFilterResult, this.planarNumFilterResult)
-        for (var i=0; i < resultFilterInput.length; i++) {
-          var keys = _.keys(resultFilterInput[i].metadata);
+        this._resultFilterInput()
+        for (var i=0; i < this._resultFilterInput().length; i++) {
+          var keys = _.keys(this._resultFilterInput()[i].metadata);
           for (var j=0; j < keys.length; j++) {
             if (this.numDropdownOptions.indexOf(keys[j]) === -1) {
               this.numDropdownOptions.push(keys[j])
@@ -1018,34 +1037,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _numericalAggregations() {
-        this.showStringAggregations = false;
-        var that = this;
-        this.linearNumFilterResult = _.filter(that._modelData.linearElements, function(o) {
-          return _.every(o.vertices, function(j) {
-            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-            that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-            that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-          })
-        })
-        this.planarNumFilterResult = _.filter(that._modelData.planarElements, function(o) {
-          return _.every(o.vertices, function(j) {
-            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-            that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-            that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-          })
-        })
-        var resultFilterInput = _.concat(this.linearNumFilterResult, this.planarNumFilterResult)
-        console.log(resultFilterInput);
+        console.log(this._resultFilterInput());
         this._generateNumDropdownOptions()
-        if (resultFilterInput.length > 0 && _.includes(this.numDropdownOptions, this.selectedContourBy)) {
-          this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
+        var that = this;
+        if (this._resultFilterInput().length > 0 && _.includes(this.numDropdownOptions, this.selectedContourBy)) {
+          this.minResult = _.round(_.minBy(this._resultFilterInput(), function(o) {
             return o.metadata[that.selectedContourBy]
           }).metadata[this.selectedContourBy], 3)
-          this.maxResult = _.round(_.maxBy(resultFilterInput, function(o) {
+          this.maxResult = _.round(_.maxBy(this._resultFilterInput(), function(o) {
             return o.metadata[that.selectedContourBy]
           }).metadata[this.selectedContourBy], 3)
           var _average = []
-          var average = _.forEach(resultFilterInput, function(o) {
+          var average = _.forEach(this._resultFilterInput(), function(o) {
             if (typeof o.metadata[that.selectedContourBy] !== 'undefined') {
               _average.push(o.metadata[that.selectedContourBy])
             }
@@ -1062,7 +1065,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
             this.push('numericalAggregationsTableData', setup)
           }
-          this.totalResult = _.round(_.sumBy(resultFilterInput, function(o) {
+          this.totalResult = _.round(_.sumBy(this._resultFilterInput(), function(o) {
             return o.metadata[that.selectedContourBy]
           }), 3);
         } else {
@@ -1097,8 +1100,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _generateNumMetadataKeys() {
         var that = this;
-        var resultFilterInput = _.concat(this.linearStringFilterResult, this.planarStringFilterResult)
-        this.resultGroupByName = _.groupBy(resultFilterInput, function(o) {
+        this._resultFilterInput()
+        this.resultGroupByName = _.groupBy(this._resultFilterInput() , function(o) {
         if (that.selectedContourBy === 'propertyname_1') {
           return o.metadata.propertyname_1 + " (" + o.metadata.propertyname_0 + ")"
         }
@@ -1207,24 +1210,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _stringAggregations() {
         this.showNumericalAggregations = false;
         var that = this
-        this.linearStringFilterResult = _.filter(that._modelData.linearElements, function(o) {
-          return _.every(o.vertices, function(j) {
-            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-            that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-            that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-          })
-        })
-        this.planarStringFilterResult = _.filter(that._modelData.planarElements, function(o) {
-          return _.every(o.vertices, function(j) {
-            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-            that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-            that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-          })
-        })
-        var resultFilterInput = _.concat(this.linearStringFilterResult, this.planarStringFilterResult)
+        this._resultFilterInput()
         console.log(this.numericalMetadataKeys);
-        console.log(resultFilterInput);
-        if (resultFilterInput.length > 0) {
+        if (this._resultFilterInput() .length > 0) {
           this._generateNumMetadataKeys()
           console.log(this.numericalMetadataKeys);
           if (typeof this.selectedSumField === 'undefined' || !_.includes(this.numericalMetadataKeys, this.selectedSumField)) {
@@ -1702,22 +1690,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _costAggregations() {
         var that = this
-        this.linearCostFilterResult = _.filter(that._modelData.linearElements, function(o) {
-          return _.every(o.vertices, function(j) {
-            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-            that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-            that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-          })
-        })
-        this.planarCostFilterResult = _.filter(that._modelData.planarElements, function(o) {
-          return _.every(o.vertices, function(j) {
-            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-            that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-            that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-          })
-        })
-        var resultFilterInput = _.concat(this.linearCostFilterResult, this.planarCostFilterResult)
-        if (resultFilterInput.length > 0) {
+        this._resultFilterInput()
+        if (this._resultFilterInput().length > 0) {
           this.costGroups = []
           for (var i=0; i < this.metadataFields.length; i++) {
             if (this.metadataFields[i].includes('propertyname')) {
@@ -1727,7 +1701,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           if (typeof this.selectedCostGroup === 'undefined') {
             this.selectedCostGroup = this.costGroups[0]
           }
-          var groupsForMaterial = _.groupBy(resultFilterInput, function(o) {
+          var groupsForMaterial = _.groupBy(this._resultFilterInput() , function(o) {
             if (that.selectedCostGroup === 'propertyname_1') {
               return o.metadata.propertyname_1 + " (" + o.metadata.propertyname_0 + ")"
             }
