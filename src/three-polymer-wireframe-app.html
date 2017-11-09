@@ -730,7 +730,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_getSumByForSelectedSumField(selectedSumField)',
           '_drawStrChart(strPieData)',
           '_drawCostChart(costPieData)',
-          '_delayChartResize(selectedView, selectedContourBy)',
+          '_delayStrChartResize(selectedView, selectedContourBy)',
+          '_delayCostChartResize(selectedView)',
           '_getCostByForSelectedCostGroup(selectedCostGroup)'
         ]
       }
@@ -1211,10 +1212,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.showNumericalAggregations = false;
         var that = this
         this._resultFilterInput()
-        console.log(this.numericalMetadataKeys);
+        console.log(this.numDropdownOptions);
         if (this._resultFilterInput() .length > 0) {
           this._generateNumMetadataKeys()
-          console.log(this.numericalMetadataKeys);
           if (typeof this.selectedSumField === 'undefined' || !_.includes(this.numericalMetadataKeys, this.selectedSumField)) {
             var that = this;
             setTimeout(function() {
@@ -1430,10 +1430,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         //console.log(this.strPieChart.series[0].userOptions.data);
       }
 
-      _delayChartResize() {
+      _delayStrChartResize() {
         var that = this;
         setTimeout(function() {
           that.strPieChart.reflow()
+        }, 0)
+      }
+
+      _delayCostChartResize() {
+        var that = this;
+        setTimeout(function() {
+          that.costPieChart.reflow()
         }, 0)
       }
 
