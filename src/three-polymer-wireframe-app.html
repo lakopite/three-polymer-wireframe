@@ -132,6 +132,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       paper-dialog#addModelDialog {
         padding: 1em;
+        width: 350px;
       }
 
       paper-spinner {
@@ -236,9 +237,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <!-- ?\<iron-ajax headers="{{authHeaders}}" id="remove-upload-request" method="DELETE" content-type="application/json" on-response="handleModelRemoval" url="[[baseUrl]]delete-model"></iron-ajax> -->
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
-      <iron-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" bind-value="{{userEmail}}" on-change="_checkEmailField">
-        <input>@arup.com
-      </iron-input>
+      <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" on-change="_checkEmailField">
+        <div slot="suffix" label="user">@arup.com</div>
+      </paper-input>
+      <paper-dropdown-menu id="project-dropdown" label="Select Project">
+        <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedProject}}">
+            <paper-item>NLVS North</paper-item>
+            <paper-item>NLVS South</paper-item>
+            <paper-item>NLVS East</paper-item>
+            <paper-item>NLVS West</paper-item>
+            <paper-item>NLVS Roof Canopy</paper-item>
+            <paper-item>NLVS Roof Support</paper-item>
+            <paper-item>NLVS Roof Cable Truss</paper-item>
+        </paper-listbox>
+      </paper-dropdown-menu>
       <iron-input>
       <input id="modelUpload" type="file" on-change="handleJsonUpload"></input>
       </iron-input>
@@ -880,6 +892,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       // }
 
       _checkEmailField() {
+        this.userEmail = Polymer.dom(this.root).querySelector("#user-email").value
+        console.log(this.userEmail);
         if (_.isEmpty(this.userEmail)) {
           this.flipUploadSwitch = false
         } else if (!_.isEmpty(this.userEmail)){
@@ -1211,7 +1225,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _stringAggregations() {
         this.showNumericalAggregations = false;
         this._resultFilterInput()
-        console.log(this.numDropdownOptions);
         this._generateNumDropdownOptions()
         if (this._resultFilterInput().length > 0) {
           this._generateNumMetadataKeys()
