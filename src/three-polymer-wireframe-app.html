@@ -116,8 +116,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         padding: 0;
       }
 
-      #model-dropdown {
-        /*font-size: .75em;*/
+      #user-email {
+        width: 250px;
       }
 
       paper-button.filterBtn {
@@ -131,6 +131,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       paper-dialog#addModelDialog {
+        padding: 1em;
+        width: 350px;
+      }
+
+      #searchFilterModal {
         padding: 1em;
         width: 350px;
       }
@@ -259,6 +264,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-button id="acceptUploadBtn" dialog-confirm autofocus disabled$="{{_acceptUploadDisabled}}" on-tap="uploadJsonModel">Upload</paper-button>
       </div>
     </paper-dialog>
+    <paper-dialog modal id="searchFilterModal">
+      <h2>Search/Filter Models</h2>
+      <paper-dropdown-menu id="user-dropdown" label="Select User">
+        <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedUser}}">
+            <!-- do a dom repeat here with users -->
+        </paper-listbox>
+      </paper-dropdown-menu>
+      <paper-dropdown-menu id="project-dropdown" label="Select Project">
+        <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedProject}}">
+            <paper-item>NLVS North</paper-item>
+            <paper-item>NLVS South</paper-item>
+            <paper-item>NLVS East</paper-item>
+            <paper-item>NLVS West</paper-item>
+            <paper-item>NLVS Roof Canopy</paper-item>
+            <paper-item>NLVS Roof Support</paper-item>
+            <paper-item>NLVS Roof Cable Truss</paper-item>
+        </paper-listbox>
+      </paper-dropdown-menu>
+      <div class="buttons">
+        <!-- Add functionality to buttons -->
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button>Apply</paper-button>
+      </div>
+    </paper-dialog>
+    <!--  -->
     <paper-toast id="validationToast" duration="0" class="fit-bottom">
       <paper-button on-tap="reopenUploadBox" class="yellow-toast">Try Again</paper-button>
       <paper-button dialog-dismiss on-tap="closeToast" class="yellow-toast">Cancel</paper-button>
@@ -288,6 +318,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </template>
         </paper-listbox>
       </paper-dropdown-menu>
+      <!-- Filter list icon goes below, not showing up-->
+      <paper-icon-button on-tap="showFilterModal" icon="my-icons:filter-list"></paper-icon-button>
       <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
       <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: {{_uploadedBy(currentModelResp.modelInformation.user)}}<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
@@ -1052,7 +1084,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _numericalAggregations() {
-        console.log(this._resultFilterInput());
         this._generateNumDropdownOptions()
         var that = this;
         if (this._resultFilterInput().length > 0 && _.includes(this.numDropdownOptions, this.selectedContourBy)) {
@@ -1969,6 +2000,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       showDialog() {
         this.$.addModelDialog.open();
+      }
+
+      showFilterModal() {
+        this.$.searchFilterModal.open();
       }
 
       handleUploadResponse(event, response) {
