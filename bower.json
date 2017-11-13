@@ -36,10 +36,11 @@
     "paper-fab": "^2.0.0",
     "vaadin-valo-theme": "vaadin/vaadin-valo-theme#^0.3.2",
     "vaadin-date-picker": "vaadin/vaadin-date-picker#^2.0.6",
-    "vaadin-combo-box": "vaadin/vaadin-combo-box#^3.0.1"
+    "vaadin-combo-box": "vaadin/vaadin-combo-box#^3.0.1",
+    "paper-chip": "^1.1.2"
   },
   "resolutions": {
-    "polymer": "^2.0.0-rc.3",
+    "polymer": "2.1.0",
     "iron-iconset-svg": "2.0-preview",
     "iron-flex-layout": "2.0-preview",
     "iron-selector": "2.0-preview",
