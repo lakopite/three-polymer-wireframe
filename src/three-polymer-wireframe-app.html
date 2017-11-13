@@ -22,6 +22,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../bower_components/neon-animation/neon-animation.html">
 <link rel="import" href="../bower_components/neon-animation/web-animations.html">
+<!-- <link rel="import" href="../bower_components/paper-fab/paper-fab.html"> -->
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
@@ -37,6 +38,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="../bower_components/vaadin-grid/vaadin-grid-sorter.html">
+<!-- <link rel="import" href="bower_components/vaadin-valo-theme/vaadin-combo-box.html">
+<link rel="import" href="bower_components/vaadin-combo-box/vaadin-combo-box.html"> -->
+<link rel="import" href="../bower_components/vaadin-valo-theme/vaadin-date-picker.html">
+<link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker.html">
 <link rel="import" href="../bower_components/three-polymer/three-view/three-view.html">
 <link rel="import" href="../bower_components/three-polymer/three-model/three-model.html">
 <link rel="import" href="shared-styles.html">
@@ -130,6 +135,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: #a8a8a8;
       }
 
+      /*paper-fab {
+        --paper-fab-background: var(--paper-light-grey-500);
+       font-size: 20px;
+     }*/
+
       paper-dialog#addModelDialog {
         padding: 1em;
         width: 350px;
@@ -137,7 +147,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       #searchFilterModal {
         padding: 1em;
-        width: 350px;
+        width: 420px;
       }
 
       paper-spinner {
@@ -242,18 +252,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <!-- ?\<iron-ajax headers="{{authHeaders}}" id="remove-upload-request" method="DELETE" content-type="application/json" on-response="handleModelRemoval" url="[[baseUrl]]delete-model"></iron-ajax> -->
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
-      <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" on-change="_checkEmailField">
+      <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" on-change="_checkEmailAndProject">
         <div slot="suffix" label="user">@arup.com</div>
       </paper-input>
       <paper-dropdown-menu id="project-dropdown" label="Select Project">
-        <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedProject}}">
-            <paper-item>NLVS North</paper-item>
-            <paper-item>NLVS South</paper-item>
-            <paper-item>NLVS East</paper-item>
-            <paper-item>NLVS West</paper-item>
-            <paper-item>NLVS Roof Canopy</paper-item>
-            <paper-item>NLVS Roof Support</paper-item>
-            <paper-item>NLVS Roof Cable Truss</paper-item>
+          <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedProject}}">
+            <template is="dom-repeat" items="{{projectList}}">
+              <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
+            </template>
+          </paper-listbox>
         </paper-listbox>
       </paper-dropdown-menu>
       <iron-input>
@@ -268,20 +275,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <h2>Search/Filter Models</h2>
       <paper-dropdown-menu id="user-dropdown" label="Select User">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedUser}}">
-            <!-- do a dom repeat here with users -->
+          <!-- do a dom repeat here with users -->
+          <paper-item>Test user 1</paper-item>
+          <paper-item>Test user 2</paper-item>
         </paper-listbox>
       </paper-dropdown-menu>
       <paper-dropdown-menu id="project-dropdown" label="Select Project">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedProject}}">
-            <paper-item>NLVS North</paper-item>
-            <paper-item>NLVS South</paper-item>
-            <paper-item>NLVS East</paper-item>
-            <paper-item>NLVS West</paper-item>
-            <paper-item>NLVS Roof Canopy</paper-item>
-            <paper-item>NLVS Roof Support</paper-item>
-            <paper-item>NLVS Roof Cable Truss</paper-item>
+          <paper-item>NLVS North</paper-item>
+          <paper-item>NLVS South</paper-item>
+          <paper-item>NLVS East</paper-item>
+          <paper-item>NLVS West</paper-item>
+          <paper-item>NLVS Roof Canopy</paper-item>
+          <paper-item>NLVS Roof Support</paper-item>
+          <paper-item>NLVS Roof Cable Truss</paper-item>
         </paper-listbox>
       </paper-dropdown-menu>
+      <vaadin-date-picker label="From"></vaadin-date-picker>
+      <vaadin-date-picker label="To"></vaadin-date-picker>
       <div class="buttons">
         <!-- Add functionality to buttons -->
         <paper-button dialog-dismiss>Cancel</paper-button>
@@ -319,7 +330,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </paper-listbox>
       </paper-dropdown-menu>
       <!-- Filter list icon goes below, not showing up-->
-      <paper-icon-button on-tap="showFilterModal" icon="my-icons:filter-list"></paper-icon-button>
+      <!-- <paper-fab mini icon="my-icons:filter-list" on-tap="showFilterModal"></paper-fab> -->
+      <paper-icon-button mini on-tap="showFilterModal" icon="my-icons:filter-list"></paper-icon-button>
       <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
       <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: {{_uploadedBy(currentModelResp.modelInformation.user)}}<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
@@ -400,7 +412,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 11/09/17</paper-item>
+        <paper-item>Build Date: 11/13/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -759,6 +771,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           showStringAggregations: {
             type: Boolean,
             value: false
+          },
+          projectList: {
+            type: Array,
+            value: ["NLVS North", "NLVS South", "NLVS East", "NLVS West", "NLVS Roof Canopy", "NLVS Roof Support", "NLVS Cable Truss"]
           }
         };
       }
@@ -834,7 +850,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         that.$['json-upload-request'].generateRequest();
         that._clearUploadInput()
         this.$.uploadSuccessToast.show({ text: "Valid JSON, posted to server" })
-        this._acceptUploadDisabled = true
         //console.log(that.dataOptions);
       }
 
@@ -847,6 +862,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         //var toast = Polymer.dom(this.root).querySelector('#validationToast')
         this.$.validationToast.hide()
         this.userEmail = ''
+        this.selectedProject = undefined
       }
 
       handleJsonUpload(evt) {
@@ -887,6 +903,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               throw "modelInformation must contain a 'name' key."
               //add email of user uploading file
               that.jsonUploadPayload.modelInformation.user = that.userEmail
+              that.jsonUploadPayload.modelInformation.project = that.selectedProject
               // check that units are either metric or imperial only
               if (!(that.jsonUploadPayload.modelInformation.units === "metric" ||
               that.jsonUploadPayload.modelInformation.units === "imperial"))
@@ -903,8 +920,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if (that.flipUploadSwitch === true) {
               that._acceptUploadDisabled = false
             } else {
-              //this won't work
-              that._checkEmailField()
+              that._checkEmailAndProject()
               if (that.flipUploadSwitch === true) {
                 that._acceptUploadDisabled = false
               }
@@ -923,12 +939,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       //   this.$['remove-upload-request'].generateRequest();
       // }
 
-      _checkEmailField() {
+      _checkEmailAndProject() {
         this.userEmail = Polymer.dom(this.root).querySelector("#user-email").value
         console.log(this.userEmail);
-        if (_.isEmpty(this.userEmail)) {
+        console.log(this.selectedProject);
+        if (_.isEmpty(this.userEmail) || typeof this.selectedProject === 'undefined') {
           this.flipUploadSwitch = false
-        } else if (!_.isEmpty(this.userEmail)){
+        } else if (!_.isEmpty(this.userEmail) && typeof this.selectedProject !== 'undefined'){
           this.flipUploadSwitch = true
         }
         this.handleJsonUpload()
@@ -936,6 +953,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _clearUploadInput() {
         Polymer.dom(this.root).querySelector('#modelUpload').value = ''
+        this.selectedProject = undefined
         this._acceptUploadDisabled = true;
       }
 
@@ -1965,6 +1983,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleDataResponse(event, response) {
         this.currentModelResp = response.response
+        console.log(this.currentModelResp);
         var costTab = Polymer.dom(this.root).querySelector("#cost-tab")
         if (costTab.disabled && this.selectedView === 'cost-view') {
           this.selectedView = 'model-view'
@@ -2011,6 +2030,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if ("success" in resp) {
           this.$['get-models-request'].generateRequest();
           this.$.uploadSuccessToast.show({ text: "Upload successful!"})
+        } else {
+          this.$.uploadSuccessToast.show({ text: "An error occurred"})
         }
       }
 

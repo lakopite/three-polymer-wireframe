@@ -32,7 +32,11 @@
     "vaadin-grid": "^3.0.0",
     "paper-toast": "PolymerElements/paper-toast#^2.0.0",
     "highcharts": "4.2.6",
-    "cognito-helper": "lakopite/cognito-helper#master"
+    "cognito-helper": "lakopite/cognito-helper#master",
+    "paper-fab": "^2.0.0",
+    "vaadin-valo-theme": "vaadin/vaadin-valo-theme#^0.3.2",
+    "vaadin-date-picker": "vaadin/vaadin-date-picker#^2.0.6",
+    "vaadin-combo-box": "vaadin/vaadin-combo-box#^3.0.1"
   },
   "resolutions": {
     "polymer": "^2.0.0-rc.3",
@@ -55,7 +59,8 @@
     "paper-icon-button": "2.0-preview",
     "webcomponentsjs": "^1.0.0-rc.7",
     "iron-ajax": "~2.0.2",
-    "iron-localstorage": "2.0-preview"
+    "iron-localstorage": "2.0-preview",
+    "iron-media-query": "2.0-preview"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0-prerelease.7"
