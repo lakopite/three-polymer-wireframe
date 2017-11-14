@@ -283,22 +283,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <h2>Filter Models</h2>
       <paper-dropdown-menu id="user-dropdown" label="Select User">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedUser}}">
-          <template is="dom-repeat" items="[[searchOptionsMap]]">
-            <paper-item class="dropdown-item" name="[[item.user]]">[[item.user]]</paper-item>
+          <template is="dom-repeat" items="[[searchOptionsMap.user]]">
+            <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
           </template>
         </paper-listbox>
       </paper-dropdown-menu>
       <paper-dropdown-menu id="project-dropdown" label="Select Project">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{filterSelectedProject}}">
-          <template is="dom-repeat" items="[[projectList]]">
+          <template is="dom-repeat" items="[[searchOptionsMap.project]]">
             <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
           </template>
         </paper-listbox>
       </paper-dropdown-menu>
-      <vaadin-date-picker id="from-date" label="From" value=""></vaadin-date-picker>
-      <vaadin-date-picker id="to-date" label="To" value=""></vaadin-date-picker>
+      <vaadin-date-picker id="from-date" label="From" min="{{minFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
+      <vaadin-date-picker id="to-date" label="To" min="{{minFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
       <div class="buttons">
-        <!-- Add functionality to buttons -->
         <paper-button dialog-dismiss>Cancel</paper-button>
         <paper-button on-tap="processSearchOptions">Apply</paper-button>
       </div>
@@ -1522,7 +1521,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _dateTimeFormat() {
         var d = new Date();
-        var curr_date = (d.getDate() < 9 ? '0': '') + (d.getDate()+1)
+        var curr_date = (d.getDate() < 9 ? '0': '') + (d.getDate())
         var curr_month = (d.getMonth() < 9 ? '0': '') + (d.getMonth()+1)
         var curr_year = d.getFullYear();
         var curr_year_formatted = curr_year.toString().substring(2)
@@ -1943,6 +1942,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this._aggregations(this._modelData, this.selectedContourBy, this.selectedView);
       }
 
+      todaysDate() {
+        var d = new Date();
+        var curr_date = (d.getDate() < 9 ? '0': '') + (d.getDate())
+        var curr_month = (d.getMonth() < 9 ? '0': '') + (d.getMonth()+1)
+        var curr_year = d.getFullYear();
+        return curr_year + "-" + curr_month + "-" + curr_date
+      }
+
       _initData(dataOptions_) {
         //this.set('dataOptions', dataOptions_)
         //sort by date
@@ -1972,29 +1979,59 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         //console.log(JSON.stringify(this.dataOptions));
         //this.dataOptions
         //create a set of all the different Options
-        var searchOptionsMap = {
+        this.searchOptionsMap = {
           'user': [],
           'project': []
         };
         var uploadTimes = []
+        for (var i in this.dataOptions) {
+          var item = this.dataOptions[i]
+          console.log(item)
+        }
         for (var i=0; i < this.dataOptions.length; i++) {
           console.log(this.dataOptions[i].model)
-          if (typeof this.dataOptions[i].s3_attributes.user !== 'undefined' && searchOptionsMap.user.indexOf(this.dataOptions[i].s3_attributes.user) === -1) {
-            searchOptionsMap.user.push(this.dataOptions[i].s3_attributes.user)
+          if (typeof this.dataOptions[i].s3_attributes.user !== 'undefined' && this.searchOptionsMap.user.indexOf(this.dataOptions[i].s3_attributes.user) === -1) {
+            this.searchOptionsMap.user.push(this.dataOptions[i].s3_attributes.user)
           }
-          if (typeof this.dataOptions[i].s3_attributes.project !== 'undefined' && searchOptionsMap.project.indexOf(this.dataOptions[i].s3_attributes.project) === -1) {
-            searchOptionsMap.project.push(this.dataOptions[i].s3_attributes.project)
+          if (typeof this.dataOptions[i].s3_attributes.project !== 'undefined' && this.searchOptionsMap.project.indexOf(this.dataOptions[i].s3_attributes.project) === -1) {
+            this.searchOptionsMap.project.push(this.dataOptions[i].s3_attributes.project)
           }
-          //console.log(Polymer.dom(this.root).querySelector("#to-date").value)
+
           uploadTimes.push(this.dataOptions[i].s3_attributes.uploadTime.split(" ")[0]);
-          console.log(this.dataOptions[i].s3_attributes.uploadTime)
         }
         console.log(uploadTimes);
-        //for model in dataOptions: (same for user)
-        var min = uploadTimes.reduce(function (a, b) { return a < b ? a : b; });
-        var max = uploadTimes.reduce(function (a, b) { return a > b ? a : b; });
+        var min = uploadTimes.reduce(function (a, b) { return a < b ? a : b });
+        this.minFromDate = min
+        var max = uploadTimes.reduce(function (a, b) { return a > b ? a : b });
         console.log("minDate: " + min)
         console.log("maxDate: " + max)
+        // if (!_.isEmpty(Polymer.dom(this.root).querySelector("#from-date").value)) {
+        //   if (Polymer.dom(this.root).querySelector("#from-date").value < ) {
+        //
+        //   }
+        // }
+        // ==================================
+        if (_.isEmpty(Polymer.dom(this.root).querySelector("#from-date").value)) {
+          this.set('searchOptionsMap.minDate', min)
+        } else {
+          this.searchOptionsMap.minDate = Polymer.dom(this.root).querySelector("#from-date").value
+        }
+        // =======================
+        if (_.isEmpty(Polymer.dom(this.root).querySelector("#to-date").value)) {
+          this.set('searchOptionsMap.maxDate', max)
+        } else {
+          this.searchOptionsMap.maxDate = Polymer.dom(this.root).querySelector("#to-date").value
+        }
+        console.log(this.searchOptionsMap.minDate)
+        console.log(this.searchOptionsMap.maxDate);
+        console.log(this.searchOptionsMap)
+        var res1 = _.filter(this.dataOptions, function(o) {
+          return o.s3_attributes.user === "trent.clifton"
+        })
+        var res2 = _.filter(this.dataOptions, { 'user': 'trent.clifton', 'project': 'NLVS South'})
+        console.log(res1);
+        console.log(res2);
+        //for model in dataOptions: (same for user)
           //if not model.project in searchOptionsMap.project:
           //  searchOptionsMap.project.push(model.project)
           //if 'minDate' in searchOptionsMap
@@ -2002,7 +2039,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               //searchOptionsMap.minDate = model.date
           //else:
             //searchOptionsMap.minDate = model.date
-        console.log(searchOptionsMap)
       }
 
       handleOptionsResponse(event, response) {
