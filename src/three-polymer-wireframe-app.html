@@ -1984,10 +1984,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'project': []
         };
         var uploadTimes = []
-        for (var i in this.dataOptions) {
-          var item = this.dataOptions[i]
-          console.log(item)
-        }
         for (var i=0; i < this.dataOptions.length; i++) {
           console.log(this.dataOptions[i].model)
           if (typeof this.dataOptions[i].s3_attributes.user !== 'undefined' && this.searchOptionsMap.user.indexOf(this.dataOptions[i].s3_attributes.user) === -1) {
@@ -2005,12 +2001,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var max = uploadTimes.reduce(function (a, b) { return a > b ? a : b });
         console.log("minDate: " + min)
         console.log("maxDate: " + max)
-        // if (!_.isEmpty(Polymer.dom(this.root).querySelector("#from-date").value)) {
-        //   if (Polymer.dom(this.root).querySelector("#from-date").value < ) {
-        //
-        //   }
-        // }
-        // ==================================
         if (_.isEmpty(Polymer.dom(this.root).querySelector("#from-date").value)) {
           this.set('searchOptionsMap.minDate', min)
         } else {
