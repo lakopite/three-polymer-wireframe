@@ -238,11 +238,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .model-div {
-        display: flex;
+        @apply(--layout-horizontal);
+        @apply(--layout-justified);
+      }
+
+      .model-div paper-dropdown-menu {
+        @apply(--layout-flex);
       }
 
       paper-icon-button.filter {
-        font-size: 50px;
+        @apply(--layout-self-end);
       }
 
       #share-model {
@@ -265,7 +270,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
             </template>
           </paper-listbox>
-        </paper-listbox>
       </paper-dropdown-menu>
       <iron-input>
       <input id="modelUpload" type="file" on-change="handleJsonUpload"></input>
@@ -279,12 +283,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <h2>Filter Models</h2>
       <paper-dropdown-menu id="user-dropdown" label="Select User">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedUser}}">
-          <!-- <template is="dom-repeat" items="[[userList]]">
-            <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
-          </template> -->
-          <!-- do a dom repeat here with users -->
-          <paper-item>Test user 1</paper-item>
-          <paper-item>Test user 2</paper-item>
+          <template is="dom-repeat" items="[[searchOptionsMap]]">
+            <paper-item class="dropdown-item" name="[[item.user]]">[[item.user]]</paper-item>
+          </template>
         </paper-listbox>
       </paper-dropdown-menu>
       <paper-dropdown-menu id="project-dropdown" label="Select Project">
@@ -294,12 +295,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </template>
         </paper-listbox>
       </paper-dropdown-menu>
-      <vaadin-date-picker label="From"></vaadin-date-picker>
-      <vaadin-date-picker label="To"></vaadin-date-picker>
+      <vaadin-date-picker id="from-date" label="From" value=""></vaadin-date-picker>
+      <vaadin-date-picker id="to-date" label="To" value=""></vaadin-date-picker>
       <div class="buttons">
         <!-- Add functionality to buttons -->
         <paper-button dialog-dismiss>Cancel</paper-button>
-        <paper-button on-tap="filterModels">Apply</paper-button>
+        <paper-button on-tap="processSearchOptions">Apply</paper-button>
       </div>
     </paper-dialog>
     <paper-toast id="validationToast" duration="0" class="fit-bottom">
@@ -369,7 +370,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div> -->
         <!-- force filter end -->
         <div class="horizontal">
-          <paper-button class="filterBtn" raised disabled$="{{_filtersDisabled}}" id="applyBtn" on-tap="applyFilters" type="number">Apply</paper-button>
+          <paper-button class="filterBtn" raised disabled$="{{_filtersDisabled}}" id="applyBtn" on-tap="" type="number">Apply</paper-button>
           <paper-button class="filterBtn" raised disabled$="{{modelLoading}}" id="resetBtn" on-tap="resetFilters" type="number">Reset</paper-button>
         </div>
       </div>
@@ -847,12 +848,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return user
         }
       }
-
-      // filterModels(user, project, from, to) {
-      //   _.filter('', function(o) {
-      //     console.log()
-      //   })
-      // }
 
       uploadJsonModel() {
         var that = this
@@ -1969,6 +1964,45 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.set('selectedModel', this.dataOptions[0].model)
           }
         }
+        this.processSearchOptions();
+      }
+
+      processSearchOptions() {
+        console.log(this.dataOptions);
+        //console.log(JSON.stringify(this.dataOptions));
+        //this.dataOptions
+        //create a set of all the different Options
+        var searchOptionsMap = {
+          'user': [],
+          'project': []
+        };
+        var uploadTimes = []
+        for (var i=0; i < this.dataOptions.length; i++) {
+          console.log(this.dataOptions[i].model)
+          if (typeof this.dataOptions[i].s3_attributes.user !== 'undefined' && searchOptionsMap.user.indexOf(this.dataOptions[i].s3_attributes.user) === -1) {
+            searchOptionsMap.user.push(this.dataOptions[i].s3_attributes.user)
+          }
+          if (typeof this.dataOptions[i].s3_attributes.project !== 'undefined' && searchOptionsMap.project.indexOf(this.dataOptions[i].s3_attributes.project) === -1) {
+            searchOptionsMap.project.push(this.dataOptions[i].s3_attributes.project)
+          }
+          //console.log(Polymer.dom(this.root).querySelector("#to-date").value)
+          uploadTimes.push(this.dataOptions[i].s3_attributes.uploadTime.split(" ")[0]);
+          console.log(this.dataOptions[i].s3_attributes.uploadTime)
+        }
+        console.log(uploadTimes);
+        //for model in dataOptions: (same for user)
+        var min = uploadTimes.reduce(function (a, b) { return a < b ? a : b; });
+        var max = uploadTimes.reduce(function (a, b) { return a > b ? a : b; });
+        console.log("minDate: " + min)
+        console.log("maxDate: " + max)
+          //if not model.project in searchOptionsMap.project:
+          //  searchOptionsMap.project.push(model.project)
+          //if 'minDate' in searchOptionsMap
+            //if model.date < searchOptionsMap.minDate:
+              //searchOptionsMap.minDate = model.date
+          //else:
+            //searchOptionsMap.minDate = model.date
+        console.log(searchOptionsMap)
       }
 
       handleOptionsResponse(event, response) {
@@ -1990,9 +2024,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleDataResponse(event, response) {
         this.currentModelResp = response.response
-        if (typeof this.currentModelResp.modelInformation.project === 'undefined') {
-          this.currentModelResp.modelInformation.project = this._formatModelName(this.currentModelResp.modelInformation.name)
-        }
+        // if (typeof this.currentModelResp.modelInformation.project === 'undefined') {
+        //   this.currentModelResp.modelInformation.project = this._formatModelName(this.currentModelResp.modelInformation.name)
+        // }
         console.log(this.currentModelResp);
         var costTab = Polymer.dom(this.root).querySelector("#cost-tab")
         if (costTab.disabled && this.selectedView === 'cost-view') {
