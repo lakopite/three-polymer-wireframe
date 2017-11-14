@@ -26,11 +26,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-styles/paper-styles.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../bower_components/paper-chip/paper-chip.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
@@ -43,7 +41,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker.html">
 <link rel="import" href="../bower_components/three-polymer/three-view/three-view.html">
 <link rel="import" href="../bower_components/three-polymer/three-model/three-model.html">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <link rel="import" href="shared-styles.html">
 <link rel="import" href="my-icons.html">
 
@@ -142,7 +139,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       #searchFilterModal {
         padding: 1em;
-        width: 420px;
+        width: 290px;
       }
 
       paper-spinner {
@@ -240,35 +237,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: grey;
       }
 
-      .buttons-below-model {
+      .model-div {
         display: flex;
       }
 
-      paper-fab.filter {
-       --paper-fab-background: var(--paper-grey-500);
+      paper-icon-button.filter {
+        font-size: 50px;
       }
 
-      .material-icons {
-        font-family: 'Material Icons';
-        font-weight: normal;
-        font-style: normal;
-        font-size: 24px;  /* Preferred icon size */
-        display: inline-block;
-        line-height: 1;
-        text-transform: none;
-        letter-spacing: normal;
-        word-wrap: normal;
-        white-space: nowrap;
-        direction: ltr;
-        cursor: pointer;
-        /* Support for all WebKit browsers. */
-        -webkit-font-smoothing: antialiased;
-        /* Support for Safari and Chrome. */
-        text-rendering: optimizeLegibility;
-        /* Support for Firefox. */
-        -moz-osx-font-smoothing: grayscale;
-        /* Support for IE. */
-        font-feature-settings: 'liga';
+      #share-model {
+        margin: 1em;
       }
 
     </style>
@@ -298,9 +276,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </div>
     </paper-dialog>
     <paper-dialog modal id="searchFilterModal">
-      <h2>Search/Filter Models</h2>
+      <h2>Filter Models</h2>
       <paper-dropdown-menu id="user-dropdown" label="Select User">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedUser}}">
+          <!-- <template is="dom-repeat" items="[[userList]]">
+            <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
+          </template> -->
           <!-- do a dom repeat here with users -->
           <paper-item>Test user 1</paper-item>
           <paper-item>Test user 2</paper-item>
@@ -321,7 +302,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-button on-tap="filterModels">Apply</paper-button>
       </div>
     </paper-dialog>
-    <!--  -->
     <paper-toast id="validationToast" duration="0" class="fit-bottom">
       <paper-button on-tap="reopenUploadBox" class="yellow-toast">Try Again</paper-button>
       <paper-button dialog-dismiss on-tap="closeToast" class="yellow-toast">Cancel</paper-button>
@@ -337,7 +317,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </app-toolbar>
     <div class="drawer-list">
       <!-- <paper-input id="search-input" label="Search Models..." value="{{searchInput}}"></paper-input> -->
-      <paper-dropdown-menu label="Model">
+      <div class="model-div">
+        <paper-icon-button class="filter" icon="my-icons:filter-list" title="filter models" on-tap="showFilterModal"></paper-icon-button>
+        <paper-dropdown-menu label="Model">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
           <!-- <paper-input id="search-input" label="Search Models..." value="{{searchInput}}" type="text" autofocus minlength="1"></paper-input> -->
           <!-- REMOVED FROM TEMPLATE BELOW: selected="" filter="{{searchFilter(searchInput)}}"-->
@@ -351,12 +333,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </template>
         </paper-listbox>
       </paper-dropdown-menu>
+    </div>
       <!-- Filter list icon goes below, not showing up-->
-      <!-- <paper-chip>Hello</paper-chip> -->
-      <div class="buttons-below-model">
-        <paper-fab class="filter" mini icon="icons:filter-list" title="filter models" on-tap="showFilterModal"></paper-fab>
-        <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
-      </div>
+      <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
       <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: {{_uploadedBy(currentModelResp.modelInformation.user)}}<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
         <paper-dropdown-menu id="main-contour-dropdown" label="Select Contour">
