@@ -22,11 +22,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../bower_components/neon-animation/neon-animation.html">
 <link rel="import" href="../bower_components/neon-animation/web-animations.html">
-<!-- <link rel="import" href="../bower_components/paper-fab/paper-fab.html"> -->
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-styles/paper-styles.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
@@ -39,8 +39,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="../bower_components/vaadin-grid/vaadin-grid-sorter.html">
-<!-- <link rel="import" href="bower_components/vaadin-valo-theme/vaadin-combo-box.html">
-<link rel="import" href="bower_components/vaadin-combo-box/vaadin-combo-box.html"> -->
 <link rel="import" href="../bower_components/vaadin-valo-theme/vaadin-date-picker.html">
 <link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker.html">
 <link rel="import" href="../bower_components/three-polymer/three-view/three-view.html">
@@ -136,11 +134,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         background: #eaeaea;
         color: #a8a8a8;
       }
-
-      /*paper-fab {
-        --paper-fab-background: var(--paper-light-grey-500);
-       font-size: 20px;
-     }*/
 
       paper-dialog#addModelDialog {
         padding: 1em;
@@ -247,6 +240,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: grey;
       }
 
+      .buttons-below-model {
+        display: flex;
+      }
+
+      paper-fab.filter {
+       --paper-fab-background: var(--paper-grey-500);
+      }
+
       .material-icons {
         font-family: 'Material Icons';
         font-weight: normal;
@@ -259,15 +260,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         word-wrap: normal;
         white-space: nowrap;
         direction: ltr;
-
+        cursor: pointer;
         /* Support for all WebKit browsers. */
         -webkit-font-smoothing: antialiased;
         /* Support for Safari and Chrome. */
         text-rendering: optimizeLegibility;
-
         /* Support for Firefox. */
         -moz-osx-font-smoothing: grayscale;
-
         /* Support for IE. */
         font-feature-settings: 'liga';
       }
@@ -354,9 +353,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </paper-dropdown-menu>
       <!-- Filter list icon goes below, not showing up-->
       <!-- <paper-chip>Hello</paper-chip> -->
-      <i mini on-tap="showFilterModal" class="material-icons">filter_list</i>
-      <!-- <paper-icon-button mini on-tap="showFilterModal" icon="icons:filter-list"></paper-icon-button> -->
-      <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
+      <div class="buttons-below-model">
+        <paper-fab class="filter" mini icon="icons:filter-list" title="filter models" on-tap="showFilterModal"></paper-fab>
+        <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
+      </div>
       <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: {{_uploadedBy(currentModelResp.modelInformation.user)}}<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
         <paper-dropdown-menu id="main-contour-dropdown" label="Select Contour">
