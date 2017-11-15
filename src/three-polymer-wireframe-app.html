@@ -2039,7 +2039,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         console.log(userSearchInput);
         var res2 = _.filter(this.dataOptions, function(o) {
-          return o.s3_attributes.user === userSearchInput.user && o.s3_attributes.project === userSearchInput.project && new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
+          if (typeof userSearchInput.user === 'undefined' || typeof userSearchInput.project === 'undefined') {
+            if (typeof userSearchInput.user === 'undefined' && typeof userSearchInput.project === 'undefined') {
+              return new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
+            } else if (typeof userSearchInput.user === 'undefined') {
+              return o.s3_attributes.project === userSearchInput.project && new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
+            } else if (typeof userSearchInput.project === 'undefined') {
+              return o.s3_attributes.user === userSearchInput.user && new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
+            }
+          } else {
+            return o.s3_attributes.user === userSearchInput.user && o.s3_attributes.project === userSearchInput.project && new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
+          }
         })
         console.log(res2);
       }
