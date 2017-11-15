@@ -237,7 +237,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: grey;
       }
 
-      .model-div {
+      .model-div, .filter-input{
         @apply(--layout-horizontal);
         @apply(--layout-justified);
       }
@@ -247,6 +247,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       paper-icon-button.filter {
+        @apply(--layout-self-end);
+      }
+
+      paper-icon-button.clear-filter-input {
         @apply(--layout-self-end);
       }
 
@@ -281,13 +285,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </paper-dialog>
     <paper-dialog modal id="searchFilterModal">
       <h2>Filter Models</h2>
-      <paper-dropdown-menu id="user-dropdown" label="Select User">
-        <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedFilterUser}}">
-          <template is="dom-repeat" items="[[searchOptionsMap.user]]">
-            <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
-          </template>
-        </paper-listbox>
-      </paper-dropdown-menu>
+      <div class="filter-input">
+        <paper-dropdown-menu id="user-dropdown" label="Select User">
+          <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{filterSelectedUser}}">
+            <template is="dom-repeat" items="[[searchOptionsMap.user]]">
+              <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
+            </template>
+          </paper-listbox>
+        </paper-dropdown-menu>
+        <paper-icon-button class="clear-filter-input" id="clearFilterUser" icon="my-icons:clear" title="clear user" on-tap="clearSearchField"></paper-icon-button>
+      </div>
+      <div class="filter-input">
       <paper-dropdown-menu id="project-dropdown" label="Select Project">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{filterSelectedProject}}">
           <template is="dom-repeat" items="[[searchOptionsMap.project]]">
@@ -295,6 +303,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </template>
         </paper-listbox>
       </paper-dropdown-menu>
+      <paper-icon-button class="clear-filter-input" id="clearFilterProject" icon="my-icons:clear" title="clear project" on-tap="clearSearchField"></paper-icon-button>
+      </div>
       <vaadin-date-picker id="from-date" label="From" min="{{minFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
       <vaadin-date-picker id="to-date" label="To" min="{{minFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
       <div class="buttons">
@@ -1975,7 +1985,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       clearFilterInput() {
-        this.selectedFilterUser = undefined,
+        this.filterSelectedUser = undefined,
         this.filterSelectedProject = undefined,
         Polymer.dom(this.root).querySelector("#from-date").value = undefined,
         Polymer.dom(this.root).querySelector("#to-date").value = undefined
@@ -1983,8 +1993,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       processSearchOptions() {
         console.log(this.dataOptions);
-        console.log(JSON.stringify(this.dataOptions));
-        //this.dataOptions
+        //console.log(JSON.stringify(this.dataOptions));
         //create a set of all the different Options
         this.searchOptionsMap = {
           'user': [],
@@ -2032,7 +2041,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var maxDate = Polymer.dom(this.root).querySelector("#to-date").value
         }
         var userSearchInput = {
-          'user': this.selectedFilterUser,
+          'user': this.filterSelectedUser,
           'project': this.filterSelectedProject,
           'minDate': minDate,
           'maxDate': maxDate
@@ -2052,6 +2061,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         })
         console.log(res2);
+      }
+
+      clearSearchField(e) {
+        //console.log(e.path[2].id); = clearFilterUser
+        if (e.path[2].id === 'clearFilterUser') {
+          this.filterSelectedUser = undefined
+        } if (e.path[2].id === 'clearFilterProject') {
+          this.filterSelectedProject = undefined
+        }
       }
 
       handleOptionsResponse(event, response) {
