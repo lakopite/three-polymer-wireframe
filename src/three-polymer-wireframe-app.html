@@ -282,7 +282,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-dialog modal id="searchFilterModal">
       <h2>Filter Models</h2>
       <paper-dropdown-menu id="user-dropdown" label="Select User">
-        <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedUser}}">
+        <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedFilterUser}}">
           <template is="dom-repeat" items="[[searchOptionsMap.user]]">
             <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
           </template>
@@ -299,7 +299,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <vaadin-date-picker id="to-date" label="To" min="{{minFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
       <div class="buttons">
         <paper-button dialog-dismiss on-tap="clearFilterInput">Cancel</paper-button>
-        <paper-button on-tap="processSearchOptions">Apply</paper-button>
+        <paper-button on-tap="applySearchFilters">Apply</paper-button>
       </div>
     </paper-dialog>
     <paper-toast id="validationToast" duration="0" class="fit-bottom">
@@ -415,7 +415,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 11/14/17</paper-item>
+        <paper-item>Build Date: 11/15/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -1975,7 +1975,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       clearFilterInput() {
-        this.selectedUser = undefined,
+        this.selectedFilterUser = undefined,
         this.filterSelectedProject = undefined,
         Polymer.dom(this.root).querySelector("#from-date").value = undefined,
         Polymer.dom(this.root).querySelector("#to-date").value = undefined
@@ -1983,7 +1983,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       processSearchOptions() {
         console.log(this.dataOptions);
-        //console.log(JSON.stringify(this.dataOptions));
+        console.log(JSON.stringify(this.dataOptions));
         //this.dataOptions
         //create a set of all the different Options
         this.searchOptionsMap = {
@@ -2009,6 +2009,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         this.minFromDate = this.searchOptionsMap.minDate
         console.log(this.searchOptionsMap)
+        //notes
+        //for model in dataOptions: (same for user)
+          //if not model.project in searchOptionsMap.project:
+          //  searchOptionsMap.project.push(model.project)
+          //if 'minDate' in searchOptionsMap
+            //if model.date < searchOptionsMap.minDate:
+              //searchOptionsMap.minDate = model.date
+          //else:
+            //searchOptionsMap.minDate = model.date
+      }
+
+      applySearchFilters() {
         if (_.isEmpty(Polymer.dom(this.root).querySelector("#from-date").value)) {
           var minDate = this.searchOptionsMap.minDate
         } else {
@@ -2020,21 +2032,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var maxDate = Polymer.dom(this.root).querySelector("#to-date").value
         }
         var userSearchInput = {
-          'user': this.selectedUser,
+          'user': this.selectedFilterUser,
           'project': this.filterSelectedProject,
           'minDate': minDate,
           'maxDate': maxDate
         }
         console.log(userSearchInput);
-        //notes
-        //for model in dataOptions: (same for user)
-          //if not model.project in searchOptionsMap.project:
-          //  searchOptionsMap.project.push(model.project)
-          //if 'minDate' in searchOptionsMap
-            //if model.date < searchOptionsMap.minDate:
-              //searchOptionsMap.minDate = model.date
-          //else:
-            //searchOptionsMap.minDate = model.date
+        var res2 = _.filter(this.dataOptions, function(o) {
+          return o.s3_attributes.user === userSearchInput.user && o.s3_attributes.project === userSearchInput.project && new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
+        })
+        console.log(res2);
       }
 
       handleOptionsResponse(event, response) {
