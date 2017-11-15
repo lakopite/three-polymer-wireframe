@@ -347,6 +347,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </div>
       <!-- Filter list icon goes below, not showing up-->
       <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
+      <paper-dropdown-menu label="test employees">
+        <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedEmployee}}">
+          <template is="dom-repeat" items="{{employees}}" filter="isOld">
+            <paper-item class="dropdown-item" name="{{item.first}}">{{item.first}}</paper-item>
+          </template>
+        </paper-listbox>
+      </paper-dropdown-menu>
       <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: {{_uploadedBy(currentModelResp.modelInformation.user)}}<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
         <paper-dropdown-menu id="main-contour-dropdown" label="Select Contour">
@@ -789,6 +796,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           projectList: {
             type: Array,
             value: ["NLVS North", "NLVS South", "NLVS East", "NLVS West", "NLVS Roof Canopy", "NLVS Roof Support", "NLVS Cable Truss"]
+          },
+          employees: {
+            type: Array,
+            value: [
+            {first: 'Bob', last: 'Smith', age: 22},
+            {first: 'Sally', last: 'Johnson', age: 27},
+            {first: 'Bob', last: 'Johnson', age: 65},
+            {first: 'Amanda', last: 'Jones', age: 40}
+        ]
           }
         };
       }
@@ -812,6 +828,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       constructor() {
         super();
+      }
+
+      isOld(item) {
+        return item.age > 25
       }
 
       logout() {
@@ -853,7 +873,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _uploadedBy(user) {
         if (_.isEmpty(user)) {
-          return user = "admin"
+          return user = "no user available"
         } else {
           return user
         }
@@ -2066,7 +2086,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.clearFilterInput()
           var toast = Polymer.dom(this.root).querySelector('#searchResultMsg')
           toast.show({ text: "No search results; filters removed" })
-
         }
       }
 
