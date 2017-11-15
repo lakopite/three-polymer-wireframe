@@ -299,7 +299,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <vaadin-date-picker id="to-date" label="To" min="{{minFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>
-        <paper-button on-tap="processSearchOptions">Apply</paper-button>
+        <paper-button on-tap="">Apply</paper-button>
       </div>
     </paper-dialog>
     <paper-toast id="validationToast" duration="0" class="fit-bottom">
@@ -1981,46 +1981,52 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         //create a set of all the different Options
         this.searchOptionsMap = {
           'user': [],
-          'project': []
+          'project': [],
+          'minDate': "",
+          'maxDate': ""
         };
-        var uploadTimes = []
         for (var i=0; i < this.dataOptions.length; i++) {
-          console.log(this.dataOptions[i].model)
-          if (typeof this.dataOptions[i].s3_attributes.user !== 'undefined' && this.searchOptionsMap.user.indexOf(this.dataOptions[i].s3_attributes.user) === -1) {
-            this.searchOptionsMap.user.push(this.dataOptions[i].s3_attributes.user)
+          var item = this.dataOptions[i]
+          console.log(item.model)
+          if (typeof item.s3_attributes.user !== 'undefined' && this.searchOptionsMap.user.indexOf(item.s3_attributes.user) === -1) {
+            this.searchOptionsMap.user.push(item.s3_attributes.user)
           }
-          if (typeof this.dataOptions[i].s3_attributes.project !== 'undefined' && this.searchOptionsMap.project.indexOf(this.dataOptions[i].s3_attributes.project) === -1) {
-            this.searchOptionsMap.project.push(this.dataOptions[i].s3_attributes.project)
+          if (typeof item.s3_attributes.project !== 'undefined' && this.searchOptionsMap.project.indexOf(item.s3_attributes.project) === -1) {
+            this.searchOptionsMap.project.push(item.s3_attributes.project)
           }
-
-          uploadTimes.push(this.dataOptions[i].s3_attributes.uploadTime.split(" ")[0]);
+          if (_.isEmpty(this.searchOptionsMap.minDate) || new Date(this.searchOptionsMap.minDate) > new Date(item.s3_attributes.uploadTime.split(" ")[0])) {
+            this.set('searchOptionsMap.minDate', item.s3_attributes.uploadTime.split(" ")[0]);
+          }
+          if (_.isEmpty(this.searchOptionsMap.maxDate) || new Date(this.searchOptionsMap.maxDate) < new Date(item.s3_attributes.uploadTime.split(" ")[0])) {
+            this.set('searchOptionsMap.maxDate', item.s3_attributes.uploadTime.split(" ")[0]);
+          }
         }
-        console.log(uploadTimes);
-        var min = uploadTimes.reduce(function (a, b) { return a < b ? a : b });
-        this.minFromDate = min
-        var max = uploadTimes.reduce(function (a, b) { return a > b ? a : b });
-        console.log("minDate: " + min)
-        console.log("maxDate: " + max)
-        if (_.isEmpty(Polymer.dom(this.root).querySelector("#from-date").value)) {
-          this.set('searchOptionsMap.minDate', min)
-        } else {
-          this.searchOptionsMap.minDate = Polymer.dom(this.root).querySelector("#from-date").value
-        }
-        // =======================
-        if (_.isEmpty(Polymer.dom(this.root).querySelector("#to-date").value)) {
-          this.set('searchOptionsMap.maxDate', max)
-        } else {
-          this.searchOptionsMap.maxDate = Polymer.dom(this.root).querySelector("#to-date").value
-        }
-        console.log(this.searchOptionsMap.minDate)
-        console.log(this.searchOptionsMap.maxDate);
+        console.log("minDate: " + this.searchOptionsMap.minDate);
+        console.log("maxDate: " + this.searchOptionsMap.maxDate);
+        // if (_.isEmpty(Polymer.dom(this.root).querySelector("#from-date").value)) {
+        //   this.set('searchOptionsMap.minDate', min)
+        // } else {
+        //   this.searchOptionsMap.minDate = Polymer.dom(this.root).querySelector("#from-date").value
+        // }
+        // if (_.isEmpty(Polymer.dom(this.root).querySelector("#to-date").value)) {
+        //   this.set('searchOptionsMap.maxDate', max)
+        // } else {
+        //   this.searchOptionsMap.maxDate = Polymer.dom(this.root).querySelector("#to-date").value
+        // }
+        // console.log(this.searchOptionsMap.minDate)
+        // console.log(this.searchOptionsMap.maxDate);
         console.log(this.searchOptionsMap)
-        var res1 = _.filter(this.dataOptions, function(o) {
-          return o.s3_attributes.user === "trent.clifton"
-        })
-        var res2 = _.filter(this.dataOptions, { 'user': 'trent.clifton', 'project': 'NLVS South'})
-        console.log(res1);
-        console.log(res2);
+        // var res1 = _.filter(this.dataOptions, function(o) {
+        //   return o.s3_attributes.user === 'trent.clifton'
+        // })
+        // console.log(this.selectedUser);
+        // // var res3 = _.filter(this.dataOptions, function(o) {
+        // //   return o.s3_attributes.user === this.selectedUser
+        // // })
+        // var res2 = _.filter(this.dataOptions, {'user': 'trent.clifton', 'project': 'NLVS South'})
+        // console.log(res1);
+        // console.log(res2);
+        // console.log(res3);
         //for model in dataOptions: (same for user)
           //if not model.project in searchOptionsMap.project:
           //  searchOptionsMap.project.push(model.project)
