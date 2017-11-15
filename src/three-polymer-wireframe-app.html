@@ -2017,6 +2017,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.set('searchOptionsMap.maxDate', item.s3_attributes.uploadTime.split(" ")[0]);
           }
         }
+        //to set min value for vaadin-date-picker
         this.minFromDate = this.searchOptionsMap.minDate
         console.log(this.searchOptionsMap)
       }
@@ -2057,17 +2058,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         })
         console.log(searchFilterResults);
-        var toast = Polymer.dom(this.root).querySelector('#searchResultMsg')
         if (searchFilterResults.length > 0) {
           this.set('dataOptions', searchFilterResults)
-          toast.show({ text: searchFilterResults.length + " search results" })
-          // //won't let me set selectedModel to first search result
-          // this.appLoading = false
-          // this.selectedModel = searchFilterResults[0]
+          this.set('selectedModel', searchFilterResults[0].model)
         } else {
-          //I should set it to previous search result
+          var toast = Polymer.dom(this.root).querySelector('#searchResultMsg')
           this.set('dataOptions', this.getModelsResp)
-          toast.show({ text: "No search results" })
+          toast.show({ text: "No search results; filters removed" })
+
         }
       }
 
