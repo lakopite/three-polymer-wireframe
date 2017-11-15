@@ -299,7 +299,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <vaadin-date-picker id="to-date" label="To" min="{{minFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>
-        <paper-button on-tap="">Apply</paper-button>
+        <paper-button on-tap="processSearchOptions">Apply</paper-button>
       </div>
     </paper-dialog>
     <paper-toast id="validationToast" duration="0" class="fit-bottom">
@@ -1987,7 +1987,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         };
         for (var i=0; i < this.dataOptions.length; i++) {
           var item = this.dataOptions[i]
-          console.log(item.model)
           if (typeof item.s3_attributes.user !== 'undefined' && this.searchOptionsMap.user.indexOf(item.s3_attributes.user) === -1) {
             this.searchOptionsMap.user.push(item.s3_attributes.user)
           }
@@ -2001,8 +2000,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.set('searchOptionsMap.maxDate', item.s3_attributes.uploadTime.split(" ")[0]);
           }
         }
-        console.log("minDate: " + this.searchOptionsMap.minDate);
-        console.log("maxDate: " + this.searchOptionsMap.maxDate);
+        this.minFromDate = this.searchOptionsMap.minDate
+        console.log(this.searchOptionsMap)
+        var userSearchInput = {
+          'user': this.selectedUser,
+          'project': this.filterSelectedProject,
+          'minDate': Polymer.dom(this.root).querySelector("#from-date").value,
+          'maxDate': Polymer.dom(this.root).querySelector("#to-date").value
+        }
+        console.log(userSearchInput);
         // if (_.isEmpty(Polymer.dom(this.root).querySelector("#from-date").value)) {
         //   this.set('searchOptionsMap.minDate', min)
         // } else {
@@ -2015,18 +2021,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // }
         // console.log(this.searchOptionsMap.minDate)
         // console.log(this.searchOptionsMap.maxDate);
-        console.log(this.searchOptionsMap)
-        // var res1 = _.filter(this.dataOptions, function(o) {
-        //   return o.s3_attributes.user === 'trent.clifton'
-        // })
-        // console.log(this.selectedUser);
-        // // var res3 = _.filter(this.dataOptions, function(o) {
-        // //   return o.s3_attributes.user === this.selectedUser
-        // // })
-        // var res2 = _.filter(this.dataOptions, {'user': 'trent.clifton', 'project': 'NLVS South'})
-        // console.log(res1);
-        // console.log(res2);
-        // console.log(res3);
+        // =================================================================================================
+        //notes
         //for model in dataOptions: (same for user)
           //if not model.project in searchOptionsMap.project:
           //  searchOptionsMap.project.push(model.project)
