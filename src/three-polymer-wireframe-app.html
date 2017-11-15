@@ -298,7 +298,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <vaadin-date-picker id="from-date" label="From" min="{{minFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
       <vaadin-date-picker id="to-date" label="To" min="{{minFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
       <div class="buttons">
-        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-dismiss on-tap="clearFilterInput">Cancel</paper-button>
         <paper-button on-tap="processSearchOptions">Apply</paper-button>
       </div>
     </paper-dialog>
@@ -1974,6 +1974,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.processSearchOptions();
       }
 
+      clearFilterInput() {
+        this.selectedUser = undefined,
+        this.filterSelectedProject = undefined,
+        Polymer.dom(this.root).querySelector("#from-date").value = undefined,
+        Polymer.dom(this.root).querySelector("#to-date").value = undefined
+      }
+
       processSearchOptions() {
         console.log(this.dataOptions);
         //console.log(JSON.stringify(this.dataOptions));
@@ -2002,26 +2009,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         this.minFromDate = this.searchOptionsMap.minDate
         console.log(this.searchOptionsMap)
+        if (_.isEmpty(Polymer.dom(this.root).querySelector("#from-date").value)) {
+          var minDate = this.searchOptionsMap.minDate
+        } else {
+          var minDate = Polymer.dom(this.root).querySelector("#from-date").value
+        }
+        if (_.isEmpty(Polymer.dom(this.root).querySelector("#to-date").value)) {
+          var maxDate = this.searchOptionsMap.maxDate
+        } else {
+          var maxDate = Polymer.dom(this.root).querySelector("#to-date").value
+        }
         var userSearchInput = {
           'user': this.selectedUser,
           'project': this.filterSelectedProject,
-          'minDate': Polymer.dom(this.root).querySelector("#from-date").value,
-          'maxDate': Polymer.dom(this.root).querySelector("#to-date").value
+          'minDate': minDate,
+          'maxDate': maxDate
         }
         console.log(userSearchInput);
-        // if (_.isEmpty(Polymer.dom(this.root).querySelector("#from-date").value)) {
-        //   this.set('searchOptionsMap.minDate', min)
-        // } else {
-        //   this.searchOptionsMap.minDate = Polymer.dom(this.root).querySelector("#from-date").value
-        // }
-        // if (_.isEmpty(Polymer.dom(this.root).querySelector("#to-date").value)) {
-        //   this.set('searchOptionsMap.maxDate', max)
-        // } else {
-        //   this.searchOptionsMap.maxDate = Polymer.dom(this.root).querySelector("#to-date").value
-        // }
-        // console.log(this.searchOptionsMap.minDate)
-        // console.log(this.searchOptionsMap.maxDate);
-        // =================================================================================================
         //notes
         //for model in dataOptions: (same for user)
           //if not model.project in searchOptionsMap.project:
