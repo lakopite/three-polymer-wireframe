@@ -2062,8 +2062,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.set('dataOptions', searchFilterResults)
           this.set('selectedModel', searchFilterResults[0].model)
         } else {
-          var toast = Polymer.dom(this.root).querySelector('#searchResultMsg')
           this.set('dataOptions', this.getModelsResp)
+          this.clearFilterInput()
+          var toast = Polymer.dom(this.root).querySelector('#searchResultMsg')
           toast.show({ text: "No search results; filters removed" })
 
         }
