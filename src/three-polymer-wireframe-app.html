@@ -309,7 +309,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <vaadin-date-picker id="to-date" label="To" min="{{minFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
       <div class="buttons">
         <paper-button dialog-dismiss on-tap="clearFilterInput">Cancel</paper-button>
-        <paper-button on-tap="applySearchFilters">Apply</paper-button>
+        <paper-button on-tap="setSearchFilters">Apply</paper-button>
       </div>
     </paper-dialog>
     <paper-toast id="searchResultMsg"></paper-toast>
@@ -334,7 +334,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
           <!-- <paper-input id="search-input" label="Search Models..." value="{{searchInput}}" type="text" autofocus minlength="1"></paper-input> -->
           <!-- REMOVED FROM TEMPLATE BELOW: selected="" filter="{{searchFilter(searchInput)}}"-->
-          <template is="dom-repeat" items="[[dataOptions]]">
+          <template is="dom-repeat" items="[[dataOptions]]" filter="{{applySearchFilters(userSearchInput)}}">
             <paper-item id="model-dropdown" class="dropdown-item" name="[[item.model]]">
             <paper-item-body two-line>
               <div class="primary-item">[[_formatModelName(item.model)]]</div>
@@ -347,13 +347,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </div>
       <!-- Filter list icon goes below, not showing up-->
       <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
-      <paper-dropdown-menu label="test employees">
-        <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedEmployee}}">
-          <template is="dom-repeat" items="{{employees}}" filter="isOld">
-            <paper-item class="dropdown-item" name="{{item.first}}">{{item.first}}</paper-item>
-          </template>
-        </paper-listbox>
-      </paper-dropdown-menu>
       <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: {{_uploadedBy(currentModelResp.modelInformation.user)}}<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
         <paper-dropdown-menu id="main-contour-dropdown" label="Select Contour">
@@ -796,15 +789,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           projectList: {
             type: Array,
             value: ["NLVS North", "NLVS South", "NLVS East", "NLVS West", "NLVS Roof Canopy", "NLVS Roof Support", "NLVS Cable Truss"]
-          },
-          employees: {
-            type: Array,
-            value: [
-            {first: 'Bob', last: 'Smith', age: 22},
-            {first: 'Sally', last: 'Johnson', age: 27},
-            {first: 'Bob', last: 'Johnson', age: 65},
-            {first: 'Amanda', last: 'Jones', age: 40}
-        ]
           }
         };
       }
@@ -828,10 +812,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       constructor() {
         super();
-      }
-
-      isOld(item) {
-        return item.age > 25
       }
 
       logout() {
@@ -2042,10 +2022,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         console.log(this.searchOptionsMap)
       }
 
-      applySearchFilters() {
-        //to clear output from last search
-        this.dataOptions = this.getModelsResp
-        console.log(this.dataOptions);
+      setSearchFilters() {
         if (_.isEmpty(Polymer.dom(this.root).querySelector("#from-date").value)) {
           var minDate = this.searchOptionsMap.minDate
         } else {
@@ -2056,37 +2033,50 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         } else {
           var maxDate = Polymer.dom(this.root).querySelector("#to-date").value
         }
-        var userSearchInput = {
+        this.userSearchInput = {
           'user': this.filterSelectedUser,
           'project': this.filterSelectedProject,
           'minDate': minDate,
           'maxDate': maxDate
         }
-        console.log(userSearchInput);
+        console.log(this.userSearchInput);
         this.$.searchFilterModal.close()
-        var searchFilterResults = _.filter(this.dataOptions, function(o) {
-          if (typeof userSearchInput.user === 'undefined' || typeof userSearchInput.project === 'undefined') {
-            if (typeof userSearchInput.user === 'undefined' && typeof userSearchInput.project === 'undefined') {
-              return new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
-            } else if (typeof userSearchInput.user === 'undefined') {
-              return o.s3_attributes.project === userSearchInput.project && new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
-            } else if (typeof userSearchInput.project === 'undefined') {
-              return o.s3_attributes.user === userSearchInput.user && new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
-            }
-          } else {
-            return o.s3_attributes.user === userSearchInput.user && o.s3_attributes.project === userSearchInput.project && new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
-          }
-        })
-        console.log(searchFilterResults);
-        if (searchFilterResults.length > 0) {
-          this.set('dataOptions', searchFilterResults)
-          this.set('selectedModel', searchFilterResults[0].model)
-        } else {
-          this.set('dataOptions', this.getModelsResp)
-          this.clearFilterInput()
-          var toast = Polymer.dom(this.root).querySelector('#searchResultMsg')
-          toast.show({ text: "No search results; filters removed" })
-        }
+      }
+
+      applySearchFilters(userSearchInput) {
+      //   //to clear output from last search
+        this.dataOptions = this.getModelsResp
+        userSearchInput = this.userSearchInput
+        var that = this;
+        that.dataOptions = _.filter(that.dataOptions, function(o) {
+          return o.s3_attributes.user === that.userSearchInput.user
+          })
+        console.log(_.filter(that.dataOptions, function(o) {
+          return o.s3_attributes.user === that.userSearchInput.user
+          }));
+        // var searchFilterResults = _.filter(this.dataOptions, function(o) {
+        //   if (typeof userSearchInput.user === 'undefined' || typeof userSearchInput.project === 'undefined') {
+        //     if (typeof userSearchInput.user === 'undefined' && typeof userSearchInput.project === 'undefined') {
+        //       return new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
+        //     } else if (typeof userSearchInput.user === 'undefined') {
+        //       return o.s3_attributes.project === userSearchInput.project && new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
+        //     } else if (typeof userSearchInput.project === 'undefined') {
+        //       return o.s3_attributes.user === userSearchInput.user && new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
+        //     }
+        //   } else {
+        //     return o.s3_attributes.user === userSearchInput.user && o.s3_attributes.project === userSearchInput.project && new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
+        //   }
+        // })
+        // console.log(searchFilterResults);
+        // if (searchFilterResults.length > 0) {
+        //   this.set('dataOptions', searchFilterResults)
+        //   this.set('selectedModel', searchFilterResults[0].model)
+        // } else {
+        //   this.set('dataOptions', this.getModelsResp)
+        //   this.clearFilterInput()
+        //   var toast = Polymer.dom(this.root).querySelector('#searchResultMsg')
+        //   toast.show({ text: "No search results; filters removed" })
+        // }
       }
 
       clearSearchField(e) {
