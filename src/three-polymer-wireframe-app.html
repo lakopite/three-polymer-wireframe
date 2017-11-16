@@ -37,6 +37,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="../bower_components/vaadin-grid/vaadin-grid-sorter.html">
+<link rel="import" href="../bower_components/vaadin-valo-theme/vaadin-date-picker.html">
+<link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker.html">
 <link rel="import" href="../bower_components/three-polymer/three-view/three-view.html">
 <link rel="import" href="../bower_components/three-polymer/three-model/three-model.html">
 <link rel="import" href="shared-styles.html">
@@ -116,8 +118,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         padding: 0;
       }
 
-      #model-dropdown {
-        /*font-size: .75em;*/
+      #user-email {
+        width: 250px;
       }
 
       paper-button.filterBtn {
@@ -132,6 +134,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       paper-dialog#addModelDialog {
         padding: 1em;
+        width: 350px;
+      }
+
+      #searchFilterModal {
+        padding: 1em;
+        width: 290px;
       }
 
       paper-spinner {
@@ -141,7 +149,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         --paper-spinner-layer-4-color: #FFF;
       }
 
-      #sum-field-dropdown {
+      #sumFieldDropDown {
         --paper-input-container-label: {
           font-size:20px;
         }
@@ -216,11 +224,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: #eeff41;
       }
 
-      #uploadSuccessToast {
-        /*--paper-toast-background-color: green;
-        --paper-toast-color: white;*/
-      }
-
       #cost-tab[disabled] {
         color: #9E9E9E;
       }
@@ -234,6 +237,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: grey;
       }
 
+      .model-div, .filter-input{
+        @apply(--layout-horizontal);
+        @apply(--layout-justified);
+      }
+
+      .model-div paper-dropdown-menu {
+        @apply(--layout-flex);
+      }
+
+      paper-icon-button.filter {
+        @apply(--layout-self-end);
+      }
+
+      paper-icon-button.clear-filter-input {
+        @apply(--layout-self-end);
+      }
+
+      #share-model {
+        margin: 1em;
+      }
+
     </style>
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="model-request" method="GET" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
@@ -241,9 +265,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <!-- ?\<iron-ajax headers="{{authHeaders}}" id="remove-upload-request" method="DELETE" content-type="application/json" on-response="handleModelRemoval" url="[[baseUrl]]delete-model"></iron-ajax> -->
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
-      <iron-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" bind-value="{{userEmail}}" on-change="_checkEmailField">
-        <input>@arup.com
-      </iron-input>
+      <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" on-change="_checkEmailAndProject">
+        <div slot="suffix" label="user">@arup.com</div>
+      </paper-input>
+      <paper-dropdown-menu id="project-dropdown" label="Select Project">
+          <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{uploadSelectedProject}}">
+            <template is="dom-repeat" items="[[projectList]]">
+              <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
+            </template>
+          </paper-listbox>
+      </paper-dropdown-menu>
       <iron-input>
       <input id="modelUpload" type="file" on-change="handleJsonUpload"></input>
       </iron-input>
@@ -252,6 +283,36 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-button id="acceptUploadBtn" dialog-confirm autofocus disabled$="{{_acceptUploadDisabled}}" on-tap="uploadJsonModel">Upload</paper-button>
       </div>
     </paper-dialog>
+    <!-- <paper-dialog modal id="searchFilterModal">
+      <h2>Filter Models</h2>
+      <div class="filter-input">
+        <paper-dropdown-menu id="user-dropdown" label="Select User">
+          <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{filterSelectedUser}}">
+            <template is="dom-repeat" items="[[searchOptionsMap.user]]">
+              <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
+            </template>
+          </paper-listbox>
+        </paper-dropdown-menu>
+        <paper-icon-button class="clear-filter-input" id="clearFilterUser" icon="my-icons:clear" title="clear user" on-tap="clearSearchField"></paper-icon-button>
+      </div>
+      <div class="filter-input">
+      <paper-dropdown-menu id="project-dropdown" label="Select Project">
+        <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{filterSelectedProject}}">
+          <template is="dom-repeat" items="[[searchOptionsMap.project]]">
+            <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
+          </template>
+        </paper-listbox>
+      </paper-dropdown-menu>
+      <paper-icon-button class="clear-filter-input" id="clearFilterProject" icon="my-icons:clear" title="clear project" on-tap="clearSearchField"></paper-icon-button>
+      </div>
+      <vaadin-date-picker id="from-date" label="From" min="{{minFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
+      <vaadin-date-picker id="to-date" label="To" min="{{minFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
+      <div class="buttons">
+        <paper-button dialog-dismiss on-tap="clearFilterInput">Cancel</paper-button>
+        <paper-button on-tap="setSearchFilters">Apply</paper-button>
+      </div>
+    </paper-dialog> -->
+    <paper-toast id="searchResultMsg"></paper-toast>
     <paper-toast id="validationToast" duration="0" class="fit-bottom">
       <paper-button on-tap="reopenUploadBox" class="yellow-toast">Try Again</paper-button>
       <paper-button dialog-dismiss on-tap="closeToast" class="yellow-toast">Cancel</paper-button>
@@ -267,11 +328,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </app-toolbar>
     <div class="drawer-list">
       <!-- <paper-input id="search-input" label="Search Models..." value="{{searchInput}}"></paper-input> -->
-      <paper-dropdown-menu label="Model">
+      <div class="model-div">
+        <!-- <paper-icon-button class="filter" icon="my-icons:filter-list" title="filter models" on-tap="showFilterModal"></paper-icon-button> -->
+        <paper-dropdown-menu label="Model">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
-          <!-- <paper-input id="search-input" label="Search Models..." value="{{searchInput}}" type="text" autofocus minlength="1"></paper-input> -->
-          <!-- REMOVED FROM TEMPLATE BELOW: selected="" filter="{{searchFilter(searchInput)}}"-->
-          <template is="dom-repeat" items="[[dataOptions]]">
+          <template is="dom-repeat" items="[[dataOptions]]" filter="{{applySearchFilters(userSearchInput)}}">
             <paper-item id="model-dropdown" class="dropdown-item" name="[[item.model]]">
             <paper-item-body two-line>
               <div class="primary-item">[[_formatModelName(item.model)]]</div>
@@ -281,12 +342,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </template>
         </paper-listbox>
       </paper-dropdown-menu>
+    </div>
+      <!-- Filter list icon goes below, not showing up-->
       <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
       <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: {{_uploadedBy(currentModelResp.modelInformation.user)}}<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
-        <paper-dropdown-menu id="main-contour-dropdown" label="Contour">
+        <paper-dropdown-menu id="main-contour-dropdown" label="Select Contour">
           <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-            <template is="dom-repeat" items="[[metadataFields]]">
+            <template is="dom-repeat" items="{{metadataFields}}">
               <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
             </template>
           </paper-listbox>
@@ -361,7 +424,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 10/31/17</paper-item>
+        <paper-item>Build Date: 11/15/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -396,7 +459,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </app-toolbar>
           <paper-dropdown-menu id="num-contour-dropdown" label="Select Contour">
             <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-              <template is="dom-repeat" items="[[metadataFields]]">
+              <template is="dom-repeat" items="{{metadataFields}}">
                 <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
               </template>
             </paper-listbox>
@@ -423,14 +486,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </app-toolbar>
           <paper-dropdown-menu id="str-contour-dropdown" label="Select Contour">
             <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-              <template is="dom-repeat" items="[[metadataFields]]">
+              <template is="dom-repeat" items="{{metadataFields}}">
                 <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
               </template>
             </paper-listbox>
           </paper-dropdown-menu>
-          <paper-dropdown-menu class="aggregation-toolbar" id="sum-field-dropdown" label="Select Sum Field">
+          <paper-dropdown-menu class="aggregation-toolbar" id="sumFieldDropDown" label="Select Sum Field">
             <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
-              <template is="dom-repeat" items="[[numericalMetadataKeys]]">
+              <template is="dom-repeat" items="{{numericalMetadataKeys}}">
                 <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
               </template>
             </paper-listbox>
@@ -720,6 +783,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           showStringAggregations: {
             type: Boolean,
             value: false
+          },
+          projectList: {
+            type: Array,
+            value: ["NLVS North", "NLVS South", "NLVS East", "NLVS West", "NLVS Roof Canopy", "NLVS Roof Support", "NLVS Cable Truss"]
           }
         };
       }
@@ -735,7 +802,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_getSumByForSelectedSumField(selectedSumField)',
           '_drawStrChart(strPieData)',
           '_drawCostChart(costPieData)',
-          '_delayChartResize(selectedView, selectedContourBy)',
+          '_delayStrChartResize(selectedView, selectedContourBy)',
+          '_delayCostChartResize(selectedView)',
           '_getCostByForSelectedCostGroup(selectedCostGroup)'
         ]
       }
@@ -749,12 +817,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _shareModelEmail(message) {
-          var email = '';
-          var subject = "Arup Model Quickview link has been shared with you";
-          var link = document.createElement("a");
-          link.href =  window.location.pathname + '#' + this.selectedModel;
-          var emailBody = 'View Arup Model Quickview link: ' + '\r\n' + link.href;
-          document.location = "mailto:"+email+"?subject="+subject+"&body="+emailBody;
+        var email = '';
+        var subject = "Arup Model Quickview link has been shared with you";
+        var link = document.createElement("a");
+        link.href =  window.location.pathname + '#' + this.selectedModel;
+        var emailBody = 'Visit Arup Model Quickview link: ' + '\r\n' + link.href;
+        document.location = "mailto:"+email+"?subject="+subject+"&body="+emailBody;
       }
 
       //the below 2 functions will have to be altered when backend is adjusted to auto timestamp
@@ -783,7 +851,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _uploadedBy(user) {
         if (_.isEmpty(user)) {
-          return user = "admin"
+          return user = "no user available"
         } else {
           return user
         }
@@ -794,7 +862,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         that.$['json-upload-request'].generateRequest();
         that._clearUploadInput()
         this.$.uploadSuccessToast.show({ text: "Valid JSON, posted to server" })
-        this._acceptUploadDisabled = true
         //console.log(that.dataOptions);
       }
 
@@ -807,6 +874,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         //var toast = Polymer.dom(this.root).querySelector('#validationToast')
         this.$.validationToast.hide()
         this.userEmail = ''
+        this.uploadSelectedProject = undefined
       }
 
       handleJsonUpload(evt) {
@@ -847,6 +915,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               throw "modelInformation must contain a 'name' key."
               //add email of user uploading file
               that.jsonUploadPayload.modelInformation.user = that.userEmail
+              that.jsonUploadPayload.modelInformation.project = that.uploadSelectedProject
               // check that units are either metric or imperial only
               if (!(that.jsonUploadPayload.modelInformation.units === "metric" ||
               that.jsonUploadPayload.modelInformation.units === "imperial"))
@@ -863,8 +932,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if (that.flipUploadSwitch === true) {
               that._acceptUploadDisabled = false
             } else {
-              //this won't work
-              that._checkEmailField()
+              that._checkEmailAndProject()
               if (that.flipUploadSwitch === true) {
                 that._acceptUploadDisabled = false
               }
@@ -883,10 +951,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       //   this.$['remove-upload-request'].generateRequest();
       // }
 
-      _checkEmailField() {
-        if (_.isEmpty(this.userEmail)) {
+      _checkEmailAndProject() {
+        this.userEmail = Polymer.dom(this.root).querySelector("#user-email").value
+        if (_.isEmpty(this.userEmail) || typeof this.uploadSelectedProject === 'undefined') {
           this.flipUploadSwitch = false
-        } else if (!_.isEmpty(this.userEmail)){
+        } else if (!_.isEmpty(this.userEmail) && typeof this.uploadSelectedProject !== 'undefined'){
           this.flipUploadSwitch = true
         }
         this.handleJsonUpload()
@@ -894,6 +963,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _clearUploadInput() {
         Polymer.dom(this.root).querySelector('#modelUpload').value = ''
+        this.uploadSelectedProject = undefined
         this._acceptUploadDisabled = true;
       }
 
@@ -1008,36 +1078,56 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      _numericalAggregations() {
-        this.showStringAggregations = false;
+      _resultFilterInput() {
         var that = this;
-        if (_.isEmpty(this.currentModelResp.payload.planarElements)) {
-          var resultFilterInput = _.filter(that._modelData.linearElements, function(o) {
-            return _.every(o.vertices, function(j) {
-              return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-              that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-              that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-            })
+        this.linearFilterResult = _.filter(that._modelData.linearElements, function(o) {
+          return _.every(o.vertices, function(j) {
+            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+            that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
+            that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
           })
-        } else if (_.isEmpty(this.currentModelResp.payload.linearElements)) {
-          var resultFilterInput = _.filter(that._modelData.planarElements, function(o) {
-            return _.every(o.vertices, function(j) {
-              return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-              that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-              that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-            })
+        })
+        this.planarFilterResult = _.filter(that._modelData.planarElements, function(o) {
+          return _.every(o.vertices, function(j) {
+            return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
+            that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
+            that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
           })
+        })
+        return _.concat(this.linearFilterResult, this.planarFilterResult)
+      }
+
+      _generateNumDropdownOptions() {
+        // using numDropdownOptions not metadataFields to not mess with metadataFields
+        this.numDropdownOptions = []
+        this._resultFilterInput()
+        for (var i=0; i < this._resultFilterInput().length; i++) {
+          var keys = _.keys(this._resultFilterInput()[i].metadata);
+          for (var j=0; j < keys.length; j++) {
+            if (this.numDropdownOptions.indexOf(keys[j]) === -1) {
+              this.numDropdownOptions.push(keys[j])
+            }
+          }
         }
-        if (resultFilterInput.length > 0) {
-          this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
+      }
+
+      _numericalAggregations() {
+        this._generateNumDropdownOptions()
+        var that = this;
+        if (this._resultFilterInput().length > 0 && _.includes(this.numDropdownOptions, this.selectedContourBy)) {
+          this.minResult = _.round(_.minBy(this._resultFilterInput(), function(o) {
             return o.metadata[that.selectedContourBy]
           }).metadata[this.selectedContourBy], 3)
-          this.maxResult = _.round(_.maxBy(resultFilterInput, function(o) {
+          this.maxResult = _.round(_.maxBy(this._resultFilterInput(), function(o) {
             return o.metadata[that.selectedContourBy]
           }).metadata[this.selectedContourBy], 3)
-          this.avgResult = _.round(_.meanBy(resultFilterInput, function(o) {
-            return o.metadata[that.selectedContourBy]
-          }), 3);
+          var _average = []
+          var average = _.forEach(this._resultFilterInput(), function(o) {
+            if (typeof o.metadata[that.selectedContourBy] !== 'undefined') {
+              _average.push(o.metadata[that.selectedContourBy])
+            }
+          })
+          this.avgResult =  _.round(_.mean(_average), 3);
           this._getAggregationLabels()
           this.numericalAggregationsTableData = []
           var name = [this.getMinLabel, this.getMaxLabel, this.getAvgLabel];
@@ -1049,7 +1139,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
             this.push('numericalAggregationsTableData', setup)
           }
-          this.totalResult = _.round(_.sumBy(resultFilterInput, function(o) {
+          this.totalResult = _.round(_.sumBy(this._resultFilterInput(), function(o) {
             return o.metadata[that.selectedContourBy]
           }), 3);
         } else {
@@ -1060,7 +1150,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _getSumByForSelectedSumField(_selectedSumField) {
-        this.numericalMetadataKeys = this.numericalMetadataKeys
         if (typeof this.selectedSumField !== 'undefined') {
           this._stringAggregations();
         }
@@ -1074,141 +1163,147 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return
       }
 
-      _stringAggregations() {
-        this.showNumericalAggregations = false;
-        var that = this
-        // ================ repeated function start ==========================================
-        if (_.isEmpty(this.currentModelResp.payload.planarElements)) {
-          var resultFilterInput = _.filter(that._modelData.linearElements, function(o) {
-            return _.every(o.vertices, function(j) {
-              return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-              that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-              that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-            })
-          })
-        } else if (_.isEmpty(this.currentModelResp.payload.linearElements)) {
-          var resultFilterInput = _.filter(that._modelData.planarElements, function(o) {
-            return _.every(o.vertices, function(j) {
-              return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-              that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-              that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-            })
-          })
-        }
-        // ================ repeated function end ==========================================
-        if (resultFilterInput.length > 0) {
-          var resultGroupByName = _.groupBy(resultFilterInput, function(o) {
-            if (that.selectedContourBy === 'propertyname_1') {
-              return o.metadata.propertyname_1 + " (" + o.metadata.propertyname_0 + ")"
-            }
-            return o.metadata[that.selectedContourBy]
-          })
-          // console.log("RESULTGROUPBYNAME");
-          // console.log(resultGroupByName);
-          this.groupKeys = _.without(_.keys(resultGroupByName), 'undefined')
-          if(typeof this.selectedSumField === 'undefined') {
-            this.allObjectsByGroup = []
-            //console.log("ALL OBJECTS BY GROUP ONCE");
-            //console.log(this.allObjectsByGroup);
-            for (var i = 0; i < this.groupKeys.length; i++) {
-              var groupObjects = resultGroupByName[this.groupKeys[i]]
-              this.push('allObjectsByGroup', groupObjects)
+      _setStringPieData() {
+        var _strPieData = []
+        for (var i=0; i < this.groupSumData.length; i++) {
+          var item = this.groupSumData[i]
+          _strPieData.push([item.group, parseFloat(item.sum)])
           }
-          var _numericalMetadataKeys = []
-          var totalGroupObjects = _.flatten(this.allObjectsByGroup)
-          for (var i = 0; i < totalGroupObjects.length; i++) {
-            var metadataObject = totalGroupObjects[i].metadata
-            var metadataValues = _.values(metadataObject)
-            var metadataKeys = _.keys(metadataObject)
-             for (var j = 0; j < metadataKeys.length; j++) {
-              //to include only these in dropdown menu
-              //var validSumGroups = ['meta_length', 'length', 'meta_mass', 'mass', 'meta_vol', 'vol', 'volume']
-              var ignoreSumGroups = ['area', 'beamnum', 'density']
-              //but also do an "includes/contains" because names could vary
-               // to find unique keys with numeric values for dropdown options
-               //&& validSumGroups.indexOf(metadataKeys[j]) !== -1
-               if(_.isNumber(metadataValues[j]) && _numericalMetadataKeys.indexOf(metadataKeys[j]) === -1 && ignoreSumGroups.indexOf(metadataKeys[j]) === -1) {
-                 _numericalMetadataKeys.push(metadataKeys[j])
-               }
-               this.set('numericalMetadataKeys', _numericalMetadataKeys.sort())
+        this.strPieData = _strPieData;
+      }
+
+      _generateNumMetadataKeys() {
+        var that = this;
+        this._resultFilterInput()
+        this.resultGroupByName = _.groupBy(this._resultFilterInput() , function(o) {
+        if (that.selectedContourBy === 'propertyname_1') {
+          return o.metadata.propertyname_1 + " (" + o.metadata.propertyname_0 + ")"
+        }
+          return o.metadata[that.selectedContourBy]
+        })
+        // console.log("RESULTGROUPBYNAME");
+        // console.log(resultGroupByName);
+        this.groupKeys = _.without(_.keys(this.resultGroupByName), 'undefined')
+        // console.log(this.groupKeys)
+        this.allObjectsByGroup = []
+        for (var i = 0; i < this.groupKeys.length; i++) {
+          var groupObjects = this.resultGroupByName[this.groupKeys[i]]
+          this.push('allObjectsByGroup', groupObjects)
+        }
+        var _numericalMetadataKeys = []
+        var totalGroupObjects = _.flatten(this.allObjectsByGroup)
+        for (var i = 0; i < totalGroupObjects.length; i++) {
+          var metadataObject = totalGroupObjects[i].metadata
+          var metadataValues = _.values(metadataObject)
+          var metadataKeys = _.keys(metadataObject)
+          for (var j = 0; j < metadataKeys.length; j++) {
+            //to include only these in dropdown menu
+            //var validSumGroups = ['meta_length', 'length', 'meta_mass', 'mass', 'meta_vol', 'vol', 'volume']
+            var ignoreSumGroups = ['area', 'beamnum', 'density', 'shellnum']
+            //but also do an "includes/contains" because names could vary
+            // to find unique keys with numeric values for dropdown options
+            //&& validSumGroups.indexOf(metadataKeys[j]) !== -1
+            if(_.isNumber(metadataValues[j]) && _numericalMetadataKeys.indexOf(metadataKeys[j]) === -1 && ignoreSumGroups.indexOf(metadataKeys[j]) === -1) {
+              _numericalMetadataKeys.push(metadataKeys[j])
+            }
+            this.set('numericalMetadataKeys', _numericalMetadataKeys.sort())
+          }
+        }
+      }
+
+      _createStringTableData() {
+        var that = this;
+        var _groupSumData = [];
+       // console.log(this.groupSumData);
+         for (var i = 0; i < this.groupKeys.length; i++) {
+         //reusing var groupObjects below (was local variable in previous loop for numericalMetadataKeys)
+           var groupObjects = this.resultGroupByName[this.groupKeys[i]]
+           var elemsPerGroup = groupObjects.length
+           var sumByGroup = _.round(_.sumBy(groupObjects, function(o) {
+             return o.metadata[that.selectedSumField]
+           }), 0)
+           var minByGroup = _.round(_.minBy(groupObjects, function(o) {
+             return o.metadata[that.selectedSumField]
+           }).metadata[that.selectedSumField], 0)
+           var maxByGroup = _.round(_.maxBy(groupObjects, function(o) {
+             return o.metadata[that.selectedSumField]
+           }).metadata[that.selectedSumField], 0)
+           var _average = []
+           var average = _.forEach(groupObjects, function(o) {
+             if (typeof o.metadata[that.selectedSumField] !== 'undefined') {
+               _average.push(o.metadata[that.selectedSumField])
+             }
+           })
+           var avgByGroup =  _.round(_.mean(_average), 3);
+           //for conversion
+           if (that.currentModelResp.modelInformation.units === 'imperial') {
+             if (that.selectedSumField.includes('length')) {
+               this.strOtherUnitSum = _.round(sumByGroup/12, 0)
+             } else if (that.selectedSumField.includes('mass')) {
+               this.strOtherUnitSum = _.round(sumByGroup/2000, 0)
+             } else if (that.selectedSumField.includes('vol')) {
+               this.strOtherUnitSum = _.round(sumByGroup/46656, 0)
+             }
+           } else if (that.currentModelResp.modelInformation.units === 'metric') {
+             if (that.selectedSumField.includes('length')) {
+               this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
+             } else if (that.selectedSumField.includes('mass')) {
+               this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
+             } else if (that.selectedSumField.includes('vol')) {
+               this.strOtherUnitSum = _.round(sumByGroup/1000000000, 0)
              }
            }
-           this.selectedSumField = this.numericalMetadataKeys[0]
+           var groupSumDataSetup = {
+             'group': this.groupKeys[i],
+             'elemsPerGroup': elemsPerGroup,
+             'sum': sumByGroup,
+             'otherUnitSum': this.strOtherUnitSum,
+             'min' : minByGroup,
+             'max' : maxByGroup,
+             'avg' : avgByGroup
+           }
+           _groupSumData.push(groupSumDataSetup)
+           this.push('allObjectsByGroup', groupObjects)
+         }
+         this.set('groupSumData',_.sortBy(_groupSumData, [function(o) { return o.group }]))
+         //   //for strOtherUnitLabel
+         this._strOtherUnitLabel()
+         // for chart total sum by group
+         this.totalElements = _.round(_.sumBy(this.groupSumData, function(o) {
+           return o.elemsPerGroup
+         }), 0)
+         this.grandTotalSum = _.round(_.sumBy(this.groupSumData, function(o) {
+           return o.sum
+         }), 1)
+         this.grandTotalOtherUnitSum = _.round(_.sumBy(this.groupSumData, function(o) {
+           return o.otherUnitSum
+         }), 1)
+         this._setStringPieData()
+      }
+
+      _stringAggregations() {
+        this.showNumericalAggregations = false;
+        this._resultFilterInput()
+        this._generateNumDropdownOptions()
+        if (this._resultFilterInput().length > 0) {
+          this._generateNumMetadataKeys()
+          if (typeof this.selectedSumField === 'undefined' || !_.includes(this.numericalMetadataKeys, this.selectedSumField)) {
+            var that = this;
+            setTimeout(function() {
+              that.set('selectedSumField', that.numericalMetadataKeys[0])
+              that._createStringTableData()
+            },0)
          } else {
-           var _groupSumData = [];
-          // console.log(this.groupSumData);
-          this.allObjectsByGroupDupe = []
-          // console.log("ALL OBJECTS BY GROUP SECOND");
-          // console.log(this.allObjectsByGroupDupe);
-          for (var i = 0; i < this.groupKeys.length; i++) {
-            //reusing var groupObjects below (was local variable in previous loop for numericalMetadataKeys)
-            var groupObjects = resultGroupByName[this.groupKeys[i]]
-              var elemsPerGroup = groupObjects.length
-              var sumByGroup = _.round(_.sumBy(groupObjects, function(o) {
-                return o.metadata[that.selectedSumField]
-              }), 0)
-              var minByGroup = _.round(_.minBy(groupObjects, function(o) {
-                return o.metadata[that.selectedSumField]
-              }).metadata[that.selectedSumField], 0)
-              var maxByGroup = _.round(_.maxBy(groupObjects, function(o) {
-                return o.metadata[that.selectedSumField]
-              }).metadata[that.selectedSumField], 0)
-              var avgByGroup = _.round(_.meanBy(groupObjects, function(o) {
-                return o.metadata[that.selectedSumField]
-              }), 0);
-              //for conversion
-              if (that.currentModelResp.modelInformation.units === 'imperial') {
-                if (that.selectedSumField.includes('length')) {
-                  this.strOtherUnitSum = _.round(sumByGroup/12, 0)
-                } else if (that.selectedSumField.includes('mass')) {
-                  this.strOtherUnitSum = _.round(sumByGroup/2000, 0)
-                } else if (that.selectedSumField.includes('vol')) {
-                  this.strOtherUnitSum = _.round(sumByGroup/46656, 0)
-                }
-              } else if (that.currentModelResp.modelInformation.units === 'metric') {
-                if (that.selectedSumField.includes('length')) {
-                  this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
-                } else if (that.selectedSumField.includes('mass')) {
-                  this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
-                } else if (that.selectedSumField.includes('vol')) {
-                  this.strOtherUnitSum = _.round(sumByGroup/1000000000, 0)
-                }
-              }
-              var groupSumDataSetup = {
-                'group': this.groupKeys[i],
-                'elemsPerGroup': elemsPerGroup,
-                'sum': sumByGroup,
-                'otherUnitSum': this.strOtherUnitSum,
-                'min' : minByGroup,
-                'max' : maxByGroup,
-                'avg' : avgByGroup
-              }
-              _groupSumData.push(groupSumDataSetup)
-              this.push('allObjectsByGroupDupe', groupObjects)
-            }
-            this.set('groupSumData',_.sortBy(_groupSumData, [function(o) { return o.group }]))
-            //   //for strOtherUnitLabel
-            this._strOtherUnitLabel()
-            // for chart total sum by group
-            this.totalElements = _.round(_.sumBy(this.groupSumData, function(o) {
-              return o.elemsPerGroup
-            }), 0)
-            this.grandTotalSum = _.round(_.sumBy(this.groupSumData, function(o) {
-              return o.sum
-            }), 1)
-            this.grandTotalOtherUnitSum = _.round(_.sumBy(this.groupSumData, function(o) {
-              return o.otherUnitSum
-            }), 1)
-            // for pie chart
-            var _strPieData = []
-            for (var i=0; i < this.groupSumData.length; i++) {
-              var item = this.groupSumData[i]
-              _strPieData.push([item.group, parseFloat(item.sum)])
-              }
-            this.strPieData = _strPieData;
+           if (!_.includes(this.numDropdownOptions, this.selectedContourBy)) {
+            this.$.sumFieldDropDown.disabled = true
+          } else if (_.includes(this.numDropdownOptions, this.selectedContourBy)) {
+            this.$.sumFieldDropDown.disabled = false
+          }
+           this._createStringTableData()
           }
         } else {
           this.groupSumData = []
+          this.totalElements = 0
           this.grandTotalSum = 0
           this.grandTotalOtherUnitSum = 0
           this.strPieData = []
@@ -1412,10 +1507,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         //console.log(this.strPieChart.series[0].userOptions.data);
       }
 
-      _delayChartResize() {
+      _delayStrChartResize() {
         var that = this;
         setTimeout(function() {
           that.strPieChart.reflow()
+        }, 0)
+      }
+
+      _delayCostChartResize() {
+        var that = this;
+        setTimeout(function() {
+          that.costPieChart.reflow()
         }, 0)
       }
 
@@ -1428,7 +1530,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _dateTimeFormat() {
         var d = new Date();
-        var curr_date = (d.getDate() < 9 ? '0': '') + (d.getDate()+1)
+        var curr_date = (d.getDate() < 9 ? '0': '') + (d.getDate())
         var curr_month = (d.getMonth() < 9 ? '0': '') + (d.getMonth()+1)
         var curr_year = d.getFullYear();
         var curr_year_formatted = curr_year.toString().substring(2)
@@ -1556,16 +1658,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _disableCostTab(_currentMetadataFields, _currentModel, _geoFilter) {
         if (!_.isEmpty(this.geometryFilter) && this.metadataFields.includes('material')) {
-          if (_.isEmpty(this.currentModelResp.payload.planarElements)) {
-            var payloadElems = this.currentModelResp.payload.linearElements
-          } else if (_.isEmpty(this.currentModelResp.payload.linearElements)) {
-            var payloadElems = this.currentModelResp.payload.planarElements
-          }
+          var payloadElems = _.concat(this.currentModelResp.payload.linearElements, this.currentModelResp.payload.planarElements)
           for (var i=0; i < payloadElems.length; i++) {
             this.material = _.toLower(payloadElems[i].metadata.material)
+            //console.log(payloadElems[i]);
             // go through payload elements and their metadata keys
             if (this.material === 'concrete' && _.has(payloadElems[i], 'metadata.volume') ||  _.has(payloadElems[i], 'metadata.vol') ||  _.has(payloadElems[i], 'metadata.meta_volume') ||
-                this.material === 'steel' && _.has(payloadElems[i], 'metadata.mass') ||  _.has(payloadElems[i], 'metadata.meta_mass')) {
+                this.material === 'steel' && _.has(payloadElems[i], 'metadata.mass') || _.has(payloadElems[i], 'metadata.meta_mass')) {
               // console.log("material cost for: " + this.material)
               // console.log("does it include 'conc': " + this.material.includes('conc'))
               // console.log("does it include 'steel': " + this.material.includes('steel'))
@@ -1589,7 +1688,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _applyAllCostResults() {
-        //make DRY!...somehow
         for (var i=0; i < this.costTableData.length; i++) {
             this.set('costTableData.'+i+'.input', this.applyToAll)
             this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
@@ -1631,7 +1729,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         for (var i=0; i < this.costTableData.length; i++) {
           if (i === inputIndex) {
             //console.log("values: " + e.target.value + " : " + this.costTableData[i].input)
-            this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
+            this.set('costTableData.'+i+'.costResult', this.costTableData[i].input * this.costTableData[i].otherUnitSum);
           }
         }
         if (this.costItems.length === 0) {
@@ -1676,26 +1774,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _costAggregations() {
         var that = this
-        // ================ repeated function start ==========================================
-        if (_.isEmpty(this.currentModelResp.payload.planarElements)) {
-          var resultFilterInput = _.filter(that._modelData.linearElements, function(o) {
-            return _.every(o.vertices, function(j) {
-              return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-              that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-              that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-            })
-          })
-        } else if (_.isEmpty(this.currentModelResp.payload.linearElements)) {
-          var resultFilterInput = _.filter(that._modelData.planarElements, function(o) {
-            return _.every(o.vertices, function(j) {
-              return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-              that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-              that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-            })
-          })
-        }
-        if (resultFilterInput.length > 0) {
-          // ================ repeated function end ==========================================
+        this._resultFilterInput()
+        if (this._resultFilterInput().length > 0) {
           this.costGroups = []
           for (var i=0; i < this.metadataFields.length; i++) {
             if (this.metadataFields[i].includes('propertyname')) {
@@ -1705,7 +1785,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           if (typeof this.selectedCostGroup === 'undefined') {
             this.selectedCostGroup = this.costGroups[0]
           }
-          var groupsForMaterial = _.groupBy(resultFilterInput, function(o) {
+          var groupsForMaterial = _.groupBy(this._resultFilterInput() , function(o) {
             if (that.selectedCostGroup === 'propertyname_1') {
               return o.metadata.propertyname_1 + " (" + o.metadata.propertyname_0 + ")"
             }
@@ -1871,10 +1951,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this._aggregations(this._modelData, this.selectedContourBy, this.selectedView);
       }
 
+      todaysDate() {
+        var d = new Date();
+        var curr_date = (d.getDate() < 9 ? '0': '') + (d.getDate())
+        var curr_month = (d.getMonth() < 9 ? '0': '') + (d.getMonth()+1)
+        var curr_year = d.getFullYear();
+        return curr_year + "-" + curr_month + "-" + curr_date
+      }
+
       _initData(dataOptions_) {
         //this.set('dataOptions', dataOptions_)
         //sort by date
-        this.set('dataOptions', _.sortBy(dataOptions_, [function(o) { return o.s3_attributes.uploadTime}]));
+        this.set('dataOptions', _.sortBy(dataOptions_, [function(o) { return o.s3_attributes.uploadTime }]));
         if (this.dataOptions.length > 0) {
           var link_ = window.location.hash.replace("#","");
           var linkIndex = -1;
@@ -1892,14 +1980,107 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.set('selectedModel', this.dataOptions[0].model)
           }
         }
+        //this.processSearchOptions();
       }
+
+      clearFilterInput() {
+        this.filterSelectedUser = undefined,
+        this.filterSelectedProject = undefined,
+        Polymer.dom(this.root).querySelector("#from-date").value = undefined,
+        Polymer.dom(this.root).querySelector("#to-date").value = undefined
+      }
+
+      // processSearchOptions() {
+      //   console.log(this.dataOptions);
+      //   //console.log(JSON.stringify(this.dataOptions));
+      //   //create a set of all the different Options
+      //   this.searchOptionsMap = {
+      //     'user': [],
+      //     'project': [],
+      //     'minDate': "",
+      //     'maxDate': ""
+      //   };
+      //   for (var i=0; i < this.dataOptions.length; i++) {
+      //     var item = this.dataOptions[i]
+      //     if (typeof item.s3_attributes.user !== 'undefined' && this.searchOptionsMap.user.indexOf(item.s3_attributes.user) === -1) {
+      //       this.searchOptionsMap.user.push(item.s3_attributes.user)
+      //     }
+      //     if (typeof item.s3_attributes.project !== 'undefined' && this.searchOptionsMap.project.indexOf(item.s3_attributes.project) === -1) {
+      //       this.searchOptionsMap.project.push(item.s3_attributes.project)
+      //     }
+      //     if (_.isEmpty(this.searchOptionsMap.minDate) || new Date(this.searchOptionsMap.minDate) > new Date(item.s3_attributes.uploadTime.split(" ")[0])) {
+      //       this.set('searchOptionsMap.minDate', item.s3_attributes.uploadTime.split(" ")[0]);
+      //     }
+      //     if (_.isEmpty(this.searchOptionsMap.maxDate) || new Date(this.searchOptionsMap.maxDate) < new Date(item.s3_attributes.uploadTime.split(" ")[0])) {
+      //       this.set('searchOptionsMap.maxDate', item.s3_attributes.uploadTime.split(" ")[0]);
+      //     }
+      //   }
+      //   //to set min value for vaadin-date-picker
+      //   this.minFromDate = this.searchOptionsMap.minDate
+      //   console.log(this.searchOptionsMap)
+      // }
+      //
+      // setSearchFilters() {
+      //   if (_.isEmpty(Polymer.dom(this.root).querySelector("#from-date").value)) {
+      //     var minDate = this.searchOptionsMap.minDate
+      //   } else {
+      //     var minDate = Polymer.dom(this.root).querySelector("#from-date").value
+      //   }
+      //   if (_.isEmpty(Polymer.dom(this.root).querySelector("#to-date").value)) {
+      //     var maxDate = this.searchOptionsMap.maxDate
+      //   } else {
+      //     var maxDate = Polymer.dom(this.root).querySelector("#to-date").value
+      //   }
+      //   this.userSearchInput = {
+      //     'user': this.filterSelectedUser,
+      //     'project': this.filterSelectedProject,
+      //     'minDate': minDate,
+      //     'maxDate': maxDate
+      //   }
+      //   console.log(this.userSearchInput);
+      //   this.$.searchFilterModal.close()
+      // }
+      //
+      // applySearchFilters(userSearchInput) {
+      //   // to clear output from last search
+      //   this.dataOptions = this.getModelsResp
+      //   var that = this;
+      //   that.dataOptions = _.filter(that.dataOptions, function(o) {
+      //     if (typeof userSearchInput.user === 'undefined' || typeof userSearchInput.project === 'undefined') {
+      //       if (typeof userSearchInput.user === 'undefined' && typeof userSearchInput.project === 'undefined') {
+      //         return new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
+      //       } else if (typeof userSearchInput.user === 'undefined') {
+      //         return o.s3_attributes.project === userSearchInput.project && new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
+      //       } else if (typeof userSearchInput.project === 'undefined') {
+      //         return o.s3_attributes.user === userSearchInput.user && new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
+      //       }
+      //     } else {
+      //       return o.s3_attributes.user === userSearchInput.user && o.s3_attributes.project === userSearchInput.project && new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
+      //     }
+      //   })
+      //   if (that.dataOptions.length > 0) {
+      //      that.set('selectedModel', that.dataOptions[0].model)
+      //   } else {
+      //     that.set('dataOptions', that.getModelsResp)
+      //     that.clearFilterInput()
+      //     var toast = Polymer.dom(that.root).querySelector('#searchResultMsg')
+      //     toast.show({ text: "No search results; filters removed" })
+      //   }
+      // }
+      //
+      // clearSearchField(e) {
+      //   if (e.path[2].id === 'clearFilterUser') {
+      //     this.filterSelectedUser = undefined
+      //   } if (e.path[2].id === 'clearFilterProject') {
+      //     this.filterSelectedProject = undefined
+      //   }
+      // }
 
       handleOptionsResponse(event, response) {
         this.getModelsResp = response.response
-        var resp = response.response;
-        if (resp) {
+        if (this.getModelsResp) {
           this.appLoading = false
-          this._initData(resp);
+          this._initData(this.getModelsResp);
         } else {
           this.handleOptionsError();
         }
@@ -1913,6 +2094,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleDataResponse(event, response) {
         this.currentModelResp = response.response
+        // if (typeof this.currentModelResp.modelInformation.project === 'undefined') {
+        //   this.currentModelResp.modelInformation.project = this._formatModelName(this.currentModelResp.modelInformation.name)
+        // }
+        //console.log(this.currentModelResp);
         var costTab = Polymer.dom(this.root).querySelector("#cost-tab")
         if (costTab.disabled && this.selectedView === 'cost-view') {
           this.selectedView = 'model-view'
@@ -1950,12 +2135,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$.addModelDialog.open();
       }
 
+      showFilterModal() {
+        this.$.searchFilterModal.open();
+      }
+
       handleUploadResponse(event, response) {
         var resp = response.response;
         if ("success" in resp) {
           this.$['get-models-request'].generateRequest();
+          this.$.uploadSuccessToast.show({ text: "Upload successful!"})
+        } else {
+          this.$.uploadSuccessToast.show({ text: "An error occurred"})
         }
       }
+
     }
 
     window.customElements.define(ThreePolymerWireframe.is, ThreePolymerWireframe);
