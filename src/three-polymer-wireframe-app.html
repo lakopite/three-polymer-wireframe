@@ -2117,7 +2117,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.$['get-models-request'].generateRequest();
           this.$.uploadSuccessToast.show({ text: "Upload successful!"})
         } else {
-          this.$.uploadSuccessToast.show({ text: "An error occurred"})
+          if ("error" in resp) {
+            this.$.uploadSuccessToast.show({ text: resp["error"]})
+          }
+          else {
+            this.$.uploadSuccessToast.show({ text: "An error occurred"})
+          }
         }
       }
 
