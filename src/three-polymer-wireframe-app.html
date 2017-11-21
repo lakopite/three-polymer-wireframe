@@ -1963,7 +1963,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.set('selectedModel', this.dataOptions[linkIndex].model)
           }
           else {
-            this.set('selectedModel', this.dataOptions[0].model)
+            console.log(Polymer.dom(this.root).querySelector("#searchOptions").items);
+            //this.set('selectedModel', Polymer.dom(this.root).querySelector("#searchOptions").items[0].model)
           }
         }
         this.processSearchOptions();
@@ -2094,6 +2095,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // if (typeof this.currentModelResp.modelInformation.project === 'undefined') {
         //   this.currentModelResp.modelInformation.project = this._formatModelName(this.currentModelResp.modelInformation.name)
         // }
+        console.log(Polymer.dom(this.root).querySelector("#searchOptions").items)
         console.log(this.currentModelResp);
         var costTab = Polymer.dom(this.root).querySelector("#cost-tab")
         if (costTab.disabled && this.selectedView === 'cost-view') {
