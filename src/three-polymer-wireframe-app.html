@@ -424,7 +424,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 11/20/17</paper-item>
+        <paper-item>Build Date: 11/21/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -1953,7 +1953,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var link_ = window.location.hash.replace("#","");
           var linkIndex = -1;
           if (link_ !== "") {
-            linkIndex = _.findIndex(this.dataOptions,function(o) {return o.model === link_})
+            linkIndex = _.findIndex(this.dataOptions, function(o) {return o.model === link_})
             if (linkIndex === -1) {
               this.$.linkFailToast.show({ text: "Couldn't find linked model" });
             }
@@ -1963,8 +1963,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.set('selectedModel', this.dataOptions[linkIndex].model)
           }
           else {
-            console.log(Polymer.dom(this.root).querySelector("#searchOptions").items);
-            //this.set('selectedModel', Polymer.dom(this.root).querySelector("#searchOptions").items[0].model)
+            this.set('selectedModel', this.dataOptions[0].model)
           }
         }
         this.processSearchOptions();
@@ -1978,7 +1977,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       processSearchOptions() {
-        console.log(this.dataOptions);
+        //console.log(this.dataOptions);
         //console.log(JSON.stringify(this.dataOptions));
         //create a set of all the different Options
         this.searchOptionsMap = {
@@ -2004,7 +2003,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         //to set min value for vaadin-date-picker
         this.minFromDate = this.searchOptionsMap.minDatelog
-        console.log("available options ");
+        console.log("available options: ");
         console.log(this.searchOptionsMap)
       }
 
@@ -2029,6 +2028,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         console.log(this.userSearchInput);
         this.$.searchFilterModal.close()
         this.$.searchOptions.render();
+        console.log(Polymer.dom(this.root).querySelector("#model-dropdown").name);
+        this.set('selectedModel', Polymer.dom(this.root).querySelector("#model-dropdown").name) 
       }
 
       applySearchFilters(item) {
@@ -2095,7 +2096,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // if (typeof this.currentModelResp.modelInformation.project === 'undefined') {
         //   this.currentModelResp.modelInformation.project = this._formatModelName(this.currentModelResp.modelInformation.name)
         // }
-        console.log(Polymer.dom(this.root).querySelector("#searchOptions").items)
         console.log(this.currentModelResp);
         var costTab = Polymer.dom(this.root).querySelector("#cost-tab")
         if (costTab.disabled && this.selectedView === 'cost-view') {
