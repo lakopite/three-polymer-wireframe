@@ -332,9 +332,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-icon-button class="filter" icon="my-icons:filter-list" title="filter models" on-tap="showFilterModal"></paper-icon-button>
         <paper-dropdown-menu label="Model">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
-          <!-- <paper-input id="search-input" label="Search Models..." value="{{searchInput}}" type="text" autofocus minlength="1"></paper-input> -->
-          <!-- REMOVED FROM TEMPLATE BELOW: selected="" filter="{{searchFilter(searchInput)}}"-->
-          <!-- <template> -->
           <template id="searchOptions" is="dom-repeat" items="[[dataOptions]]" filter="applySearchFilters">
             <paper-item id="model-dropdown" class="dropdown-item" name="[[item.model]]">
             <paper-item-body two-line>
@@ -347,7 +344,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </paper-listbox>
       </paper-dropdown-menu>
     </div>
-      <!-- Filter list icon goes below, not showing up-->
       <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
       <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: {{_uploadedBy(currentModelResp.modelInformation.user)}}<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
@@ -970,20 +966,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.uploadSelectedProject = undefined
         this._acceptUploadDisabled = true;
       }
-
-      // searchFilter(searchInput) {
-      //   //to clear results of previous search and filter within ALL models in bucket
-      //   this.dataOptions = this.getModelsResp
-      //   searchInput = _.toLower(searchInput)
-      //   var that = this;
-      //   var result = _.filter(that.dataOptions, function(o) {
-      //     return _.toLower(o).indexOf(searchInput) !== -1
-      //   })
-      //   that.dataOptions = _.uniq(_.concat(that.selectedModel, result))
-      //   // console.log("SEARCHING: " + searchInput)
-      //   // console.log("RESULTS:")
-      //   // console.log(that.dataOptions);
-      // }
 
       _isWithinBounds(val, min, max) {
         return val >= min && val <= max
@@ -2053,22 +2035,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return true
         } else if (typeof this.userSearchInput.user === 'undefined' && typeof this.userSearchInput.project === 'undefined') {
           if (new Date(item.s3_attributes.uploadTime.split(" ")[0]) >= new Date(this.userSearchInput.minDate) && new Date(item.s3_attributes.uploadTime.split(" ")[0]) <= new Date(this.userSearchInput.maxDate)) {
-            // console.log(item);
+            console.log(item);
             return item
           }
         } else if (typeof this.userSearchInput.user === 'undefined') {
           if (item.s3_attributes.project === this.userSearchInput.project && new Date(item.s3_attributes.uploadTime.split(" ")[0]) >= new Date(this.userSearchInput.minDate) && new Date(item.s3_attributes.uploadTime.split(" ")[0]) <= new Date(this.userSearchInput.maxDate)) {
-            // console.log(item);
+            console.log(item);
             return item
           }
         } else if (typeof this.userSearchInput.project === 'undefined') {
           if (item.s3_attributes.user === this.userSearchInput.user && new Date(item.s3_attributes.uploadTime.split(" ")[0]) >= new Date(this.userSearchInput.minDate) && new Date(item.s3_attributes.uploadTime.split(" ")[0]) <= new Date(this.userSearchInput.maxDate)) {
-            // console.log(item);
+            console.log(item);
             return item
           }
         } else {
           if (item.s3_attributes.user === this.userSearchInput.user && item.s3_attributes.project === this.userSearchInput.project && new Date(item.s3_attributes.uploadTime.split(" ")[0]) >= new Date(this.userSearchInput.minDate) && new Date(item.s3_attributes.uploadTime.split(" ")[0]) <= new Date(this.userSearchInput.maxDate)) {
-            // console.log(item.s3_attributes.uploadTime.split(" ")[0]);
+            console.log(item);
+            console.log(item.s3_attributes.uploadTime.split(" ")[0]);
             return item
           }
         }
