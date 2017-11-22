@@ -2033,13 +2033,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var includedModels = _.map(that.$['model-options'].items, function(o) {return o.name})
           if (includedModels.length === 0) {
             that.clearFilterInput()
-            // that.$.searchOptions.filter = ''
-            // that.$.searchOptions.render();
+            that.userSearchInput = {
+              'user': undefined,
+              'project': undefined,
+              'minDate': that.minFromDate,
+              'maxDate': that.todaysDate()
+            }
+            that.$.searchOptions.render();
+            // that.$.searchOptions.filter = 'applySearchFilters'
             var toast = Polymer.dom(that.root).querySelector('#searchResultMsg')
             toast.show({ text: "No search results; filters removed" })
           } else {
-            that.$.searchOptions.filter = 'applySearchFilters'
-            // console.log(that.$.searchOptions.filter);
+            console.log(that.$.searchOptions.filter);
             // that.$.searchOptions.render();
             if (!_.includes(includedModels, that.selectedModel)) {
               for (var m = 0; m < includedModels.length; m++) {
