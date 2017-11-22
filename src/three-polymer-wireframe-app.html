@@ -279,8 +279,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <input id="modelUpload" type="file" on-change="_enableUploadBtn"></input>
       </iron-input>
       <div class="buttons">
-        <paper-button dialog-dismiss>Cancel</paper-button>
-        <paper-button id="acceptUploadBtn" dialog-confirm autofocus disabled>Upload</paper-button>
+        <paper-button dialog-dismiss on-tap="_clearUploadInput">Cancel</paper-button>
+        <paper-button id="acceptUploadBtn" dialog-confirm autofocus disabled on-tap="handleJsonUpload">Upload</paper-button>
       </div>
     </paper-dialog>
     <paper-dialog modal id="searchFilterModal">
@@ -878,109 +878,87 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _enableUploadBtn() {
-        console.log(Polymer.dom(this.root).querySelector('#user-email').value)
-        console.log(this.$.modelUpload.files[0].name)
-        console.log(_.isEmpty(Polymer.dom(this.root).querySelector('#user-email').value));
-        if (!_.isEmpty(Polymer.dom(this.root).querySelector('#user-email').value) && !_.isEmpty(this.uploadSelectedProject) && !_.isEmpty(this.$.modelUpload.files[0].name)) {
-          this.$.acceptUploadBtn.disabled = false
-        } else {
-          this.$.acceptUploadBtn.disabled = true
-        }
+          this.userEmail = Polymer.dom(this.root).querySelector('#user-email').value
+          this.fileName = this.$.modelUpload.files[0].name
+          if (!_.isEmpty(this.userEmail) && !_.isEmpty(this.uploadSelectedProject) && !_.isEmpty(this.fileName)) {
+            this.$.acceptUploadBtn.disabled = false
+          } else {
+            this.$.acceptUploadBtn.disabled = true
+          }
       }
 
-      // handleJsonUpload(evt) {
-      //   var inputFile = this.$.modelUpload.files[0]
-      //   var fileName = inputFile.name
-      //   var fileNameNoExtension = fileName.slice(0, fileName.lastIndexOf('.'))
-      //   // this.jsonUrl = fileNameNoExtension//this won't work because does not include appended timestamp
-      //   var extension = fileName.slice(fileName.indexOf('.'))
-      // 	var reader = new FileReader()
-      //   var that = this;
-      //   // Capture the file information
-      //   reader.onload = (function (theFile) {
-    	// 		return function (e) {
-      //       //console.log(theFile);//also works
-      //       this.fileName = fileNameNoExtension
-      //       console.log(this.fileName);
-    	// 			// console.log('e readAsText = ', e);
-    	// 			// console.log('e readAsText target = ', e.target);
-      //         //validation
-      //     //   try {
-      //     //     //check extension
-      //     //     if (fileName.slice(-5) !== ".json")
-      //     //     throw "file has a " + "\"'" + extension  + "'\"" + " extension, but must be a .json file."
-      //     //     // check that this json has not already been uplaoded
-      //     //     if (_.includes(_.map(that.dataOptions,'model'), fileNameNoExtension))
-      //     //     throw "a file with the name " + "\"'" + fileNameNoExtension + "'\"" + " has already been uploaded."
-      //     //     //parse JSON
-      //     //     that.jsonUploadPayload = JSON.parse(e.target.result)
-      //     //     // check that file name matches name in doc
-      //     //     if (_.toLower(that.jsonUploadPayload.modelInformation.name) + ".json"!== _.toLower(fileName))
-      //     //     throw "file name is "  + "\"'" + fileName + "'\"" + " and modelInformation.name is " + "\"'" + that.jsonUploadPayload.modelInformation.name + "'\"" + ". These must match."
-      //     //     // check that modelInfo keys exists
-      //     //     if (_.has(that.jsonUploadPayload, 'modelInformation') === false)
-      //     //     throw "it is missing a 'modelInformation' key. This property is required."
-      //     //     // check that payload key exists
-      //     //     if (_.has(that.jsonUploadPayload, 'payload') === false)
-      //     //     throw "it is missing payload key. This property is required."
-      //     //     // check that modelInfo has units and name keys
-      //     //     if (_.has(that.jsonUploadPayload, 'modelInformation.units') === false)
-      //     //     throw "modelInformation must contain a 'units' key."
-      //     //     if (_.has(that.jsonUploadPayload, 'modelInformation.name') === false)
-      //     //     throw "modelInformation must contain a 'name' key."
-      //     //     //add email of user uploading file
-      //     //     that.jsonUploadPayload.modelInformation.user = that.userEmail
-      //     //     that.jsonUploadPayload.modelInformation.project = that.uploadSelectedProject
-      //     //     // check that units are either metric or imperial only
-      //     //     if (!(that.jsonUploadPayload.modelInformation.units === "metric" ||
-      //     //     that.jsonUploadPayload.modelInformation.units === "imperial"))
-      //     //     throw "units values must be either 'imperial' or 'metric'. " + "\"'" + that.jsonUploadPayload.modelInformation.units + "'\"" + " is not a valid unit type."
-      //     //     var payloadElems = that.jsonUploadPayload.payload
-      //     //     for (var i=0; i < payloadElems.length; i++) {
-      //     //       // go through payload elements and ensure each has vertices and metadata keys
-      //     //       if (_.has(payloadElems[i], 'vertices') === false ||
-      //     //           _.has(payloadElems[i], 'metadata') === false) {
-      //     //         throw "payload must include both a 'vertices' and 'metadata' key for each element."
-      //     //       }
-      //     //     }
-      //     //   //if it does not get stuck on any errors above, it'll make it to the below
-      //     //   if (that.flipUploadSwitch === true) {
-      //     //     that._acceptUploadDisabled = false
-      //     //   } else {
-      //     //     that._checkEmailAndProject()
-      //     //     if (that.flipUploadSwitch === true) {
-      //     //       that._acceptUploadDisabled = false
-      //     //     }
-      //     //   }
-      //     // } catch (err) {
-      //     //     that._clearUploadInput()
-      //     //     var toast = Polymer.dom(that.root).querySelector('#validationToast')
-      //     //     toast.show({ text: "File could not be uploaded because " + err })
-      //     //   }
-      //     }
-      //   })(inputFile);
-      //   reader.readAsText(inputFile);
-      // }
+      handleJsonUpload(evt) {
+        var inputFile = this.$.modelUpload.files[0]
+        var fileName = inputFile.name
+        var fileNameNoExtension = fileName.slice(0, fileName.lastIndexOf('.'))
+        // this.jsonUrl = fileNameNoExtension//this won't work because does not include appended timestamp
+        var extension = fileName.slice(fileName.indexOf('.'))
+      	var reader = new FileReader()
+        var that = this;
+        // Capture the file information
+        reader.onload = (function (theFile) {
+    			return function (e) {
+            //console.log(theFile);//also works
+            this.fileName = fileNameNoExtension
+            console.log(this.fileName);
+    				// console.log('e readAsText = ', e);
+    				// console.log('e readAsText target = ', e.target);
+              //validation
+            try {
+              //check extension
+              if (fileName.slice(-5) !== ".json")
+              throw "file has a " + "\"'" + extension  + "'\"" + " extension, but must be a .json file."
+              // check that this json has not already been uplaoded
+              if (_.includes(_.map(that.dataOptions,'model'), fileNameNoExtension))
+              throw "a file with the name " + "\"'" + fileNameNoExtension + "'\"" + " has already been uploaded."
+              //parse JSON
+              that.jsonUploadPayload = JSON.parse(e.target.result)
+              // check that file name matches name in doc
+              if (_.toLower(that.jsonUploadPayload.modelInformation.name) + ".json"!== _.toLower(fileName))
+              throw "file name is "  + "\"'" + fileName + "'\"" + " and modelInformation.name is " + "\"'" + that.jsonUploadPayload.modelInformation.name + "'\"" + ". These must match."
+              // check that modelInfo keys exists
+              if (_.has(that.jsonUploadPayload, 'modelInformation') === false)
+              throw "it is missing a 'modelInformation' key. This property is required."
+              // check that payload key exists
+              if (_.has(that.jsonUploadPayload, 'payload') === false)
+              throw "it is missing payload key. This property is required."
+              // check that modelInfo has units and name keys
+              if (_.has(that.jsonUploadPayload, 'modelInformation.units') === false)
+              throw "modelInformation must contain a 'units' key."
+              if (_.has(that.jsonUploadPayload, 'modelInformation.name') === false)
+              throw "modelInformation must contain a 'name' key."
+              //add email of user uploading file
+              that.jsonUploadPayload.modelInformation.user = that.userEmail
+              that.jsonUploadPayload.modelInformation.project = that.uploadSelectedProject
+              // check that units are either metric or imperial only
+              if (!(that.jsonUploadPayload.modelInformation.units === "metric" ||
+              that.jsonUploadPayload.modelInformation.units === "imperial"))
+              throw "units values must be either 'imperial' or 'metric'. " + "\"'" + that.jsonUploadPayload.modelInformation.units + "'\"" + " is not a valid unit type."
+              var payloadElems = that.jsonUploadPayload.payload
+              for (var i=0; i < payloadElems.length; i++) {
+                // go through payload elements and ensure each has vertices and metadata keys
+                if (_.has(payloadElems[i], 'vertices') === false ||
+                    _.has(payloadElems[i], 'metadata') === false) {
+                  throw "payload must include both a 'vertices' and 'metadata' key for each element."
+                }
+              }
+            //if it does not get stuck on any errors above, it'll make it to the below
+            that.uploadJsonModel()
+          } catch (err) {
+              that._clearUploadInput()
+              var toast = Polymer.dom(that.root).querySelector('#validationToast')
+              toast.show({ text: "File could not be uploaded because " + err })
+            }
+          }
+        })(inputFile);
+        reader.readAsText(inputFile);
+      }
 
-      // handleModelRemoval() {
-      //   this.$['remove-upload-request'].generateRequest();
-      // }
-      //
-      // _checkEmailAndProject() {
-      //   this.userEmail = Polymer.dom(this.root).querySelector("#user-email").value
-      //   if (_.isEmpty(this.userEmail) || typeof this.uploadSelectedProject === 'undefined') {
-      //     this.flipUploadSwitch = false
-      //   } else if (!_.isEmpty(this.userEmail) && typeof this.uploadSelectedProject !== 'undefined'){
-      //     this.flipUploadSwitch = true
-      //   }
-      //   this.handleJsonUpload()
-      // }
-
-      // _clearUploadInput() {
-      //   Polymer.dom(this.root).querySelector('#modelUpload').value = ''
-      //   this.uploadSelectedProject = undefined
-      //   this._acceptUploadDisabled = true;
-      // }
+      _clearUploadInput() {
+        Polymer.dom(this.root).querySelector('#modelUpload').value = ''
+        this.uploadSelectedProject = undefined
+        this._acceptUploadDisabled = true;
+      }
 
       _isWithinBounds(val, min, max) {
         return val >= min && val <= max
