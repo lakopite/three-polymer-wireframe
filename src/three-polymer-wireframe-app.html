@@ -2028,36 +2028,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         //console.log(this.userSearchInput);
         this.$.searchFilterModal.close()
         this.$.searchOptions.render();
-        // if (this.filterResult.length > 0) {
-        //   this.set('selectedModel', this.filterResult[0].model)
-        //   console.log(this.selectedModel);
-        // } else {
-        //   this.clearFilterInput()
-        //   //this._initData(this.dataOptions)
-        //   this.set('filterResult', this.dataOptions)
-        //   var toast = Polymer.dom(this.root).querySelector('#searchResultMsg')
-        //   toast.show({ text: "No search results; filters removed" })
-        // }
-
-        //console.log(this.$['model-options'])
         var that = this
         setTimeout(function() {
           var includedModels = _.map(that.$['model-options'].items, function(o) {return o.name})
           if (includedModels.length === 0) {
             that.clearFilterInput()
-            //that._initData(that.dataOptions)
+            that.$.searchOptions.filter = ''
+            that.$.searchOptions.render();
             var toast = Polymer.dom(that.root).querySelector('#searchResultMsg')
             toast.show({ text: "No search results; filters removed" })
-          }
-          if (!_.includes(includedModels, that.selectedModel)) {
-            for (var m = 0; m < includedModels.length; m++) {
-              //these are all the available Models
-              console.log(includedModels[m])
-              that.set('selectedModel', includedModels[0])
+          } else {
+            that.$.searchOptions.filter = 'applySearchFilters'
+            console.log(that.$.searchOptions.filter);
+            that.$.searchOptions.render();
+            if (!_.includes(includedModels, that.selectedModel)) {
+              for (var m = 0; m < includedModels.length; m++) {
+                //these are all the available Models
+
+                console.log(includedModels[m])
+                that.set('selectedModel', includedModels[0])
+              }
             }
           }
           console.log(that.selectedModel);
-        },0)
+        }, 0)
       }
 
       applySearchFilters(item) {
@@ -2085,14 +2079,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return item
           }
         }
-        // if (that.dataOptions.length > 0) {
-        //    that.set('selectedModel', that.dataOptions[0].model)
-        // } else {
-        //   that.set('dataOptions', that.getModelsResp)
-        //   that.clearFilterInput()
-        //   var toast = Polymer.dom(that.root).querySelector('#searchResultMsg')
-        //   toast.show({ text: "No search results; filters removed" })
-        // }
       }
 
       clearSearchField(e) {
