@@ -2045,17 +2045,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var includedModels = _.map(that.$['model-options'].items, function(o) {return o.name})
           if (includedModels.length === 0) {
             that.clearFilterInput()
-            //this._initData(this.dataOptions)
-            that.set('dataOptions', that.dataOptions)
+            //that._initData(that.dataOptions)
             var toast = Polymer.dom(that.root).querySelector('#searchResultMsg')
             toast.show({ text: "No search results; filters removed" })
           }
-          for (var m = 0; m < includedModels.length; m++) {
-            //these are all the available Models
-            console.log(includedModels[m])
-            that.set('selectedModel', includedModels[0])
-            //   console.log(this.selectedModel);
+          if (!_.includes(includedModels, that.selectedModel)) {
+            for (var m = 0; m < includedModels.length; m++) {
+              //these are all the available Models
+              console.log(includedModels[m])
+              that.set('selectedModel', includedModels[0])
+            }
           }
+          console.log(that.selectedModel);
         },0)
       }
 
