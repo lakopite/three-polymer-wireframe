@@ -331,13 +331,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <div class="model-div">
         <paper-icon-button class="filter" icon="my-icons:filter-list" title="filter models" on-tap="showFilterModal"></paper-icon-button>
         <paper-dropdown-menu label="Model">
-        <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
+        <paper-listbox id="model-options" slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
           <template id="searchOptions" is="dom-repeat" items="[[dataOptions]]" filter="applySearchFilters">
             <paper-item id="model-dropdown" class="dropdown-item" name="[[item.model]]">
-            <paper-item-body two-line>
-              <div class="primary-item">[[_formatModelName(item.model)]]</div>
-              <div secondary class="secondary-item">[[_formatModelTimeStamp(item.model)]]</div>
-            </paper-item-body>
+              <paper-item-body two-line>
+                <div class="primary-item">[[_formatModelName(item.model)]]</div>
+                <div secondary class="secondary-item">[[_formatModelTimeStamp(item.model)]]</div>
+              </paper-item-body>
           </paper-item>
         </template>
       <!-- </template> -->
@@ -2024,12 +2024,39 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'minDate': minDate,
           'maxDate': maxDate
         }
-        console.log("search input: ");
-        console.log(this.userSearchInput);
+        //console.log("search input: ");
+        //console.log(this.userSearchInput);
         this.$.searchFilterModal.close()
         this.$.searchOptions.render();
-        console.log(Polymer.dom(this.root).querySelector("#model-dropdown").name);
-        this.set('selectedModel', Polymer.dom(this.root).querySelector("#model-dropdown").name) 
+        // if (this.filterResult.length > 0) {
+        //   this.set('selectedModel', this.filterResult[0].model)
+        //   console.log(this.selectedModel);
+        // } else {
+        //   this.clearFilterInput()
+        //   //this._initData(this.dataOptions)
+        //   this.set('filterResult', this.dataOptions)
+        //   var toast = Polymer.dom(this.root).querySelector('#searchResultMsg')
+        //   toast.show({ text: "No search results; filters removed" })
+        // }
+
+        //console.log(this.$['model-options'])
+        var that = this
+        setTimeout(function() {
+          var includedModels = _.map(that.$['model-options'].items, function(o) {return o.name})
+          if (includedModels.length === 0) {
+            that.clearFilterInput()
+            //this._initData(this.dataOptions)
+            that.set('dataOptions', that.dataOptions)
+            var toast = Polymer.dom(that.root).querySelector('#searchResultMsg')
+            toast.show({ text: "No search results; filters removed" })
+          }
+          for (var m = 0; m < includedModels.length; m++) {
+            //these are all the available Models
+            console.log(includedModels[m])
+            that.set('selectedModel', includedModels[0])
+            //   console.log(this.selectedModel);
+          }
+        },0)
       }
 
       applySearchFilters(item) {
@@ -2037,23 +2064,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return true
         } else if (typeof this.userSearchInput.user === 'undefined' && typeof this.userSearchInput.project === 'undefined') {
           if (new Date(item.s3_attributes.uploadTime.split(" ")[0]) >= new Date(this.userSearchInput.minDate) && new Date(item.s3_attributes.uploadTime.split(" ")[0]) <= new Date(this.userSearchInput.maxDate)) {
-            console.log(item);
+            //console.log(item);
             return item
           }
         } else if (typeof this.userSearchInput.user === 'undefined') {
           if (item.s3_attributes.project === this.userSearchInput.project && new Date(item.s3_attributes.uploadTime.split(" ")[0]) >= new Date(this.userSearchInput.minDate) && new Date(item.s3_attributes.uploadTime.split(" ")[0]) <= new Date(this.userSearchInput.maxDate)) {
-            console.log(item);
+            //console.log(item);
             return item
           }
         } else if (typeof this.userSearchInput.project === 'undefined') {
           if (item.s3_attributes.user === this.userSearchInput.user && new Date(item.s3_attributes.uploadTime.split(" ")[0]) >= new Date(this.userSearchInput.minDate) && new Date(item.s3_attributes.uploadTime.split(" ")[0]) <= new Date(this.userSearchInput.maxDate)) {
-            console.log(item);
+            //console.log(item);
             return item
           }
         } else {
           if (item.s3_attributes.user === this.userSearchInput.user && item.s3_attributes.project === this.userSearchInput.project && new Date(item.s3_attributes.uploadTime.split(" ")[0]) >= new Date(this.userSearchInput.minDate) && new Date(item.s3_attributes.uploadTime.split(" ")[0]) <= new Date(this.userSearchInput.maxDate)) {
-            console.log(item);
-            console.log(item.s3_attributes.uploadTime.split(" ")[0]);
+            //console.log(item);
+            //console.log(item.s3_attributes.uploadTime.split(" ")[0]);
             return item
           }
         }
