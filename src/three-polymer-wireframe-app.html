@@ -37,8 +37,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="../bower_components/vaadin-grid/vaadin-grid-sorter.html">
-<!-- <link rel="import" href="../bower_components/vaadin-valo-theme/vaadin-date-picker.html">
-<link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker.html"> -->
+<link rel="import" href="../bower_components/vaadin-valo-theme/vaadin-date-picker.html">
+<link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker.html">
 <link rel="import" href="../bower_components/three-polymer/three-view/three-view.html">
 <link rel="import" href="../bower_components/three-polymer/three-model/three-model.html">
 <link rel="import" href="shared-styles.html">
@@ -264,7 +264,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <iron-ajax headers="{{authHeaders}}" id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="[[baseUrl]]post-model"></iron-ajax>
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
-      <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" on-change="_checkEmailAndProject">
+      <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" on-change="_enableUploadBtn">
         <div slot="suffix" label="user">@arup.com</div>
       </paper-input>
       <paper-dropdown-menu id="project-dropdown" label="Select Project">
@@ -275,14 +275,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </paper-listbox>
       </paper-dropdown-menu>
       <iron-input>
-      <input id="modelUpload" type="file" on-change="handleJsonUpload"></input>
+      <input id="modelUpload" type="file" on-change="_enableUploadBtn"></input>
       </iron-input>
       <div class="buttons">
         <paper-button dialog-dismiss on-tap="_clearUploadInput">Cancel</paper-button>
-        <paper-button id="acceptUploadBtn" dialog-confirm autofocus disabled$="{{_acceptUploadDisabled}}" on-tap="uploadJsonModel">Upload</paper-button>
+        <paper-button id="acceptUploadBtn" dialog-confirm autofocus disabled on-tap="handleJsonUpload">Upload</paper-button>
       </div>
     </paper-dialog>
-    <!-- <paper-dialog modal id="searchFilterModal">
+    <paper-dialog modal id="searchFilterModal">
       <h2>Filter Models</h2>
       <div class="filter-input">
         <paper-dropdown-menu id="user-dropdown" label="Select User">
@@ -310,7 +310,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-button dialog-dismiss on-tap="clearFilterInput">Cancel</paper-button>
         <paper-button on-tap="setSearchFilters">Apply</paper-button>
       </div>
-    </paper-dialog> -->
+    </paper-dialog>
     <paper-toast id="searchResultMsg"></paper-toast>
     <paper-toast id="validationToast" duration="0" class="fit-bottom">
       <paper-button on-tap="reopenUploadBox" class="yellow-toast">Try Again</paper-button>
@@ -327,21 +327,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </app-toolbar>
     <div class="drawer-list">
       <div class="model-div">
-        <!-- <paper-icon-button class="filter" icon="my-icons:filter-list" title="filter models" on-tap="showFilterModal"></paper-icon-button> -->
+        <paper-icon-button class="filter" icon="my-icons:filter-list" title="filter models" on-tap="showFilterModal"></paper-icon-button>
         <paper-dropdown-menu label="Model">
-        <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
-          <template is="dom-repeat" items="[[dataOptions]]" filter="{{applySearchFilters(userSearchInput)}}">
+        <paper-listbox id="model-options" slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
+          <template id="searchOptions" is="dom-repeat" items="[[dataOptions]]" filter="applySearchFilters">
             <paper-item id="model-dropdown" class="dropdown-item" name="[[item.model]]">
-            <paper-item-body two-line>
-              <div class="primary-item">[[_formatModelName(item.model)]]</div>
-              <div secondary class="secondary-item">[[_formatModelTimeStamp(item.model)]]</div>
-            </paper-item-body>
+              <paper-item-body two-line>
+                <div class="primary-item">[[_formatModelName(item.model)]]</div>
+                <div secondary class="secondary-item">[[_formatModelTimeStamp(item.model)]]</div>
+              </paper-item-body>
           </paper-item>
-          </template>
+        </template>
         </paper-listbox>
       </paper-dropdown-menu>
     </div>
-      <!-- Filter list icon goes below, not showing up-->
       <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
       <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: {{_uploadedBy(currentModelResp.modelInformation.user)}}<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
@@ -414,7 +413,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 11/17/17</paper-item>
+        <paper-item>Build Date: 11/27/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -867,16 +866,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.uploadSelectedProject = undefined
       }
 
+      _enableUploadBtn() {
+          this.userEmail = Polymer.dom(this.root).querySelector('#user-email').value
+          this.fileName = this.$.modelUpload.files[0].name
+          if (!_.isEmpty(this.userEmail) && !_.isEmpty(this.uploadSelectedProject) && !_.isEmpty(this.fileName)) {
+            this.$.acceptUploadBtn.disabled = false
+          } else {
+            this.$.acceptUploadBtn.disabled = true
+          }
+      }
+
       handleJsonUpload(evt) {
         var inputFile = this.$.modelUpload.files[0]
         var fileName = inputFile.name
         var fileNameNoExtension = fileName.slice(0, fileName.lastIndexOf('.'))
+        // this.jsonUrl = fileNameNoExtension//this won't work because does not include appended timestamp
         var extension = fileName.slice(fileName.indexOf('.'))
       	var reader = new FileReader()
         var that = this;
         // Capture the file information
         reader.onload = (function (theFile) {
     			return function (e) {
+            //console.log(theFile);//also works
     				// console.log('e readAsText = ', e);
     				// console.log('e readAsText target = ', e.target);
               //validation
@@ -919,14 +930,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
               }
             //if it does not get stuck on any errors above, it'll make it to the below
-            if (that.flipUploadSwitch === true) {
-              that._acceptUploadDisabled = false
-            } else {
-              that._checkEmailAndProject()
-              if (that.flipUploadSwitch === true) {
-                that._acceptUploadDisabled = false
-              }
-            }
+            that.uploadJsonModel()
           } catch (err) {
               that._clearUploadInput()
               var toast = Polymer.dom(that.root).querySelector('#validationToast')
@@ -935,16 +939,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         })(inputFile);
         reader.readAsText(inputFile);
-      }
-
-      _checkEmailAndProject() {
-        this.userEmail = Polymer.dom(this.root).querySelector("#user-email").value
-        if (_.isEmpty(this.userEmail) || typeof this.uploadSelectedProject === 'undefined') {
-          this.flipUploadSwitch = false
-        } else if (!_.isEmpty(this.userEmail) && typeof this.uploadSelectedProject !== 'undefined'){
-          this.flipUploadSwitch = true
-        }
-        this.handleJsonUpload()
       }
 
       _clearUploadInput() {
@@ -1224,6 +1218,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
              } else if (that.selectedSumField.includes('vol')) {
                this.strOtherUnitSum = _.round(sumByGroup/1000000000, 0)
              }
+           } else if (that.currentModelResp.modelInformation.units === 'metric') {
+             if (that.selectedSumField.includes('length')) {
+               this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
+             } else if (that.selectedSumField.includes('mass')) {
+               this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
+             } else if (that.selectedSumField.includes('vol')) {
+               this.strOtherUnitSum = _.round(sumByGroup/1000000000, 0)
+             }
+           }
+           var groupSumDataSetup = {
+             'group': this.groupKeys[i],
+             'elemsPerGroup': elemsPerGroup,
+             'sum': sumByGroup,
+             'otherUnitSum': this.strOtherUnitSum,
+             'min' : minByGroup,
+             'max' : maxByGroup,
+             'avg' : avgByGroup
            }
            var groupSumDataSetup = {
              'group': this.groupKeys[i],
@@ -1939,7 +1950,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var link_ = window.location.hash.replace("#","");
           var linkIndex = -1;
           if (link_ !== "") {
-            linkIndex = _.findIndex(this.dataOptions,function(o) {return o.model === link_})
+            linkIndex = _.findIndex(this.dataOptions, function(o) {return o.model === link_})
             if (linkIndex === -1) {
               this.$.linkFailToast.show({ text: "Couldn't find linked model" });
             }
@@ -1952,101 +1963,130 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.set('selectedModel', this.dataOptions[0].model)
           }
         }
-        //this.processSearchOptions();
+        this.processSearchOptions();
       }
 
-      // clearFilterInput() {
-      //   this.filterSelectedUser = undefined,
-      //   this.filterSelectedProject = undefined,
-      //   Polymer.dom(this.root).querySelector("#from-date").value = undefined,
-      //   Polymer.dom(this.root).querySelector("#to-date").value = undefined
-      // }
+      clearFilterInput() {
+        this.filterSelectedUser = undefined,
+        this.filterSelectedProject = undefined,
+        Polymer.dom(this.root).querySelector("#from-date").value = undefined,
+        Polymer.dom(this.root).querySelector("#to-date").value = undefined
+      }
 
-      // processSearchOptions() {
-      //   console.log(this.dataOptions);
-      //   //console.log(JSON.stringify(this.dataOptions));
-      //   //create a set of all the different Options
-      //   this.searchOptionsMap = {
-      //     'user': [],
-      //     'project': [],
-      //     'minDate': "",
-      //     'maxDate': ""
-      //   };
-      //   for (var i=0; i < this.dataOptions.length; i++) {
-      //     var item = this.dataOptions[i]
-      //     if (typeof item.s3_attributes.user !== 'undefined' && this.searchOptionsMap.user.indexOf(item.s3_attributes.user) === -1) {
-      //       this.searchOptionsMap.user.push(item.s3_attributes.user)
-      //     }
-      //     if (typeof item.s3_attributes.project !== 'undefined' && this.searchOptionsMap.project.indexOf(item.s3_attributes.project) === -1) {
-      //       this.searchOptionsMap.project.push(item.s3_attributes.project)
-      //     }
-      //     if (_.isEmpty(this.searchOptionsMap.minDate) || new Date(this.searchOptionsMap.minDate) > new Date(item.s3_attributes.uploadTime.split(" ")[0])) {
-      //       this.set('searchOptionsMap.minDate', item.s3_attributes.uploadTime.split(" ")[0]);
-      //     }
-      //     if (_.isEmpty(this.searchOptionsMap.maxDate) || new Date(this.searchOptionsMap.maxDate) < new Date(item.s3_attributes.uploadTime.split(" ")[0])) {
-      //       this.set('searchOptionsMap.maxDate', item.s3_attributes.uploadTime.split(" ")[0]);
-      //     }
-      //   }
-      //   //to set min value for vaadin-date-picker
-      //   this.minFromDate = this.searchOptionsMap.minDate
-      //   console.log(this.searchOptionsMap)
-      // }
-      //
-      // setSearchFilters() {
-      //   if (_.isEmpty(Polymer.dom(this.root).querySelector("#from-date").value)) {
-      //     var minDate = this.searchOptionsMap.minDate
-      //   } else {
-      //     var minDate = Polymer.dom(this.root).querySelector("#from-date").value
-      //   }
-      //   if (_.isEmpty(Polymer.dom(this.root).querySelector("#to-date").value)) {
-      //     var maxDate = this.searchOptionsMap.maxDate
-      //   } else {
-      //     var maxDate = Polymer.dom(this.root).querySelector("#to-date").value
-      //   }
-      //   this.userSearchInput = {
-      //     'user': this.filterSelectedUser,
-      //     'project': this.filterSelectedProject,
-      //     'minDate': minDate,
-      //     'maxDate': maxDate
-      //   }
-      //   console.log(this.userSearchInput);
-      //   this.$.searchFilterModal.close()
-      // }
-      //
-      // applySearchFilters(userSearchInput) {
-      //   // to clear output from last search
-      //   this.dataOptions = this.getModelsResp
-      //   var that = this;
-      //   that.dataOptions = _.filter(that.dataOptions, function(o) {
-      //     if (typeof userSearchInput.user === 'undefined' || typeof userSearchInput.project === 'undefined') {
-      //       if (typeof userSearchInput.user === 'undefined' && typeof userSearchInput.project === 'undefined') {
-      //         return new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
-      //       } else if (typeof userSearchInput.user === 'undefined') {
-      //         return o.s3_attributes.project === userSearchInput.project && new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
-      //       } else if (typeof userSearchInput.project === 'undefined') {
-      //         return o.s3_attributes.user === userSearchInput.user && new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
-      //       }
-      //     } else {
-      //       return o.s3_attributes.user === userSearchInput.user && o.s3_attributes.project === userSearchInput.project && new Date(o.s3_attributes.uploadTime.split(" ")[0]) >= new Date(userSearchInput.minDate) && new Date(o.s3_attributes.uploadTime.split(" ")[0]) <= new Date(userSearchInput.maxDate)
-      //     }
-      //   })
-      //   if (that.dataOptions.length > 0) {
-      //      that.set('selectedModel', that.dataOptions[0].model)
-      //   } else {
-      //     that.set('dataOptions', that.getModelsResp)
-      //     that.clearFilterInput()
-      //     var toast = Polymer.dom(that.root).querySelector('#searchResultMsg')
-      //     toast.show({ text: "No search results; filters removed" })
-      //   }
-      // }
-      //
-      // clearSearchField(e) {
-      //   if (e.path[2].id === 'clearFilterUser') {
-      //     this.filterSelectedUser = undefined
-      //   } if (e.path[2].id === 'clearFilterProject') {
-      //     this.filterSelectedProject = undefined
-      //   }
-      // }
+      processSearchOptions() {
+        //console.log(this.dataOptions);
+        //console.log(JSON.stringify(this.dataOptions));
+        //create a set of all the different Options
+        this.searchOptionsMap = {
+          'user': [],
+          'project': [],
+          'minDate': "",
+          'maxDate': ""
+        };
+        for (var i=0; i < this.dataOptions.length; i++) {
+          var item = this.dataOptions[i]
+          if (typeof item.s3_attributes.user !== 'undefined' && this.searchOptionsMap.user.indexOf(item.s3_attributes.user) === -1) {
+            this.searchOptionsMap.user.push(item.s3_attributes.user)
+          }
+          if (typeof item.s3_attributes.project !== 'undefined' && this.searchOptionsMap.project.indexOf(item.s3_attributes.project) === -1) {
+            this.searchOptionsMap.project.push(item.s3_attributes.project)
+          }
+          if (_.isEmpty(this.searchOptionsMap.minDate) || new Date(this.searchOptionsMap.minDate) > new Date(item.s3_attributes.uploadTime.split(" ")[0])) {
+            this.set('searchOptionsMap.minDate', item.s3_attributes.uploadTime.split(" ")[0]);
+          }
+          if (_.isEmpty(this.searchOptionsMap.maxDate) || new Date(this.searchOptionsMap.maxDate) < new Date(item.s3_attributes.uploadTime.split(" ")[0])) {
+            this.set('searchOptionsMap.maxDate', item.s3_attributes.uploadTime.split(" ")[0]);
+          }
+        }
+        //to set min value for vaadin-date-picker
+        this.minFromDate = this.searchOptionsMap.minDate
+        // console.log("available options: ");
+        // console.log(this.searchOptionsMap)
+      }
+
+      setSearchFilters() {
+        if (_.isEmpty(Polymer.dom(this.root).querySelector("#from-date").value)) {
+          var minDate = this.searchOptionsMap.minDate
+        } else {
+          var minDate = Polymer.dom(this.root).querySelector("#from-date").value
+        }
+        if (_.isEmpty(Polymer.dom(this.root).querySelector("#to-date").value)) {
+          var maxDate = this.searchOptionsMap.maxDate
+        } else {
+          var maxDate = Polymer.dom(this.root).querySelector("#to-date").value
+        }
+        this.userSearchInput = {
+          'user': this.filterSelectedUser,
+          'project': this.filterSelectedProject,
+          'minDate': minDate,
+          'maxDate': maxDate
+        }
+        //console.log("search input: ");
+        //console.log(this.userSearchInput);
+        this.$.searchFilterModal.close()
+        this.$.searchOptions.render();
+        var that = this
+        setTimeout(function() {
+          var includedModels = _.map(that.$['model-options'].items, function(o) {return o.name})
+          if (includedModels.length === 0) {
+            that.clearFilterInput()
+            that.userSearchInput = {
+              'user': undefined,
+              'project': undefined,
+              'minDate': that.minFromDate,
+              'maxDate': that.todaysDate()
+            }
+            that.$.searchOptions.render();
+            var toast = Polymer.dom(that.root).querySelector('#searchResultMsg')
+            toast.show({ text: "No search results; filters removed" })
+          } else {
+            // console.log(that.$.searchOptions.filter);
+            if (!_.includes(includedModels, that.selectedModel)) {
+              for (var m = 0; m < includedModels.length; m++) {
+                //these are all the available Models
+                // console.log(includedModels[m])
+                that.set('selectedModel', includedModels[0])
+              }
+            }
+          }
+          // console.log(that.selectedModel);
+        }, 0)
+      }
+
+      applySearchFilters(item) {
+        if (typeof this.userSearchInput === 'undefined') {
+          return true
+        } else if (typeof this.userSearchInput.user === 'undefined' && typeof this.userSearchInput.project === 'undefined') {
+          if (new Date(item.s3_attributes.uploadTime.split(" ")[0]) >= new Date(this.userSearchInput.minDate) && new Date(item.s3_attributes.uploadTime.split(" ")[0]) <= new Date(this.userSearchInput.maxDate)) {
+            //console.log(item);
+            return item
+          }
+        } else if (typeof this.userSearchInput.user === 'undefined') {
+          if (item.s3_attributes.project === this.userSearchInput.project && new Date(item.s3_attributes.uploadTime.split(" ")[0]) >= new Date(this.userSearchInput.minDate) && new Date(item.s3_attributes.uploadTime.split(" ")[0]) <= new Date(this.userSearchInput.maxDate)) {
+            //console.log(item);
+            return item
+          }
+        } else if (typeof this.userSearchInput.project === 'undefined') {
+          if (item.s3_attributes.user === this.userSearchInput.user && new Date(item.s3_attributes.uploadTime.split(" ")[0]) >= new Date(this.userSearchInput.minDate) && new Date(item.s3_attributes.uploadTime.split(" ")[0]) <= new Date(this.userSearchInput.maxDate)) {
+            //console.log(item);
+            return item
+          }
+        } else {
+          if (item.s3_attributes.user === this.userSearchInput.user && item.s3_attributes.project === this.userSearchInput.project && new Date(item.s3_attributes.uploadTime.split(" ")[0]) >= new Date(this.userSearchInput.minDate) && new Date(item.s3_attributes.uploadTime.split(" ")[0]) <= new Date(this.userSearchInput.maxDate)) {
+            //console.log(item);
+            //console.log(item.s3_attributes.uploadTime.split(" ")[0]);
+            return item
+          }
+        }
+      }
+
+      clearSearchField(e) {
+        if (e.path[2].id === 'clearFilterUser') {
+          this.filterSelectedUser = undefined
+        } if (e.path[2].id === 'clearFilterProject') {
+          this.filterSelectedProject = undefined
+        }
+      }
 
       handleOptionsResponse(event, response) {
         this.getModelsResp = response.response
@@ -2069,7 +2109,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // if (typeof this.currentModelResp.modelInformation.project === 'undefined') {
         //   this.currentModelResp.modelInformation.project = this._formatModelName(this.currentModelResp.modelInformation.name)
         // }
-        //console.log(this.currentModelResp);
+        // console.log(this.currentModelResp);
         var costTab = Polymer.dom(this.root).querySelector("#cost-tab")
         if (costTab.disabled && this.selectedView === 'cost-view') {
           this.selectedView = 'model-view'
@@ -2105,6 +2145,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       showDialog() {
         this.$.addModelDialog.open();
+        // this.userEmail = Polymer.dom(this.root).querySelector('#user-email').value
+        // this.fileName = this.$.modelUpload.files[0].name
+        // console.log(this.userEmail);
+        // console.log(this.fileName);
+      }
+
+      showFilterModal() {
+        this.$.searchFilterModal.open();
       }
 
       showFilterModal() {
