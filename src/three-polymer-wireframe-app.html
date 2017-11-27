@@ -343,10 +343,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </paper-dropdown-menu>
     </div>
     <div class="filter-paper-chips">
-      <paper-chip id="paper1" label="Test 1 user" closable></paper-chip>
-      <paper-chip id="paper2" label="Test 2 project" closable></paper-chip>
-      <paper-chip id="paper3" label="Test 3 from" closable></paper-chip>
-      <paper-chip id="paper4" label="Test 4 to" closable></paper-chip>
+      <paper-chip hidden$="{{_hideUserChip(userSearchInput)}}" id="userChip" label="user: {{userSearchInput.user}}" closable></paper-chip>
+      <paper-chip hidden$="{{_hideProjectChip(userSearchInput)}}" id="projectChip" label="project: {{userSearchInput.project}}" closable></paper-chip>
+      <paper-chip hidden$="{{_hideFromChip(userSearchInput)}}" id="fromChip" label="from: {{userSearchInput.minDate}}" closable></paper-chip>
+      <paper-chip hidden$="{{_hideToChip(userSearchInput)}}" id="toChip" label="to: {{userSearchInput.maxDate}}" closable></paper-chip>
     </div>
       <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
       <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: {{_uploadedBy(currentModelResp.modelInformation.user)}}<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
@@ -1364,10 +1364,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return typeof this.selectedModel === 'undefined'
       }
 
-      // _hideChart(_totalCost) {
-      //   return this.totalCost === 0
-      // }
-
       _initCostChart() {
         var chartdiv = Polymer.dom(this.root).querySelector("#cost-chart-container")
         this.costPieChart = Highcharts.chart(chartdiv, {
@@ -2024,8 +2020,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'minDate': minDate,
           'maxDate': maxDate
         }
-        //console.log("search input: ");
-        //console.log(this.userSearchInput);
+        console.log("search input: ");
+        console.log(this.userSearchInput);
         this.$.searchFilterModal.close()
         this.$.searchOptions.render();
         var that = this
@@ -2089,6 +2085,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         } if (e.path[2].id === 'clearFilterProject') {
           this.filterSelectedProject = undefined
         }
+      }
+
+      _hideUserChip(search) {
+        console.log(this.userSearchInput);
+        return typeof search.user === 'undefined'
+      }
+
+      _hideProjectChip(search) {
+        console.log(this.userSearchInput);
+        return typeof search.project === 'undefined'
+      }
+
+      _hideFromChip(search) {
+        console.log(this.userSearchInput);
+        return search.minDate === this.minFromDate
+      }
+
+      _hideToChip(search) {
+        console.log(this.userSearchInput);
+        return search.user === this.todaysDate()
       }
 
       handleOptionsResponse(event, response) {
