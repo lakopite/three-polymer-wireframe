@@ -860,7 +860,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       closeToast() {
-        //var toast = Polymer.dom(this.root).querySelector('#validationToast')
         this.$.validationToast.hide()
         this.userEmail = ''
         this.uploadSelectedProject = undefined
@@ -868,7 +867,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _enableUploadBtn() {
           this.userEmail = Polymer.dom(this.root).querySelector('#user-email').value
-          this.file = this.$.modelUpload.files[0] 
+          this.file = this.$.modelUpload.files[0]
           if (!_.isEmpty(this.userEmail) && !_.isEmpty(this.uploadSelectedProject) && !_.isEmpty(this.file.name)) {
             this.$.acceptUploadBtn.disabled = false
           } else {
