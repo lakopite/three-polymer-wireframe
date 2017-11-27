@@ -868,8 +868,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _enableUploadBtn() {
           this.userEmail = Polymer.dom(this.root).querySelector('#user-email').value
-          this.fileName = this.$.modelUpload.files[0].name
-          if (!_.isEmpty(this.userEmail) && !_.isEmpty(this.uploadSelectedProject) && !_.isEmpty(this.fileName)) {
+          this.file = this.$.modelUpload.files[0] 
+          if (!_.isEmpty(this.userEmail) && !_.isEmpty(this.uploadSelectedProject) && !_.isEmpty(this.file.name)) {
             this.$.acceptUploadBtn.disabled = false
           } else {
             this.$.acceptUploadBtn.disabled = true
