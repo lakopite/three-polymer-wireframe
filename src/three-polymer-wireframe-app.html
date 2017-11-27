@@ -585,11 +585,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <template class="footer">[[_prettify(totalMaterialSumDiffUnit)]] [[costOtherUnitLabel]]</template>
           </vaadin-grid-column>
           <vaadin-grid-column>
-            <template class="header">Cost/[[costOtherUnitLabel]]<div id ="apply-all-div"><iron-input id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" bind-value="{{applyToAll}}"><input></iron-input>
+            <template class="header">Cost/[[costOtherUnitLabel]]<div id ="apply-all-div"><iron-input id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" minlength="1"  bind-value="{{applyToAll}}"><input></iron-input>
               <br><button id="apply-all-btn" on-tap="_applyAllCostResults">Apply all</button></div>
             </template>
             <template>
-              <iron-input id="cost-input-[[index]]" prevent-invalid-input allowed-pattern="[.\d]" bind-value="{{item.input}}" on-change="_setCostResults">
+              <iron-input id="cost-input-[[index]]" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{item.input}}" on-change="_setCostResults">
                 <input>
               </iron-input>
             </template>
@@ -1698,12 +1698,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _setCostResults(e) {
-        //console.log(e.model);
+        console.log(e.model);
         var item = e.model.item
         var inputIndex = e.model.index
         for (var i=0; i < this.costTableData.length; i++) {
           if (i === inputIndex) {
-            //console.log("values: " + e.target.value + " : " + this.costTableData[i].input)
+            console.log("values: " + e.target.value + " : " + this.costTableData[i].input)
             this.set('costTableData.'+i+'.costResult', this.costTableData[i].input * this.costTableData[i].otherUnitSum);
           }
         }
