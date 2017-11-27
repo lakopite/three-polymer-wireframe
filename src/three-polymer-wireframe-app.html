@@ -29,6 +29,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-styles/paper-styles.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-chip/paper-chip.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
@@ -341,14 +342,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </paper-listbox>
       </paper-dropdown-menu>
     </div>
-
-    <div class="try">
-      <paper-chip removable single-line>
-        <div slot="label">*******Single-line Chip</div>
-      </paper-chip>
-      <paper-chip label="Closable" closable></paper-chip>
+    <div class="filter-paper-chips">
+      <paper-chip id="paper1" label="Test 1 user" closable></paper-chip>
+      <paper-chip id="paper2" label="Test 2 project" closable></paper-chip>
+      <paper-chip id="paper3" label="Test 3 from" closable></paper-chip>
+      <paper-chip id="paper4" label="Test 4 to" closable></paper-chip>
     </div>
-
       <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
       <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: {{_uploadedBy(currentModelResp.modelInformation.user)}}<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
@@ -399,9 +398,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </div>
         </div>
       </div>
-    <!-- </div>
-    </div>
-    </app-drawer> -->
       <!-- for cost aggregations -->
       <div hidden$="{{_hideCostCsvButton(selectedView)}}">
         <div class="csv-wrapper">
@@ -414,7 +410,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </div>
   </div>
   </div>
-    </app-drawer>
+  </app-drawer>
   <!-- Main content -->
     <app-header-layout has-scrolling-region>
     <app-header slot="header" medium-tall>
@@ -2158,10 +2154,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$.searchFilterModal.open();
       }
 
-      showFilterModal() {
-        this.$.searchFilterModal.open();
-      }
-
       handleUploadResponse(event, response) {
         var resp = response.response;
         if ("success" in resp) {
@@ -2176,7 +2168,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         }
       }
-
     }
 
     window.customElements.define(ThreePolymerWireframe.is, ThreePolymerWireframe);
