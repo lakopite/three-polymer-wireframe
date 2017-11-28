@@ -1273,6 +1273,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _stringAggregations() {
+        this.stringPieIcon = this.$.strPieIcon.icon
         this.showNumericalAggregations = false;
         this._resultFilterInput()
         this._generateNumDropdownOptions()
@@ -1515,12 +1516,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       strToggleView() {
         if (this.$.strPieIcon.icon === 'my-icons:pie-chart') {
           this.$.strPieIcon.icon = 'my-icons:list'
-          Polymer.dom(this.root).querySelector("#sum-chart-container").hidden = true
+          Polymer.dom(this.root).querySelector("#sum-chart-container").hidden = false
         } else if (this.$.strPieIcon.icon === 'my-icons:list') {
           this.$.strPieIcon.icon = 'my-icons:pie-chart'
-          Polymer.dom(this.root).querySelector("#sum-chart-container").hidden = false
+          Polymer.dom(this.root).querySelector("#sum-chart-container").hidden = true
         }
-        this.stringPieIcon = this.$.strPieIcon.icon
       }
 
       costToggleView() {
@@ -1544,7 +1544,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _hideStringPieChart(pieIcon) {
-        //won't hide on first entering
         return this.stringPieIcon === undefined || this.stringPieIcon !== 'my-icons:list'
       }
 
