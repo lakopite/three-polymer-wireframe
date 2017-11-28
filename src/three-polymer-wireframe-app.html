@@ -197,15 +197,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         /*overflow-y: hidden;*/
       }
 
-      #sum-chart-container {
-        /*height: calc(100vh - 192px);*/
+      #sum-chart-container, #cost-chart-container {
+        height: calc(100vh - 192px);
       }
 
       .data-by-group-table, .cost-by-group-table {
-        /*height: calc(100vh - 192px);*/
-      }
-
-      #cost-chart-container {
         /*height: calc(100vh - 192px);*/
       }
 
@@ -247,7 +243,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         @apply(--layout-flex);
       }
 
-      paper-icon-button.filter, .clear-filter-input, .pie-icon {
+      paper-icon-button.filter, .clear-filter-input {
         @apply(--layout-self-end);
       }
 
@@ -258,6 +254,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       .print-clean {
         border: none;
         background: transparent;
+      }
+
+      .pie-icon {
+        @apply(--layout-self-center)
       }
 
     </style>
