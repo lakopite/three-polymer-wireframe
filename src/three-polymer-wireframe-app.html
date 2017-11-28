@@ -555,7 +555,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <!-- <paper-icon-button class="list-icon" id="showPieBtn" icon="my-icons:list" title="show table" on-tap="togglePieAndList"></paper-icon-button> -->
       </div>
       <div id="wrap-cost-info">
-        <div id="cost-table-section">
+        <div id="cost-table-section" hidden$="{{_hideCostTable(pieIcon)}}">
         <!-- cost by group table -->
         <vaadin-grid class="cost-by-group-table" items="{{costTableData}}">
         <vaadin-grid-column width="200px">
@@ -589,7 +589,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <vaadin-grid-column>
             <template class="header">Cost/[[costOtherUnitLabel]]<div id ="apply-all-div">
               <paper-input-container>
-                <label slot="label">cost per unit</label>
                 <iron-input slot="input" id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{applyToAll}}">
                   <input>
                 </iron-input>
@@ -598,7 +597,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </template>
             <template>
               <paper-input-container>
-                <label slot="label">Cost</label>
+                <label slot="label">Cost per unit</label>
                 <iron-input slot="input" id="cost-input-[[index]]" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{item.input}}" on-change="_setCostResults">
                   <input>
                 </iron-input>
@@ -613,9 +612,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <template class="footer">[[_prettifyDollar(totalCost)]]</template>
         </vaadin-grid-column>
         </vaadin-grid>
+        </div>
         <!-- to hold cost pie chart -->
         <div id="cost-chart-container" ></div>
-        </div>
       </div>
     </div>
     </iron-pages>
@@ -1511,14 +1510,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         console.log(Polymer.dom(this.root).querySelector(".pie-icon").icon);
         if (Polymer.dom(this.root).querySelector(".pie-icon").icon === 'my-icons:pie-chart') {
           Polymer.dom(this.root).querySelector(".pie-icon").icon = 'my-icons:list'
-          console.log(this.costPieChart);
-          console.log(this.costPieChart.hidden);
-          console.log(Polymer.dom(this.root).querySelector("#cost-chart-container"));
-          console.log(Polymer.dom(this.root).querySelector("#cost-chart-container").hidden);
           Polymer.dom(this.root).querySelector("#cost-chart-container").hidden = true
         } else if (Polymer.dom(this.root).querySelector(".pie-icon").icon === 'my-icons:list') {
           Polymer.dom(this.root).querySelector(".pie-icon").icon = 'my-icons:pie-chart'
+          Polymer.dom(this.root).querySelector("#cost-chart-container").hidden = false //NOTE unless total cost amt is 0, but acct for this in html first
         }
+        this.pieIcon = Polymer.dom(this.root).querySelector(".pie-icon").icon
+      }
+
+      _hideCostTable(pieIcon) {
+        if (this.pieIcon === 'my-icons:pie-chart') {
+          return false
+        } else if (this.pieIcon === 'my-icons:list') {
+          return true
+        }
+        //return Polymer.dom(this.root).querySelector(".pie-icon").icon === 'my-icons:list'
       }
 
       ready() {
