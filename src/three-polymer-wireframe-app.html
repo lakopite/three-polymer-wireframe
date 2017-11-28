@@ -168,7 +168,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       .num-wrapper {
         background-color: var(--paper-grey-300);
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 5fr 5fr 0.5fr;
       }
 
       .str-header {
@@ -246,11 +246,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         @apply(--layout-flex);
       }
 
-      paper-icon-button.filter {
+      paper-icon-button.filter, .pie-icon {
         @apply(--layout-self-end);
       }
 
-      paper-icon-button.clear-filter-input {
+      paper-icon-button.clear-filter-input, .pie-icon {
         @apply(--layout-self-end);
       }
 
@@ -551,6 +551,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </template>
         </paper-listbox>
         </paper-dropdown-menu>
+        <paper-icon-button class="pie-icon" id="showPieBtn" icon="my-icons:pie-chart" title="show pie chart" on-tap="togglePieAndList"></paper-icon-button>
+        <!-- <paper-icon-button class="list-icon" id="showPieBtn" icon="my-icons:list" title="show table" on-tap="togglePieAndList"></paper-icon-button> -->
       </div>
       <div id="wrap-cost-info">
         <div id="cost-table-section">
@@ -585,13 +587,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <template class="footer">[[_prettify(totalMaterialSumDiffUnit)]] [[costOtherUnitLabel]]</template>
           </vaadin-grid-column>
           <vaadin-grid-column>
-            <template class="header">Cost/[[costOtherUnitLabel]]<div id ="apply-all-div"><iron-input id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" minlength="1"  bind-value="{{applyToAll}}"><input></iron-input>
+            <template class="header">Cost/[[costOtherUnitLabel]]<div id ="apply-all-div">
+              <paper-input-container>
+                <label slot="label">cost per unit</label>
+                <iron-input slot="input" id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{applyToAll}}">
+                  <input>
+                </iron-input>
+              </paper-input-container>
               <br><button id="apply-all-btn" on-tap="_applyAllCostResults">Apply all</button></div>
             </template>
             <template>
-              <iron-input id="cost-input-[[index]]" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{item.input}}" on-change="_setCostResults">
-                <input>
-              </iron-input>
+              <paper-input-container>
+                <label slot="label">Cost</label>
+                <iron-input slot="input" id="cost-input-[[index]]" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{item.input}}" on-change="_setCostResults">
+                  <input>
+                </iron-input>
+              </paper-input-container>
             </template>
           </vaadin-grid-column>
         <vaadin-grid-column>
@@ -1496,6 +1507,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }, 0)
       }
 
+      togglePieAndList() {
+        console.log(Polymer.dom(this.root).querySelector(".pie-icon").icon);
+        if (Polymer.dom(this.root).querySelector(".pie-icon").icon === 'my-icons:pie-chart') {
+          Polymer.dom(this.root).querySelector(".pie-icon").icon = 'my-icons:list'
+          console.log(this.costPieChart);
+          console.log(this.costPieChart.hidden);
+          console.log(Polymer.dom(this.root).querySelector("#cost-chart-container"));
+          console.log(Polymer.dom(this.root).querySelector("#cost-chart-container").hidden);
+          Polymer.dom(this.root).querySelector("#cost-chart-container").hidden = true
+        } else if (Polymer.dom(this.root).querySelector(".pie-icon").icon === 'my-icons:list') {
+          Polymer.dom(this.root).querySelector(".pie-icon").icon = 'my-icons:pie-chart'
+        }
+      }
+
       ready() {
         super.ready();
         this.$['get-models-request'].generateRequest();
@@ -1663,6 +1688,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _applyAllCostResults() {
+        console.log(this.applyToAll);
         for (var i=0; i < this.costTableData.length; i++) {
             this.set('costTableData.'+i+'.input', this.applyToAll)
             this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
@@ -1698,7 +1724,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _setCostResults(e) {
-        console.log(e.model);
         var item = e.model.item
         var inputIndex = e.model.index
         for (var i=0; i < this.costTableData.length; i++) {
@@ -1709,8 +1734,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         if (this.costItems.length === 0) {
           this.costItems.push({'model': this.selectedModel, 'group': item.group, 'input': item.input})
+          console.log(e.target.value);
+          console.log(item.input);
         } else {
           var found = this.costItems.some(function (el) {
+            console.log(el.group);
+            console.log(item.group);
             return el.group === item.group;
           });
           if (!found) {
@@ -1726,6 +1755,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.totalCost = _.sumBy(this.costTableData, function(o) {
           return o.costResult
         })
+        console.log(this.costItems);
         this._setCostPieData()
       }
 
