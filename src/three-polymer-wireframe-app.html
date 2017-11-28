@@ -246,11 +246,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         @apply(--layout-flex);
       }
 
-      paper-icon-button.filter, .pie-icon {
-        @apply(--layout-self-end);
-      }
-
-      paper-icon-button.clear-filter-input, .pie-icon {
+      paper-icon-button.filter, .clear-filter-input, .pie-icon {
         @apply(--layout-self-end);
       }
 
@@ -557,9 +553,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </template>
         </paper-listbox>
         </paper-dropdown-menu>
-        <div hidden$="{{_hidePieIcon(totalCost)}}">
-          <paper-icon-button id="costPieIcon" class="pie-icon" icon="my-icons:pie-chart" title="show pie chart" on-tap="costToggleView"></paper-icon-button>
-        </div>
+          <paper-icon-button disabled="{{_disablePieIcon(totalCost)}}" id="costPieIcon" class="pie-icon" icon="my-icons:pie-chart" title="show pie chart" on-tap="costToggleView"></paper-icon-button>
       </div>
       <div id="wrap-cost-info">
         <div id="cost-table-section" hidden$="{{_hideCostTable(costPieIcon)}}">
@@ -1278,7 +1272,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _stringAggregations() {
-        this.stringPieIcon = this.$.strPieIcon.icon
         this.showNumericalAggregations = false;
         this._resultFilterInput()
         this._generateNumDropdownOptions()
@@ -1514,7 +1507,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }, 0)
       }
 
-      _hidePieIcon(totalCost) {
+      _disablePieIcon(totalCost) {
         return totalCost === 0
       }
 
@@ -1539,6 +1532,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.costPieIcon = this.$.costPieIcon.icon
       }
 
+      // _getCostIcon(costPieView) {
+      //   return (this.costPieView) ? 'my-icons:list' : 'my-icons:pie-chart'
+      // }
+      //
+
+      // _getStringIcon(stringPieView) {
+      //   return (this.stringPieView) ? 'my-icons:list' : 'my-icons:pie-chart'
+      // }
 
       _hideCostTable(pieIcon) {
         return this.costPieIcon === 'my-icons:list'
@@ -1763,7 +1764,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var inputIndex = e.model.index
         for (var i=0; i < this.costTableData.length; i++) {
           if (i === inputIndex) {
-            console.log("values: " + e.target.value + " : " + this.costTableData[i].input)
+            // console.log("values: " + e.target.value + " : " + this.costTableData[i].input)
             this.set('costTableData.'+i+'.costResult', this.costTableData[i].input * this.costTableData[i].otherUnitSum);
           }
         }
@@ -1788,7 +1789,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.totalCost = _.sumBy(this.costTableData, function(o) {
           return o.costResult
         })
-        console.log(this.costItems);
+        // console.log(this.costItems);
         this._setCostPieData()
       }
 
