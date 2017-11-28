@@ -258,6 +258,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         margin: 1em;
       }
 
+      .print-clean {
+        border: none;
+        background: transparent;
+      }
+
     </style>
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="model-request" method="GET" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
@@ -592,7 +597,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <template class="header">Cost/[[costOtherUnitLabel]]<div id ="apply-all-div">
               <paper-input-container>
                 <iron-input slot="input" id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{applyToAll}}">
-                  <input>
+                  <input class="print-clean">
                 </iron-input>
               </paper-input-container>
               <br><button id="apply-all-btn" on-tap="_applyAllCostResults">Apply all</button></div>
@@ -601,7 +606,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <paper-input-container>
                 <label slot="label">Cost per unit</label>
                 <iron-input slot="input" id="cost-input-[[index]]" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{item.input}}" on-change="_setCostResults">
-                  <input>
+                  <input class="print-clean">
                 </iron-input>
               </paper-input-container>
             </template>
