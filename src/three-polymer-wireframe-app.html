@@ -174,7 +174,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       .str-header {
         background-color: var(--paper-grey-300);
         display: grid;
-        grid-template-columns: 1fr 1fr 2fr;
+        grid-template-columns: 2fr 1fr 1fr 0.2fr;
       }
 
       #num-contour-dropdown, #str-contour-dropdown {
@@ -187,7 +187,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       #wrap-str-info {
         @apply(--layout-vertical);
         overflow-x:hidden;
-        height: calc(100vh - 192px);
+        /*height: calc(100vh - 192px);*/
         /*overflow-y: hidden;*/
       }
 
@@ -197,10 +197,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       #sum-chart-container {
-        height: 398px;
+        height: calc(100vh - 192px);
       }
 
-      .cost-by-group-table {
+      .data-by-group-table, .cost-by-group-table {
         height: calc(100vh - 192px);
       }
 
@@ -484,14 +484,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               </template>
             </paper-listbox>
           </paper-dropdown-menu>
-            <paper-icon-button class="pie-icon" icon="my-icons:pie-chart" title="show pie chart" on-tap="togglePieAndList"></paper-icon-button>
+            <paper-icon-button id="strPieIcon" class="pie-icon" icon="my-icons:pie-chart" title="show pie chart" on-tap="strToggleView"></paper-icon-button>
         </div>
         <!-- wrap all string aggregation info -->
         <div id="wrap-str-info">
           <!-- div holds pie chart -->
-          <div id="sum-chart-container" hidden$="{{_hideStringPieChart(pieIcon)}}"></div>
+          <div id="sum-chart-container" hidden$="{{_hideStringPieChart(stringPieIcon)}}"></div>
           <!-- data by group table -->
-          <div id="group-data-table-section" hidden$="{{_hideCostTable(pieIcon)}}">
+          <div id="group-data-table-section" hidden$="{{_hideStringTable(stringPieIcon)}}">
           <vaadin-grid class="data-by-group-table" items="[[groupSumData]]">
             <vaadin-grid-column width="200px">
               <template class="header">
@@ -553,11 +553,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </paper-listbox>
         </paper-dropdown-menu>
         <div hidden$="{{_hidePieIcon(totalCost)}}">
-          <paper-icon-button class="pie-icon" icon="my-icons:pie-chart" title="show pie chart" on-tap="togglePieAndList"></paper-icon-button>
+          <paper-icon-button id="costPieIcon" class="pie-icon" icon="my-icons:pie-chart" title="show pie chart" on-tap="costToggleView"></paper-icon-button>
         </div>
       </div>
       <div id="wrap-cost-info">
-        <div id="cost-table-section" hidden$="{{_hideCostTable(pieIcon)}}">
+        <div id="cost-table-section" hidden$="{{_hideCostTable(costPieIcon)}}">
         <!-- cost by group table -->
         <vaadin-grid class="cost-by-group-table" items="{{costTableData}}">
         <vaadin-grid-column width="200px">
@@ -616,7 +616,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </vaadin-grid>
         </div>
         <!-- to hold cost pie chart -->
-        <div id="cost-chart-container" hidden$="{{_hideCostPieChart(pieIcon, totalCost)}}"></div>
+        <div id="cost-chart-container" hidden$="{{_hideCostPieChart(costPieIcon, totalCost)}}"></div>
       </div>
     </div>
     </iron-pages>
@@ -1512,29 +1512,44 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return totalCost === 0
       }
 
-      togglePieAndList() {
-        if (Polymer.dom(this.root).querySelector(".pie-icon").icon === 'my-icons:pie-chart') {
-          Polymer.dom(this.root).querySelector(".pie-icon").icon = 'my-icons:list'
-          Polymer.dom(this.root).querySelector("#cost-chart-container").hidden = true
+      strToggleView() {
+        if (this.$.strPieIcon.icon === 'my-icons:pie-chart') {
+          this.$.strPieIcon.icon = 'my-icons:list'
           Polymer.dom(this.root).querySelector("#sum-chart-container").hidden = true
-        } else if (Polymer.dom(this.root).querySelector(".pie-icon").icon === 'my-icons:list') {
-          Polymer.dom(this.root).querySelector(".pie-icon").icon = 'my-icons:pie-chart'
-          Polymer.dom(this.root).querySelector("#cost-chart-container").hidden = false
+        } else if (this.$.strPieIcon.icon === 'my-icons:list') {
+          this.$.strPieIcon.icon = 'my-icons:pie-chart'
           Polymer.dom(this.root).querySelector("#sum-chart-container").hidden = false
         }
-        this.pieIcon = Polymer.dom(this.root).querySelector(".pie-icon").icon
+        this.stringPieIcon = this.$.strPieIcon.icon
       }
 
+      costToggleView() {
+        if (this.$.costPieIcon.icon === 'my-icons:pie-chart') {
+          this.$.costPieIcon.icon = 'my-icons:list'
+          Polymer.dom(this.root).querySelector("#cost-chart-container").hidden = true
+        } else if (this.$.costPieIcon.icon === 'my-icons:list') {
+          this.$.costPieIcon.icon = 'my-icons:pie-chart'
+          Polymer.dom(this.root).querySelector("#cost-chart-container").hidden = false
+        }
+        this.costPieIcon = this.$.costPieIcon.icon
+      }
+
+
       _hideCostTable(pieIcon) {
-        return this.pieIcon === 'my-icons:list'
+        return this.costPieIcon === 'my-icons:list'
+      }
+
+      _hideStringTable(pieIcon) {
+        return this.stringPieIcon === 'my-icons:list'
       }
 
       _hideStringPieChart(pieIcon) {
-        return this.pieIcon !== 'my-icons:list'
+        //won't hide on first entering
+        return this.stringPieIcon === undefined || this.stringPieIcon !== 'my-icons:list'
       }
 
       _hideCostPieChart(pieIcon, totalcost) {
-        return this.pieIcon !== 'my-icons:list' || this.totalCost === 0
+        return this.costPieIcon !== 'my-icons:list' || this.totalCost === 0
       }
 
 
