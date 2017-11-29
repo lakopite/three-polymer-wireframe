@@ -1528,8 +1528,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       strToggleView() {
         this.stringTableView = !this.stringTableView
-        console.log("toggling string view");
-        console.log("***stringTableView: " + this.stringTableView);
         if (this.stringTableView) {
           Polymer.dom(this.root).querySelector("#sum-chart-container").hidden = true
           Polymer.dom(this.root).querySelector("#group-data-table-section").hidden = false
@@ -1542,8 +1540,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       costToggleView() {
         this.costTableView = !this.costTableView
-        console.log("toggling cost view");
-        console.log("***costTableView: " + this.costTableView);
         if (this.costTableView) {
           Polymer.dom(this.root).querySelector("#cost-chart-container").hidden = true
           Polymer.dom(this.root).querySelector("#cost-table-section").hidden = false
