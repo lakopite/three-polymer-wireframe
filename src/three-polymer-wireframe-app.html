@@ -203,7 +203,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .data-by-group-table, .cost-by-group-table {
-        /*height: calc(100vh - 192px);*/
+        height: calc(100vh - 192px);
       }
 
       #csv-button {
@@ -493,7 +493,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <!-- wrap all string aggregation info -->
         <div id="wrap-str-info">
           <!-- div holds pie chart -->
-          <div id="sum-chart-container" hidden></div>
+          <div id="sum-chart-container"></div>
           <!-- data by group table -->
           <div id="group-data-table-section">
           <vaadin-grid class="data-by-group-table" items="[[groupSumData]]">
@@ -618,7 +618,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </vaadin-grid>
         </div>
         <!-- to hold cost pie chart -->
-        <div id="cost-chart-container" hidden></div>
+        <div id="cost-chart-container"></div>
       </div>
     </div>
     </iron-pages>
