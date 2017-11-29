@@ -552,8 +552,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <!-- Cost Tab -->
     <div name="cost-view">
       <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedMaterialTab}}">
-        <paper-tab name="concrete-tab">Concrete</paper-tab>
-        <paper-tab name="steel-tab">Steel</paper-tab>
+        <paper-tab name="concrete-tab" disabled$="{{_disableConcreteTab(materials)}}">Concrete</paper-tab>
+        <paper-tab name="steel-tab" disabled$="{{_disableSteelTab(materials)}}">Steel</paper-tab>
       </paper-tabs>
       <div class="num-wrapper">
         <app-toolbar class="aggregation-toolbar">
@@ -588,14 +588,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </vaadin-grid-column>
           <vaadin-grid-column>
             <template class="header">
-              <vaadin-grid-sorter path="sum">[[material]] sum [[_costUnitLabels(material, unitType)]]</vaadin-grid-sorter>
+              <vaadin-grid-sorter path="sum">* sum [[_costUnitLabels(materials, unitType)]]</vaadin-grid-sorter>
             </template>
             <template>[[_prettify(item.sum)]]</template>
-            <template class="footer">[[_prettify(totalMaterialSum)]] [[_costUnitLabels(material, unitType)]]</template>
+            <template class="footer">[[_prettify(totalMaterialSum)]] [[_costUnitLabels(materials, unitType)]]</template>
           </vaadin-grid-column>
           <vaadin-grid-column>
             <template class="header">
-              <vaadin-grid-sorter path="otherUnitSum">[[material]] sum [[costOtherUnitLabel]]</vaadin-grid-sorter>
+              <vaadin-grid-sorter path="otherUnitSum">* sum [[costOtherUnitLabel]]</vaadin-grid-sorter>
             </template>
             <template>[[_prettify(item.otherUnitSum)]]</template>
             <template class="footer">[[_prettify(totalMaterialSumDiffUnit)]] [[costOtherUnitLabel]]</template>
@@ -1089,11 +1089,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _costUnitLabels(material, unitType) {
         var that = this;
-        material = _.toLower(that.material)
+        material = _.toLower(that.materials)
         unitType = _.toLower(that.currentModelResp.modelInformation.units)
-        if (that.material.includes('conc')) {
+        if (that.materials.includes('conc') && that.selectedMaterialTab === "concrete-tab") {
           return unitType === 'imperial' ? that.costUnitLabel =' (in\u00B3)' : that.costUnitLabel =' (mm\u00B3)'
-        } else if (that.material.includes('steel')) {
+        } else if (that.materials.includes('steel') && that.selectedMaterialTab === "steel-tab") {
           return unitType === 'imperial' ? that.costUnitLabel =' (lb)' : that.costUnitLabel =' (kg)'
         } else {
           return ''
@@ -1705,11 +1705,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (!_.isEmpty(this.geometryFilter) && this.metadataFields.includes('material')) {
           var payloadElems = _.concat(this.currentModelResp.payload.linearElements, this.currentModelResp.payload.planarElements)
           for (var i=0; i < payloadElems.length; i++) {
-            this.material = _.toLower(payloadElems[i].metadata.material)
+            this.materials = _.toLower(payloadElems[i].metadata.material)
             //console.log(payloadElems[i]);
             // go through payload elements and their metadata keys
-            if (this.material === 'concrete' && _.has(payloadElems[i], 'metadata.volume') ||  _.has(payloadElems[i], 'metadata.vol') ||  _.has(payloadElems[i], 'metadata.meta_volume') ||
-                this.material === 'steel' && _.has(payloadElems[i], 'metadata.mass') || _.has(payloadElems[i], 'metadata.meta_mass')) {
+            if (_.includes(this.materials, "concrete") && _.has(payloadElems[i], 'metadata.volume') ||  _.has(payloadElems[i], 'metadata.vol') ||  _.has(payloadElems[i], 'metadata.meta_volume') ||
+                _.includes(this.materials, "steel") && _.has(payloadElems[i], 'metadata.mass') || _.has(payloadElems[i], 'metadata.meta_mass')) {
               // console.log("material cost for: " + this.material)
               // console.log("does it include 'conc': " + this.material.includes('conc'))
               // console.log("does it include 'steel': " + this.material.includes('steel'))
@@ -1823,6 +1823,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
+      _disableConcreteTab(materials) {
+        return !_.includes(this.materials, "concrete")
+      }
+
+      _disableSteelTab() {
+        return !_.includes(this.materials, "steel")
+      }
+
       _costAggregations() {
         var that = this
         this._resultFilterInput()
@@ -1849,7 +1857,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           // console.log(this.costTableData);
           var groupKeys = _.without(_.keys(groupsForMaterial), 'undefined')
           var allObjectsByMaterialGroup = []
-          if (this.material === 'concrete') {
+          if (_.includes(this.materials, "concrete") && this.selectedMaterialTab === "concrete-tab") {
             for (var i=0; i < groupKeys.length; i++) {
               var groupObjects = groupsForMaterial[groupKeys[i]];
               var elemsPerGroup = groupObjects.length
@@ -1870,7 +1878,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               _costTableData.push(costTableDataSetup)
             }
             this.set('costTableData', _.sortBy(_costTableData, [function(o) { return o.group }]))
-          } else if (this.material === 'steel') {
+          } else if (_.includes(this.materials, "steel") && this.selectedMaterialTab === "steel-tab") {
             for (var i=0; i < groupKeys.length; i++) {
               var groupObjects = groupsForMaterial[groupKeys[i]];
               var elemsPerGroup = groupObjects.length
@@ -2178,10 +2186,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleDataResponse(event, response) {
         this.currentModelResp = response.response
+        console.log(this.currentModelResp);
         // if (typeof this.currentModelResp.modelInformation.project === 'undefined') {
         //   this.currentModelResp.modelInformation.project = this._formatModelName(this.currentModelResp.modelInformation.name)
         // }
-        // console.log(this.currentModelResp);
         var costTab = Polymer.dom(this.root).querySelector("#cost-tab")
         if (costTab.disabled && this.selectedView === 'cost-view') {
           this.selectedView = 'model-view'
