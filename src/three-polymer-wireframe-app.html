@@ -26,6 +26,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-styles/paper-styles.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
@@ -256,8 +257,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         background: transparent;
       }
 
-      .pie-icon {
-        @apply(--layout-self-center)
+      paper-fab {
+         --paper-fab-background: var(--paper-blue-500);
+         @apply(--layout-self-center)
       }
 
     </style>
@@ -486,7 +488,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               </template>
             </paper-listbox>
           </paper-dropdown-menu>
-            <paper-icon-button id="strPieIcon" class="pie-icon" icon="{{_getCostIcon(stringTableView)}}" title="show pie chart" on-tap="strToggleView"></paper-icon-button>
+            <paper-fab mini id="strPieIcon" class="pie-icon" icon="{{_getCostIcon(stringTableView)}}" title="switch view" on-tap="strToggleView"></paper-fab>
         </div>
         <!-- wrap all string aggregation info -->
         <div id="wrap-str-info">
@@ -554,7 +556,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </template>
         </paper-listbox>
         </paper-dropdown-menu>
-          <paper-icon-button disabled="{{_disablePieIcon(totalCost)}}" id="costPieIcon" class="pie-icon" icon="{{_getCostIcon(costTableView)}}" title="show pie chart" on-tap="costToggleView"></paper-icon-button>
+          <paper-fab mini disabled="{{_disablePieIcon(totalCost)}}" id="costPieIcon" class="pie-icon" icon="{{_getCostIcon(costTableView)}}" title="switch view" on-tap="costToggleView"></paper-fab>
       </div>
       <div id="wrap-cost-info">
         <div id="cost-table-section">
