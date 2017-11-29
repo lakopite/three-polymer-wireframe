@@ -551,6 +551,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </div>
     <!-- Cost Tab -->
     <div name="cost-view">
+      <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedMaterialTab}}">
+        <paper-tab name="concrete-tab">Concrete</paper-tab>
+        <paper-tab name="steel-tab">Steel</paper-tab>
+      </paper-tabs>
       <div class="num-wrapper">
         <app-toolbar class="aggregation-toolbar">
           <div main-title>Cost of [[_capitalize(material)]] by Group</div>
