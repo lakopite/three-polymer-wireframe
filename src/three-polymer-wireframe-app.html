@@ -26,6 +26,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-styles/paper-styles.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
@@ -155,11 +156,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      .numerical-aggregations-table {
+      /*.numerical-aggregations-table {
         height: calc(100vh - 192px);
-      }
+      }*/
 
       .data-by-group-table, .numerical-aggregations-table, .cost-by-group-table {
+        height: calc(100vh - 192px);
         --vaadin-grid-body-row-odd-cell: {
           background-color: #f5f5f5;
         };
@@ -168,13 +170,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       .num-wrapper {
         background-color: var(--paper-grey-300);
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 5fr 5fr 0.5fr;
       }
 
       .str-header {
         background-color: var(--paper-grey-300);
         display: grid;
-        grid-template-columns: 1fr 1fr 2fr;
+        grid-template-columns: 2fr 1fr 1fr 0.2fr;
       }
 
       #num-contour-dropdown, #str-contour-dropdown {
@@ -187,7 +189,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       #wrap-str-info {
         @apply(--layout-vertical);
         overflow-x:hidden;
-        height: calc(100vh - 192px);
+        /*height: calc(100vh - 192px);*/
         /*overflow-y: hidden;*/
       }
 
@@ -196,16 +198,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         /*overflow-y: hidden;*/
       }
 
-      #sum-chart-container {
-        height: 398px;
+      #sum-chart-container, #cost-chart-container {
+        height: calc(100vh - 192px);
       }
 
-      .cost-by-group-table {
-        height: 630px;
-      }
-
-      #cost-chart-container {
-        height: 398px;
+      .data-by-group-table, .cost-by-group-table {
+        height: calc(100vh - 192px);
       }
 
       #csv-button {
@@ -246,16 +244,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         @apply(--layout-flex);
       }
 
-      paper-icon-button.filter {
-        @apply(--layout-self-end);
-      }
-
-      paper-icon-button.clear-filter-input {
+      paper-icon-button.filter, .clear-filter-input {
         @apply(--layout-self-end);
       }
 
       #share-model {
         margin: 1em;
+      }
+
+      .print-clean {
+        border: none;
+        background: transparent;
+      }
+
+      paper-fab {
+         --paper-fab-background: var(--paper-blue-500);
+         @apply(--layout-self-center)
       }
 
     </style>
@@ -327,7 +331,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </app-toolbar>
     <div class="drawer-list">
       <div class="model-div">
-        <paper-icon-button class="filter" icon="my-icons:filter-list" title="filter models" on-tap="showFilterModal"></paper-icon-button>
+        <paper-icon-button id="filterIcon" class="filter" icon="my-icons:filter-list" title="filter models" on-tap="showFilterModal"></paper-icon-button>
         <paper-dropdown-menu label="Model">
         <paper-listbox id="model-options" slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
           <template id="searchOptions" is="dom-repeat" items="[[dataOptions]]" filter="applySearchFilters">
@@ -391,9 +395,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </div>
         </div>
       </div>
-    <!-- </div>
-    </div>
-    </app-drawer> -->
       <!-- for cost aggregations -->
       <div hidden$="{{_hideCostCsvButton(selectedView)}}">
         <div class="csv-wrapper">
@@ -406,7 +407,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </div>
   </div>
   </div>
-    </app-drawer>
+  </app-drawer>
   <!-- Main content -->
     <app-header-layout has-scrolling-region>
     <app-header slot="header" medium-tall>
@@ -487,6 +488,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               </template>
             </paper-listbox>
           </paper-dropdown-menu>
+            <paper-fab mini id="strPieIcon" class="pie-icon" icon="{{_getCostIcon(stringTableView)}}" title="switch view" on-tap="strToggleView"></paper-fab>
         </div>
         <!-- wrap all string aggregation info -->
         <div id="wrap-str-info">
@@ -554,6 +556,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </template>
         </paper-listbox>
         </paper-dropdown-menu>
+          <paper-fab mini disabled="{{_disablePieIcon(totalCost)}}" id="costPieIcon" class="pie-icon" icon="{{_getCostIcon(costTableView)}}" title="switch view" on-tap="costToggleView"></paper-fab>
       </div>
       <div id="wrap-cost-info">
         <div id="cost-table-section">
@@ -588,13 +591,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <template class="footer">[[_prettify(totalMaterialSumDiffUnit)]] [[costOtherUnitLabel]]</template>
           </vaadin-grid-column>
           <vaadin-grid-column>
-            <template class="header">Cost/[[costOtherUnitLabel]]<div id ="apply-all-div"><iron-input id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" bind-value="{{applyToAll}}"><input></iron-input>
+            <template class="header">Cost/[[costOtherUnitLabel]]<div id ="apply-all-div">
+              <paper-input-container>
+                <iron-input slot="input" id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{applyToAll}}">
+                  <input class="print-clean">
+                </iron-input>
+              </paper-input-container>
               <br><button id="apply-all-btn" on-tap="_applyAllCostResults">Apply all</button></div>
             </template>
             <template>
-              <iron-input id="cost-input-[[index]]" prevent-invalid-input allowed-pattern="[.\d]" bind-value="{{item.input}}" on-change="_setCostResults">
-                <input>
-              </iron-input>
+              <paper-input-container>
+                <label slot="label">Cost per unit</label>
+                <iron-input slot="input" id="cost-input-[[index]]" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{item.input}}" on-change="_setCostResults">
+                  <input class="print-clean">
+                </iron-input>
+              </paper-input-container>
             </template>
           </vaadin-grid-column>
         <vaadin-grid-column>
@@ -605,9 +616,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <template class="footer">[[_prettifyDollar(totalCost)]]</template>
         </vaadin-grid-column>
         </vaadin-grid>
-        <!-- to hold cost pie chart -->
-        <div id="cost-chart-container" ></div>
         </div>
+        <!-- to hold cost pie chart -->
+        <div id="cost-chart-container"></div>
       </div>
     </div>
     </iron-pages>
@@ -1264,6 +1275,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _stringAggregations() {
+        if (this.selectedView === 'aggregations-view') {
+          this.stringTableView = true
+          Polymer.dom(this.root).querySelector("#sum-chart-container").hidden = true
+          Polymer.dom(this.root).querySelector("#group-data-table-section").hidden = false
+          this.costTableView = false
+        }
+        console.log("stringTableView: " + this.stringTable);
+        console.log("costTableView: " + this.costTableView);
         this.showNumericalAggregations = false;
         this._resultFilterInput()
         this._generateNumDropdownOptions()
@@ -1360,10 +1379,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return typeof this.selectedModel === 'undefined'
       }
 
-      // _hideChart(_totalCost) {
-      //   return this.totalCost === 0
-      // }
-
       _initCostChart() {
         var chartdiv = Polymer.dom(this.root).querySelector("#cost-chart-container")
         this.costPieChart = Highcharts.chart(chartdiv, {
@@ -1405,7 +1420,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             plotBackgroundColor: null,
             plotBorderWidth: null,
             plotShadow: false,
-            type: 'pie'
+            type: 'pie',
+            height: 800,
+            width: 1200
         },
         title: {
             text: 'Sum by Group',
@@ -1451,7 +1468,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             plotBackgroundColor: null,
             plotBorderWidth: null,
             plotShadow: false,
-            type: 'pie'
+            type: 'pie',
+            height: 800,
+            width: 1200
         },
         title: {
             text: 'Cost by Group',
@@ -1501,6 +1520,46 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         setTimeout(function() {
           that.costPieChart.reflow()
         }, 0)
+      }
+
+      _disablePieIcon(totalCost) {
+        return totalCost === 0
+      }
+
+      strToggleView() {
+        this.stringTableView = !this.stringTableView
+        console.log("toggling string view");
+        console.log("***stringTableView: " + this.stringTableView);
+        if (this.stringTableView) {
+          Polymer.dom(this.root).querySelector("#sum-chart-container").hidden = true
+          Polymer.dom(this.root).querySelector("#group-data-table-section").hidden = false
+        } else if (!this.stringTableView) {
+          Polymer.dom(this.root).querySelector("#sum-chart-container").hidden = false
+          Polymer.dom(this.root).querySelector("#group-data-table-section").hidden = true
+        }
+      }
+
+
+      costToggleView() {
+        this.costTableView = !this.costTableView
+        console.log("toggling cost view");
+        console.log("***costTableView: " + this.costTableView);
+        if (this.costTableView) {
+          Polymer.dom(this.root).querySelector("#cost-chart-container").hidden = true
+          Polymer.dom(this.root).querySelector("#cost-table-section").hidden = false
+        } else if (!this.costTableView) {
+          Polymer.dom(this.root).querySelector("#cost-chart-container").hidden = false
+          Polymer.dom(this.root).querySelector("#cost-table-section").hidden = true
+        }
+      }
+
+      _getCostIcon(costTableView) {
+        return (costTableView) ? 'my-icons:pie-chart' : 'my-icons:list'
+      }
+
+
+      _getStringIcon(stringTableView) {
+        return (stringPieView) ? 'my-icons:pie-chart' : 'my-icons:list'
       }
 
       ready() {
@@ -1705,17 +1764,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _setCostResults(e) {
-        //console.log(e.model);
         var item = e.model.item
         var inputIndex = e.model.index
         for (var i=0; i < this.costTableData.length; i++) {
           if (i === inputIndex) {
-            //console.log("values: " + e.target.value + " : " + this.costTableData[i].input)
+            // console.log("values: " + e.target.value + " : " + this.costTableData[i].input)
             this.set('costTableData.'+i+'.costResult', this.costTableData[i].input * this.costTableData[i].otherUnitSum);
           }
         }
         if (this.costItems.length === 0) {
           this.costItems.push({'model': this.selectedModel, 'group': item.group, 'input': item.input})
+          // console.log(e.target.value);
+          // console.log(item.input);
         } else {
           var found = this.costItems.some(function (el) {
             return el.group === item.group;
@@ -1733,6 +1793,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.totalCost = _.sumBy(this.costTableData, function(o) {
           return o.costResult
         })
+        // console.log(this.costItems);
         this._setCostPieData()
       }
 
@@ -1755,6 +1816,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _costAggregations() {
+        if (this.selectedView === 'cost-view') {
+          this.costTableView = true
+          Polymer.dom(this.root).querySelector("#cost-table-section").hidden = false
+          Polymer.dom(this.root).querySelector("#cost-chart-container").hidden = true
+          this.stringTableView = false
+        }
+        console.log("stringTableView: " + this.stringTable);
+        console.log("costTableView: " + this.costTableView);
         var that = this
         this._resultFilterInput()
         if (this._resultFilterInput().length > 0) {
@@ -2020,8 +2089,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'minDate': minDate,
           'maxDate': maxDate
         }
-        //console.log("search input: ");
-        //console.log(this.userSearchInput);
+        console.log("search input: ");
+        console.log(this.userSearchInput);
         this.$.searchFilterModal.close()
         this.$.searchOptions.render();
         var that = this
@@ -2056,23 +2125,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (typeof this.userSearchInput === 'undefined') {
           return true
         } else if (typeof this.userSearchInput.user === 'undefined' && typeof this.userSearchInput.project === 'undefined') {
+          this.$.filterIcon.style.color = '';
           if (new Date(item.s3_attributes.uploadTime.split(" ")[0]) >= new Date(this.userSearchInput.minDate) && new Date(item.s3_attributes.uploadTime.split(" ")[0]) <= new Date(this.userSearchInput.maxDate)) {
-            //console.log(item);
+            console.log(item);
             return item
           }
         } else if (typeof this.userSearchInput.user === 'undefined') {
+          this.$.filterIcon.style.color = '#4CAF50';
           if (item.s3_attributes.project === this.userSearchInput.project && new Date(item.s3_attributes.uploadTime.split(" ")[0]) >= new Date(this.userSearchInput.minDate) && new Date(item.s3_attributes.uploadTime.split(" ")[0]) <= new Date(this.userSearchInput.maxDate)) {
-            //console.log(item);
+            console.log(item);
             return item
           }
         } else if (typeof this.userSearchInput.project === 'undefined') {
+          this.$.filterIcon.style.color = '#4CAF50';
           if (item.s3_attributes.user === this.userSearchInput.user && new Date(item.s3_attributes.uploadTime.split(" ")[0]) >= new Date(this.userSearchInput.minDate) && new Date(item.s3_attributes.uploadTime.split(" ")[0]) <= new Date(this.userSearchInput.maxDate)) {
-            //console.log(item);
+            console.log(item);
             return item
           }
         } else {
+          this.$.filterIcon.style.color = '#4CAF50';
           if (item.s3_attributes.user === this.userSearchInput.user && item.s3_attributes.project === this.userSearchInput.project && new Date(item.s3_attributes.uploadTime.split(" ")[0]) >= new Date(this.userSearchInput.minDate) && new Date(item.s3_attributes.uploadTime.split(" ")[0]) <= new Date(this.userSearchInput.maxDate)) {
-            //console.log(item);
+            console.log(item);
             //console.log(item.s3_attributes.uploadTime.split(" ")[0]);
             return item
           }
@@ -2144,14 +2217,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       showDialog() {
         this.$.addModelDialog.open();
-        // this.userEmail = Polymer.dom(this.root).querySelector('#user-email').value
-        // this.fileName = this.$.modelUpload.files[0].name
-        // console.log(this.userEmail);
-        // console.log(this.fileName);
-      }
-
-      showFilterModal() {
-        this.$.searchFilterModal.open();
       }
 
       showFilterModal() {
@@ -2172,7 +2237,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         }
       }
-
     }
 
     window.customElements.define(ThreePolymerWireframe.is, ThreePolymerWireframe);
