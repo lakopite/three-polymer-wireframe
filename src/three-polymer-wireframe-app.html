@@ -1277,6 +1277,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _stringAggregations() {
         if (this.selectedView === 'aggregations-view') {
           this.stringTableView = true
+          Polymer.dom(this.root).querySelector("#sum-chart-container").hidden = true
+          Polymer.dom(this.root).querySelector("#group-data-table-section").hidden = false
           this.costTableView = false
         }
         console.log("stringTableView: " + this.stringTable);
@@ -1812,6 +1814,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _costAggregations() {
         if (this.selectedView === 'cost-view') {
           this.costTableView = true
+          Polymer.dom(this.root).querySelector("#cost-table-section").hidden = false
+          Polymer.dom(this.root).querySelector("#cost-chart-container").hidden = true
           this.stringTableView = false
         }
         console.log("stringTableView: " + this.stringTable);
