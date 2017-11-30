@@ -571,7 +571,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </template>
         </paper-listbox>
         </paper-dropdown-menu>
-          <paper-fab mini disabled="{{_disablePieIcon(totalCost)}}" id="costPieIcon" class="pie-icon" icon="{{_getCostIcon(costPieView)}}" title="switch view" on-tap="costToggleView"></paper-fab>
+          <paper-fab mini disabled="{{_disableViewIcon(totalCost, costPieView)}}" id="costPieIcon" class="pie-icon" icon="{{_getCostIcon(costPieView)}}" title="switch view" on-tap="costToggleView"></paper-fab>
       </div>
       <div id="wrap-cost-info">
         <div id="cost-table-section" hidden$="[[costPieView]]">
@@ -1547,8 +1547,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         //console.log(this.strPieChart.series[0].userOptions.data);
       }
 
-      _disablePieIcon(totalCost) {
-        return totalCost === 0
+      _disableViewIcon(totalCost, costPieView) {
+        return totalCost === 0 && !costPieView
       }
 
       _getStringIcon(stringPieView) {
