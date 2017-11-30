@@ -608,8 +608,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                   <input class="print-clean">
                 </iron-input>
               </paper-input-container>
-              <paper-icon-button id="apply-all-btn" on-tap="_applyAllCostResults" icon="my-icons:check-circle" title="apply to all"></paper-icon-button>
-              <!-- <br><button id="apply-all-btn" on-tap="_applyAllCostResults">Apply all</button></div> -->
+              <paper-icon-button id="apply-all-btn" on-tap="_applyAllCostResults" icon="my-icons:check-circle" title="apply to all" disabled="{{_disableApplyAllBtn(applyToAll)}}"></paper-icon-button>
             </template>
             <template>
               <paper-input-container>
@@ -850,7 +849,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _handleResize(e) {
-        console.log("handled")
         setTimeout(function() {
           if (this.stringPieView) {
             this.strPieChart.reflow()
@@ -1560,14 +1558,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (this.selectedView === "aggregations-view" && this.showStringAggregations === true) {
           this.stringPieView = !this.stringPieView
         }
-        console.log(this.stringPieView);
       }
 
       costToggleView() {
         if (this.selectedView === "cost-view") {
           this.costPieView = !this.costPieView
         }
-        console.log(this.costPieView);
       }
 
       ready() {
@@ -1734,6 +1730,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           _costPieData.push([item.group, parseFloat(item.costResult)])
           }
         this.costPieData = _costPieData;
+      }
+
+      _disableApplyAllBtn(applyToAll) {
+        return applyToAll === undefined || applyToAll === ''
       }
 
       _applyAllCostResults() {
