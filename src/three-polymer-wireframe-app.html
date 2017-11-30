@@ -552,12 +552,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <!-- Cost Tab -->
     <div name="cost-view">
       <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedMaterial}}">
-        <paper-tab name="concrete" disabled$="{{_disableConcreteTab(materials)}}">Concrete</paper-tab>
-        <paper-tab name="steel" disabled$="{{_disableSteelTab(materials)}}">Steel</paper-tab>
+        <paper-tab name="concrete" id="concrete-tab" disabled$="{{_disableConcreteTab(materials)}}">Concrete</paper-tab>
+        <paper-tab name="steel" id="steel-tab" disabled$="{{_disableSteelTab(materials)}}">Steel</paper-tab>
       </paper-tabs>
       <div class="num-wrapper">
         <app-toolbar class="aggregation-toolbar">
-          <div main-title>Cost of [[_capitalize(material)]] by Group</div>
+          <div main-title>Cost of [[_capitalize(selectedMaterial)]] by Group</div>
         </app-toolbar>
         <paper-dropdown-menu id="cost-group" label="Select Group/Subgroup">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedCostGroup}}">
@@ -588,14 +588,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </vaadin-grid-column>
           <vaadin-grid-column>
             <template class="header">
-              <vaadin-grid-sorter path="sum">* sum [[_costUnitLabels(materials, unitType)]]</vaadin-grid-sorter>
+              <vaadin-grid-sorter path="sum">[[selectedMaterial]] sum [[_costUnitLabels(selectedMaterial, unitType)]]</vaadin-grid-sorter>
             </template>
             <template>[[_prettify(item.sum)]]</template>
-            <template class="footer">[[_prettify(totalMaterialSum)]] [[_costUnitLabels(materials, unitType)]]</template>
+            <template class="footer">[[_prettify(totalMaterialSum)]] [[_costUnitLabels(selectedMaterial, unitType)]]</template>
           </vaadin-grid-column>
           <vaadin-grid-column>
             <template class="header">
-              <vaadin-grid-sorter path="otherUnitSum">* sum [[costOtherUnitLabel]]</vaadin-grid-sorter>
+              <vaadin-grid-sorter path="otherUnitSum">[[selectedMaterial]] sum [[costOtherUnitLabel]]</vaadin-grid-sorter>
             </template>
             <template>[[_prettify(item.otherUnitSum)]]</template>
             <template class="footer">[[_prettify(totalMaterialSumDiffUnit)]] [[costOtherUnitLabel]]</template>
@@ -1087,13 +1087,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      _costUnitLabels(materials, unitType) {
+      _costUnitLabels(selectedMaterial, unitType) {
         var that = this;
-        materials = _.toLower(that.materials)
+        selectedMaterial = _.toLower(that.selectedMaterial)
         unitType = _.toLower(that.currentModelResp.modelInformation.units)
-        if (that.materials.includes('conc')) {
+        if (that.selectedMaterial === "concrete") {
           return unitType === 'imperial' ? that.costUnitLabel =' (in\u00B3)' : that.costUnitLabel =' (mm\u00B3)'
-        } if (that.materials.includes('steel')) {
+        } if (that.selectedMaterial === "steel") {
           return unitType === 'imperial' ? that.costUnitLabel =' (lb)' : that.costUnitLabel =' (kg)'
         } else {
           return ''
@@ -1857,7 +1857,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           // console.log(this.costTableData);
           var groupKeys = _.without(_.keys(groupsForMaterial), 'undefined')
           var allObjectsByMaterialGroup = []
-          if (_.includes(this.materials, "concrete")) {
+          if (Polymer.dom(this.root).querySelector("#concrete-tab").disabled === true) {
+            this.selectedMaterial = "steel"
+          } else if (Polymer.dom(this.root).querySelector("#steel-tab").disabled === true) {
+            this.selectedMaterial = "concrete"
+          } else {
+            this.selectedMaterial = this.materials[0]
+          }
+          if (_.includes(this.materials, "concrete") && this.selectedMaterial === "concrete") {
             for (var i=0; i < groupKeys.length; i++) {
               var groupObjects = groupsForMaterial[groupKeys[i]];
               var elemsPerGroup = groupObjects.length
@@ -1878,7 +1885,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               _costTableData.push(costTableDataSetup)
             }
             this.set('costTableData', _.sortBy(_costTableData, [function(o) { return o.group }]))
-          } if (_.includes(this.materials, "steel")) {
+          } if (_.includes(this.materials, "steel") && this.selectedMaterial === "steel") {
             for (var i=0; i < groupKeys.length; i++) {
               var groupObjects = groupsForMaterial[groupKeys[i]];
               var elemsPerGroup = groupObjects.length
