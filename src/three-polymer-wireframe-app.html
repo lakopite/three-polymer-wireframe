@@ -255,6 +255,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       .print-clean {
         border: none;
         background: transparent;
+        width: -webkit-fill-available;
+        padding: .5em;
       }
 
       paper-fab {
@@ -628,7 +630,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <script>
 
-    class ThreePolymerWireframe extends Polymer.Element {
+    class ThreePolymerWireframe extends Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element) {
 
       static get is() {
         return 'three-polymer-wireframe-app';
@@ -810,6 +812,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       constructor() {
         super();
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        this.addEventListener('iron-resize', e => this._handleResize(e));
+      }
+
+      _handleResize(e) {
+        console.log("handled")
+        //if pie charts exists, call reflow/resize (whatever works)
+        console.log();
+        console.log(this.costPieChart);
       }
 
       logout() {
@@ -1420,9 +1434,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             plotBackgroundColor: null,
             plotBorderWidth: null,
             plotShadow: false,
-            type: 'pie',
-            height: 800,
-            width: 1200
+            type: 'pie'
         },
         title: {
             text: 'Sum by Group',
@@ -1468,9 +1480,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             plotBackgroundColor: null,
             plotBorderWidth: null,
             plotShadow: false,
-            type: 'pie',
-            height: 800,
-            width: 1200
+            type: 'pie'
         },
         title: {
             text: 'Cost by Group',
