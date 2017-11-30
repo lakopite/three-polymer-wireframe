@@ -1733,7 +1733,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _disableApplyAllBtn(applyToAll) {
-        return applyToAll === undefined || applyToAll === ''
+        return typeof this.applyToAll === 'undefined' || this.applyToAll === '' || this.applyToAll === 0
       }
 
       _applyAllCostResults() {
