@@ -222,7 +222,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: #eeff41;
       }
 
-      #cost-tab[disabled] {
+      #steel[disabled] {
         color: #9E9E9E;
       }
 
@@ -551,9 +551,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </div>
     <!-- Cost Tab -->
     <div name="cost-view">
-      <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedMaterialTab}}">
-        <paper-tab name="concrete-tab" disabled$="{{_disableConcreteTab(materials)}}">Concrete</paper-tab>
-        <paper-tab name="steel-tab" disabled$="{{_disableSteelTab(materials)}}">Steel</paper-tab>
+      <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedMaterial}}">
+        <paper-tab name="concrete" disabled$="{{_disableConcreteTab(materials)}}">Concrete</paper-tab>
+        <paper-tab name="steel" disabled$="{{_disableSteelTab(materials)}}">Steel</paper-tab>
       </paper-tabs>
       <div class="num-wrapper">
         <app-toolbar class="aggregation-toolbar">
@@ -1087,13 +1087,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      _costUnitLabels(material, unitType) {
+      _costUnitLabels(materials, unitType) {
         var that = this;
-        material = _.toLower(that.materials)
+        materials = _.toLower(that.materials)
         unitType = _.toLower(that.currentModelResp.modelInformation.units)
-        if (that.materials.includes('conc') && that.selectedMaterialTab === "concrete-tab") {
+        if (that.materials.includes('conc')) {
           return unitType === 'imperial' ? that.costUnitLabel =' (in\u00B3)' : that.costUnitLabel =' (mm\u00B3)'
-        } else if (that.materials.includes('steel') && that.selectedMaterialTab === "steel-tab") {
+        } if (that.materials.includes('steel')) {
           return unitType === 'imperial' ? that.costUnitLabel =' (lb)' : that.costUnitLabel =' (kg)'
         } else {
           return ''
@@ -1857,7 +1857,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           // console.log(this.costTableData);
           var groupKeys = _.without(_.keys(groupsForMaterial), 'undefined')
           var allObjectsByMaterialGroup = []
-          if (_.includes(this.materials, "concrete") && this.selectedMaterialTab === "concrete-tab") {
+          if (_.includes(this.materials, "concrete")) {
             for (var i=0; i < groupKeys.length; i++) {
               var groupObjects = groupsForMaterial[groupKeys[i]];
               var elemsPerGroup = groupObjects.length
@@ -1878,7 +1878,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               _costTableData.push(costTableDataSetup)
             }
             this.set('costTableData', _.sortBy(_costTableData, [function(o) { return o.group }]))
-          } else if (_.includes(this.materials, "steel") && this.selectedMaterialTab === "steel-tab") {
+          } if (_.includes(this.materials, "steel")) {
             for (var i=0; i < groupKeys.length; i++) {
               var groupObjects = groupsForMaterial[groupKeys[i]];
               var elemsPerGroup = groupObjects.length
