@@ -420,7 +420,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 11/29/17</paper-item>
+        <paper-item>Build Date: 11/30/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -494,14 +494,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               </template>
             </paper-listbox>
           </paper-dropdown-menu>
-            <paper-fab mini id="strPieIcon" class="pie-icon" icon="{{_getCostIcon(stringTableView)}}" title="switch view" on-tap="strToggleView"></paper-fab>
+            <paper-fab mini id="strPieIcon" class="pie-icon" icon="{{_getStringIcon(stringPieView)}}" title="switch view" on-tap="strToggleView"></paper-fab>
         </div>
         <!-- wrap all string aggregation info -->
         <div id="wrap-str-info">
           <!-- div holds pie chart -->
-          <div id="sum-chart-container"></div>
+          <div id="sum-chart-container" hidden$="[[!stringPieView]]"></div>
           <!-- data by group table -->
-          <div id="group-data-table-section">
+          <div id="group-data-table-section" hidden$="[[stringPieView]]">
           <vaadin-grid class="data-by-group-table" items="[[groupSumData]]">
             <vaadin-grid-column width="200px">
               <template class="header">
@@ -566,10 +566,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </template>
         </paper-listbox>
         </paper-dropdown-menu>
-          <paper-fab mini disabled="{{_disablePieIcon(totalCost)}}" id="costPieIcon" class="pie-icon" icon="{{_getCostIcon(costTableView)}}" title="switch view" on-tap="costToggleView"></paper-fab>
+          <paper-fab mini disabled="{{_disablePieIcon(totalCost)}}" id="costPieIcon" class="pie-icon" icon="{{_getCostIcon(costPieView)}}" title="switch view" on-tap="costToggleView"></paper-fab>
       </div>
       <div id="wrap-cost-info">
-        <div id="cost-table-section">
+        <div id="cost-table-section" hidden$="[[costPieView]]">
         <!-- cost by group table -->
         <vaadin-grid class="cost-by-group-table" items="{{costTableData}}">
         <vaadin-grid-column width="200px">
@@ -630,7 +630,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </vaadin-grid>
         </div>
         <!-- to hold cost pie chart -->
-        <div id="cost-chart-container"></div>
+        <div id="cost-chart-container" hidden$="[[!costPieView]]"></div>
       </div>
     </div>
     </iron-pages>
@@ -799,6 +799,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           projectList: {
             type: Array,
             value: ["NLVS North", "NLVS South", "NLVS East", "NLVS West", "NLVS Roof Canopy", "NLVS Roof Support", "NLVS Cable Truss", "Samples"]
+          },
+          stringPieView: {
+            type: Boolean,
+            value: false
+          },
+          costPieView: {
+            type: Boolean,
+            value: false
           }
         };
       }
@@ -1299,14 +1307,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _stringAggregations() {
-        if (this.selectedView === 'aggregations-view') {
-          this.stringTableView = true
-          Polymer.dom(this.root).querySelector("#sum-chart-container").hidden = true
-          Polymer.dom(this.root).querySelector("#group-data-table-section").hidden = false
-          this.costTableView = false
-        }
-        // console.log("stringTableView: " + this.stringTable);
-        // console.log("costTableView: " + this.costTableView);
         this.showNumericalAggregations = false;
         this._resultFilterInput()
         this._generateNumDropdownOptions()
@@ -1546,36 +1546,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return totalCost === 0
       }
 
-      strToggleView() {
-        this.stringTableView = !this.stringTableView
-        if (this.stringTableView) {
-          Polymer.dom(this.root).querySelector("#sum-chart-container").hidden = true
-          Polymer.dom(this.root).querySelector("#group-data-table-section").hidden = false
-        } else if (!this.stringTableView) {
-          Polymer.dom(this.root).querySelector("#sum-chart-container").hidden = false
-          Polymer.dom(this.root).querySelector("#group-data-table-section").hidden = true
-        }
+      _getStringIcon(stringPieView) {
+        return (stringPieView) ? 'my-icons:list' : 'my-icons:pie-chart'
       }
 
+      _getCostIcon(costPieView) {
+        return (costPieView) ? 'my-icons:list' : 'my-icons:pie-chart'
+      }
+
+      strToggleView() {
+        if (this.selectedView === "aggregations-view" && this.showStringAggregations === true) {
+          this.stringPieView = !this.stringPieView
+        }
+        console.log(this.stringPieView);
+      }
 
       costToggleView() {
-        this.costTableView = !this.costTableView
-        if (this.costTableView) {
-          Polymer.dom(this.root).querySelector("#cost-chart-container").hidden = true
-          Polymer.dom(this.root).querySelector("#cost-table-section").hidden = false
-        } else if (!this.costTableView) {
-          Polymer.dom(this.root).querySelector("#cost-chart-container").hidden = false
-          Polymer.dom(this.root).querySelector("#cost-table-section").hidden = true
+        if (this.selectedView === "cost-view") {
+          this.costPieView = !this.costPieView
         }
-      }
-
-      _getCostIcon(costTableView) {
-        return (costTableView) ? 'my-icons:pie-chart' : 'my-icons:list'
-      }
-
-
-      _getStringIcon(stringTableView) {
-        return (stringPieView) ? 'my-icons:pie-chart' : 'my-icons:list'
+        console.log(this.costPieView);
       }
 
       ready() {
@@ -1832,14 +1822,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _costAggregations() {
-        if (this.selectedView === 'cost-view') {
-          this.costTableView = true
-          Polymer.dom(this.root).querySelector("#cost-table-section").hidden = false
-          Polymer.dom(this.root).querySelector("#cost-chart-container").hidden = true
-          this.stringTableView = false
-        }
-        // console.log("stringTableView: " + this.stringTable);
-        // console.log("costTableView: " + this.costTableView);
         var that = this
         this._resultFilterInput()
         if (this._resultFilterInput().length > 0) {
