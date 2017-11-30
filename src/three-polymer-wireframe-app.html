@@ -227,7 +227,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       #apply-all-div {
-        display: inline-block;
+        display: flex;
       }
 
       .secondary-item {
@@ -244,8 +244,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         @apply(--layout-flex);
       }
 
-      paper-icon-button.filter, .clear-filter-input {
+      paper-icon-button.filter, .clear-filter-input, #apply-all-btn {
         @apply(--layout-self-end);
+      }
+
+      #apply-all-btn {
+
       }
 
       #share-model {
@@ -595,11 +599,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <vaadin-grid-column>
             <template class="header">Cost/[[costOtherUnitLabel]]<div id ="apply-all-div">
               <paper-input-container>
+                <label slot="label">Apply to all</label>
                 <iron-input slot="input" id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{applyToAll}}">
                   <input class="print-clean">
                 </iron-input>
               </paper-input-container>
-              <br><button id="apply-all-btn" on-tap="_applyAllCostResults">Apply all</button></div>
+              <paper-icon-button id="apply-all-btn" on-tap="_applyAllCostResults" icon="my-icons:check-circle" title="apply to all"></paper-icon-button>
+              <!-- <br><button id="apply-all-btn" on-tap="_applyAllCostResults">Apply all</button></div> -->
             </template>
             <template>
               <paper-input-container>
