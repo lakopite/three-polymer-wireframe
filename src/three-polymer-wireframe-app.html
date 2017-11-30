@@ -826,10 +826,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _handleResize(e) {
-        console.log("handled")
-        //if pie charts exists, call reflow/resize (whatever works)
-        console.log();
-        console.log(this.costPieChart);
+        // console.log("handled")
+        // //if pie charts exists, call reflow/resize (whatever works)
+        // console.log();
+        // console.log(this.costPieChart);
       }
 
       logout() {
@@ -1301,8 +1301,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           Polymer.dom(this.root).querySelector("#group-data-table-section").hidden = false
           this.costTableView = false
         }
-        console.log("stringTableView: " + this.stringTable);
-        console.log("costTableView: " + this.costTableView);
+        // console.log("stringTableView: " + this.stringTable);
+        // console.log("costTableView: " + this.costTableView);
         this.showNumericalAggregations = false;
         this._resultFilterInput()
         this._generateNumDropdownOptions()
@@ -1834,8 +1834,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           Polymer.dom(this.root).querySelector("#cost-chart-container").hidden = true
           this.stringTableView = false
         }
-        console.log("stringTableView: " + this.stringTable);
-        console.log("costTableView: " + this.costTableView);
+        // console.log("stringTableView: " + this.stringTable);
+        // console.log("costTableView: " + this.costTableView);
         var that = this
         this._resultFilterInput()
         if (this._resultFilterInput().length > 0) {
