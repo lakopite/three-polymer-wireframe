@@ -822,8 +822,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_getSumByForSelectedSumField(selectedSumField)',
           '_drawStrChart(strPieData)',
           '_drawCostChart(costPieData)',
-          // '_delayStrChartResize(selectedView, selectedContourBy)',
-          // '_delayCostChartResize(selectedView)',
+          '_resizeStringChart(stringPieView)',
+          '_resizeCostChart(costPieView)',
           '_getCostByForSelectedCostGroup(selectedCostGroup)'
         ]
       }
@@ -835,6 +835,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       connectedCallback() {
         super.connectedCallback();
         this.addEventListener('iron-resize', e => this._handleResize(e));
+      }
+
+      _resizeStringChart(stringPieView) {
+        if (stringPieView) {
+          this.strPieChart.reflow()
+        }
+      }
+
+      _resizeCostChart(costPieView) {
+        if (costPieView) {
+          this.costPieChart.reflow()
+        }
       }
 
       _handleResize(e) {
@@ -1531,20 +1543,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
         //console.log(this.strPieChart.series[0].userOptions.data);
       }
-
-      // _delayStrChartResize() {
-      //   var that = this;
-      //   setTimeout(function() {
-      //     that.strPieChart.reflow()
-      //   }, 0)
-      // }
-      //
-      // _delayCostChartResize() {
-      //   var that = this;
-      //   setTimeout(function() {
-      //     that.costPieChart.reflow()
-      //   }, 0)
-      // }
 
       _disablePieIcon(totalCost) {
         return totalCost === 0
