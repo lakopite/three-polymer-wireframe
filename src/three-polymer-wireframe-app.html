@@ -425,7 +425,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 12/01/17</paper-item>
+        <paper-item>Build Date: 12/04/17</paper-item>
         <div class="spacer"></div>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
@@ -556,13 +556,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </div>
     <!-- Cost Tab -->
     <div name="cost-view">
-      <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedMaterial}}">
+      <!-- <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedMaterial}}">
         <paper-tab name="concrete" id="concrete-tab" disabled$="{{_disableConcreteTab(materials)}}">Concrete</paper-tab>
         <paper-tab name="steel" id="steel-tab" disabled$="{{_disableSteelTab(materials)}}">Steel</paper-tab>
-      </paper-tabs>
+      </paper-tabs> -->
       <div class="num-wrapper">
         <app-toolbar class="aggregation-toolbar">
-          <div main-title>Cost of [[_capitalize(selectedMaterial)]] by Group</div>
+          <div main-title>Cost of [[_capitalize(material)]] by Group</div>
         </app-toolbar>
         <paper-dropdown-menu id="cost-group" label="Select Group/Subgroup">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedCostGroup}}">
@@ -593,14 +593,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </vaadin-grid-column>
           <vaadin-grid-column>
             <template class="header">
-              <vaadin-grid-sorter path="sum">[[selectedMaterial]] sum [[_costUnitLabels(selectedMaterial, unitType)]]</vaadin-grid-sorter>
+              <vaadin-grid-sorter path="sum">[[material]] sum [[_costUnitLabels(material, unitType)]]</vaadin-grid-sorter>
             </template>
             <template>[[_prettify(item.sum)]]</template>
-            <template class="footer">[[_prettify(totalMaterialSum)]] [[_costUnitLabels(selectedMaterial, unitType)]]</template>
+            <template class="footer">[[_prettify(totalMaterialSum)]] [[_costUnitLabels(material, unitType)]]</template>
           </vaadin-grid-column>
           <vaadin-grid-column>
             <template class="header">
-              <vaadin-grid-sorter path="otherUnitSum">[[selectedMaterial]] sum [[costOtherUnitLabel]]</vaadin-grid-sorter>
+              <vaadin-grid-sorter path="otherUnitSum">[[material]] sum [[costOtherUnitLabel]]</vaadin-grid-sorter>
             </template>
             <template>[[_prettify(item.otherUnitSum)]]</template>
             <template class="footer">[[_prettify(totalMaterialSumDiffUnit)]] [[costOtherUnitLabel]]</template>
@@ -1092,13 +1092,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      _costUnitLabels(selectedMaterial, unitType) {
+      _costUnitLabels(material, unitType) {
         var that = this;
-        selectedMaterial = _.toLower(that.selectedMaterial)
+        material = _.toLower(that.material)
         unitType = _.toLower(that.currentModelResp.modelInformation.units)
-        if (that.selectedMaterial === "concrete") {
+        if (that.material === "concrete") {
           return unitType === 'imperial' ? that.costUnitLabel =' (in\u00B3)' : that.costUnitLabel =' (mm\u00B3)'
-        } if (that.selectedMaterial === "steel") {
+        } if (that.material === "steel") {
           return unitType === 'imperial' ? that.costUnitLabel =' (lb)' : that.costUnitLabel =' (kg)'
         } else {
           return ''
@@ -1672,9 +1672,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             } if (h === 'elemsPerGroup') {
               return "elements per group"
             } if (h === 'sum') {
-              return that.selectedMaterial + " sum " + that.costUnitLabel
+              return that.material + " sum " + that.costUnitLabel
             } if (h === 'otherUnitSum') {
-              return that.selectedMaterial + " sum " + that.costOtherUnitLabel
+              return that.material + " sum " + that.costOtherUnitLabel
             } if (h === 'input') {
               return "cost per " + that.costOtherUnitLabel
             } if (h === 'costResult') {
@@ -1707,26 +1707,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _disableCostTab(_currentMetadataFields, _currentModel, _geoFilter) {
-        if (!_.isEmpty(this.geometryFilter) && this.metadataFields.includes('material')) {
-          var payloadElems = _.concat(this.currentModelResp.payload.linearElements, this.currentModelResp.payload.planarElements)
-          for (var i=0; i < payloadElems.length; i++) {
-            this.materials = _.toLower(payloadElems[i].metadata.material)
-            //console.log(payloadElems[i]);
-            // go through payload elements and their metadata keys
-            if (_.includes(this.materials, "concrete") && _.has(payloadElems[i], 'metadata.volume') ||  _.has(payloadElems[i], 'metadata.vol') ||  _.has(payloadElems[i], 'metadata.meta_volume') ||
-                _.includes(this.materials, "steel") && _.has(payloadElems[i], 'metadata.mass') || _.has(payloadElems[i], 'metadata.meta_mass')) {
-              // console.log("material cost for: " + this.material)
-              // console.log("does it include 'conc': " + this.material.includes('conc'))
-              // console.log("does it include 'steel': " + this.material.includes('steel'))
-              this._costAggregations()
-              return false
-            } else {
-              //console.log("cost-tab should be DISABLED!");
-            }
-          }
-        }
-        return true
-      }
+       if (!_.isEmpty(this.geometryFilter) && this.metadataFields.includes('material')) {
+         var payloadElems = _.concat(this.currentModelResp.payload.linearElements, this.currentModelResp.payload.planarElements)
+         for (var i=0; i < payloadElems.length; i++) {
+           this.material = _.toLower(payloadElems[i].metadata.material)
+           //console.log(payloadElems[i]);
+           // go through payload elements and their metadata keys
+           if (this.material === 'concrete' && _.has(payloadElems[i], 'metadata.volume') ||  _.has(payloadElems[i], 'metadata.vol') ||  _.has(payloadElems[i], 'metadata.meta_volume') ||
+               this.material === 'steel' && _.has(payloadElems[i], 'metadata.mass') || _.has(payloadElems[i], 'metadata.meta_mass')) {
+             // console.log("material cost for: " + this.material)
+             // console.log("does it include 'conc': " + this.material.includes('conc'))
+             // console.log("does it include 'steel': " + this.material.includes('steel'))
+             this._costAggregations()
+             return false
+           } else {
+             //console.log("cost-tab should be DISABLED!");
+           }
+         }
+       }
+       return true
+     }
 
       _setCostPieData() {
         var _costPieData = []
@@ -1828,15 +1828,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      _disableConcreteTab(materials) {
-        return !_.includes(this.materials, "concrete")
-      }
-
-      _disableSteelTab() {
-        return !_.includes(this.materials, "steel")
-      }
+      // _disableConcreteTab(materials) {
+      //   return !_.includes(this.materials, "concrete")
+      // }
+      //
+      // _disableSteelTab(materials) {
+      //   return !_.includes(this.materials, "steel")
+      // }
 
       _costAggregations() {
+        if (this.selectedView === 'cost-view') {
+          this.costTableView = true
+          Polymer.dom(this.root).querySelector("#cost-table-section").hidden = false
+          Polymer.dom(this.root).querySelector("#cost-chart-container").hidden = true
+          this.stringTableView = false
+        }
+        // console.log("stringTableView: " + this.stringTable);
+        // console.log("costTableView: " + this.costTableView);
         var that = this
         this._resultFilterInput()
         if (this._resultFilterInput().length > 0) {
@@ -1862,14 +1870,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           // console.log(this.costTableData);
           var groupKeys = _.without(_.keys(groupsForMaterial), 'undefined')
           var allObjectsByMaterialGroup = []
-          if (Polymer.dom(this.root).querySelector("#concrete-tab").disabled === true) {
-            this.selectedMaterial = "steel"
-          } else if (Polymer.dom(this.root).querySelector("#steel-tab").disabled === true) {
-            this.selectedMaterial = "concrete"
-          } else {
-            this.selectedMaterial = this.materials[0]
-          }
-          if (_.includes(this.materials, "concrete") && this.selectedMaterial === "concrete") {
+          if (this.material === 'concrete') {
             for (var i=0; i < groupKeys.length; i++) {
               var groupObjects = groupsForMaterial[groupKeys[i]];
               var elemsPerGroup = groupObjects.length
@@ -1890,7 +1891,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               _costTableData.push(costTableDataSetup)
             }
             this.set('costTableData', _.sortBy(_costTableData, [function(o) { return o.group }]))
-          } if (_.includes(this.materials, "steel") && this.selectedMaterial === "steel") {
+          } else if (this.material === 'steel') {
             for (var i=0; i < groupKeys.length; i++) {
               var groupObjects = groupsForMaterial[groupKeys[i]];
               var elemsPerGroup = groupObjects.length
