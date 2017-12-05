@@ -1106,30 +1106,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      // _resultFilterInput() {
-      //   var that = this;
-      //   this.linearFilterResult = _.filter(that._modelData.linearElements, function(o) {
-      //     return _.every(o.vertices, function(j) {
-      //       return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-      //       that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-      //       that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-      //     })
-      //   })
-      //   this.planarFilterResult = _.filter(that._modelData.planarElements, function(o) {
-      //     return _.every(o.vertices, function(j) {
-      //       return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
-      //       that._isWithinBounds(j[1], that.geometryFilter.yMin, that.geometryFilter.yMax) &&
-      //       that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
-      //     })
-      //   })
-      //   console.log("_resultFilterInput: " + new Date().toUTCString())
-      //   return _.concat(this.linearFilterResult, this.planarFilterResult)
-      // }
-
       _generateNumDropdownOptions() {
         // using numDropdownOptions not metadataFields to not mess with metadataFields
         this.numDropdownOptions = []
-        // this._resultFilterInput()
         var that = this;
         this.linearNumFilterResult = _.filter(that._modelData.linearElements, function(o) {
           return _.every(o.vertices, function(j) {
@@ -2279,7 +2258,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleDataResponse(event, response) {
         this.currentModelResp = response.response
-        console.log(this.currentModelResp);
+        // console.log(this.currentModelResp);
         // if (typeof this.currentModelResp.modelInformation.project === 'undefined') {
         //   this.currentModelResp.modelInformation.project = this._formatModelName(this.currentModelResp.modelInformation.name)
         // }
