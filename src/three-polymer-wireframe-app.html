@@ -1617,6 +1617,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (this.selectedView === "cost-view") {
           this.costPieView = !this.costPieView
         }
+        if (this.selectedView === "cost-view" && !this.costPieView) {
+          this._costAggregations()
+        }
       }
 
       ready() {
@@ -1885,14 +1888,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       // }
 
       _costAggregations() {
-        if (this.selectedView === 'cost-view') {
-          this.costTableView = true
-          Polymer.dom(this.root).querySelector("#cost-table-section").hidden = false
-          Polymer.dom(this.root).querySelector("#cost-chart-container").hidden = true
-          this.stringTableView = false
-        }
-        // console.log("stringTableView: " + this.stringTable);
-        // console.log("costTableView: " + this.costTableView);
         var that = this
         // ================ repeated function start ==========================================
         this.linearStringFilterResult = _.filter(that._modelData.linearElements, function(o) {
