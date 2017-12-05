@@ -1372,6 +1372,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           })
         })
         var resultFilterInput = _.concat(this.linearStringFilterResult, this.planarStringFilterResult)
+        console.log(resultFilterInput);
         this._generateNumDropdownOptions()
         if (resultFilterInput.length > 0) {
           this._generateNumMetadataKeys()
@@ -1606,6 +1607,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       strToggleView() {
         if (this.selectedView === "aggregations-view" && this.showStringAggregations === true) {
           this.stringPieView = !this.stringPieView
+        }
+        if (this.selectedView === "aggregations-view" && this.showStringAggregations === true && !this.stringPieView) {
+          this._stringAggregations()
         }
       }
 
@@ -2258,7 +2262,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleDataResponse(event, response) {
         this.currentModelResp = response.response
-        // console.log(this.currentModelResp);
+        console.log(this.currentModelResp);
         // if (typeof this.currentModelResp.modelInformation.project === 'undefined') {
         //   this.currentModelResp.modelInformation.project = this._formatModelName(this.currentModelResp.modelInformation.name)
         // }
