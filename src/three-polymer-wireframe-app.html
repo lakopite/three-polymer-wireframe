@@ -854,11 +854,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _handleResize(e) {
+        var that = this;
         setTimeout(function() {
-          if (this.stringPieView) {
-            this.strPieChart.reflow()
-          } else if (this.costPieView) {
-            this.costPieChart.reflow()
+          if (that.stringPieView) {
+            that.strPieChart.reflow()
+          } else if (that.costPieView) {
+            that.costPieChart.reflow()
           }
         }, 0)
       }
