@@ -273,6 +273,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
          @apply(--layout-self-center)
       }
 
+      paper-dialog#loadingData {
+        border: 2px solid;
+        border-color: #448AFF;
+        background-color: #f1f8e9;
+        color: #448AFF;
+      }
+
+      paper-spinner.loading {
+        --paper-spinner-layer-1-color: var(--paper-blue-grey-500);
+        --paper-spinner-layer-2-color: var(--paper-blue-grey-500);
+        --paper-spinner-layer-3-color: var(--paper-blue-grey-500);
+        --paper-spinner-layer-4-color: var(--paper-blue-grey-500);
+      }
+
+
     </style>
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="model-request" method="GET" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
@@ -425,8 +440,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 12/05/17</paper-item>
+        <paper-item>Build Date: 12/07/17</paper-item>
         <div class="spacer"></div>
+        <paper-dialog modal id="loadingData">
+          <h3>Pulling data from server, please wait</h3>
+            <paper-spinner class="loading" active></paper-spinner>
+        </paper-dialog>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
         <paper-menu-button horizontal-align="right">
@@ -828,7 +847,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_drawCostChart(costPieData)',
           '_resizeStringChart(stringPieView)',
           '_resizeCostChart(costPieView)',
-          '_getCostByForSelectedCostGroup(selectedCostGroup)'
+          '_getCostByForSelectedCostGroup(selectedCostGroup)',
+          '_showLoading(modelLoading, appLoading)'
         ]
       }
 
@@ -866,6 +886,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       logout() {
         this.dispatchEvent(new CustomEvent('logout', {bubbles: true, composed: true}))
+      }
+
+      _showLoading(modelLoading, appLoading) {
+        if (modelLoading || appLoading) {
+          this.$.loadingData.open();
+        } else {
+          this.$.loadingData.close();
+        }
       }
 
       _shareModelEmail(message) {
