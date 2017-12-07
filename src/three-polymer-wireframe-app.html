@@ -287,10 +287,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         --paper-spinner-layer-4-color: var(--paper-blue-grey-500);
       }
 
+<<<<<<< HEAD
       span.pat {
         margin: 2em;
       }
 
+=======
+>>>>>>> 15e26c1c38a3b83cfd0e53a64757650b8e4bbb81
     </style>
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="model-request" method="GET" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
@@ -447,7 +450,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <div class="spacer"></div>
         <paper-dialog modal id="loadingData">
           <h3>Pulling data from server, please wait</h3>
+<<<<<<< HEAD
           <span class="pat"></span> <paper-spinner class="loading" active></paper-spinner>
+=======
+          <span class="pat"></span><span class="pat"></span> <paper-spinner class="loading" active></paper-spinner>
+>>>>>>> 15e26c1c38a3b83cfd0e53a64757650b8e4bbb81
         </paper-dialog>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
