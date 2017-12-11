@@ -2184,6 +2184,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.searchOptionsMap = {
           'user': [],
           'project': [],
+          // 'project': _.concat([], "non-tagged"),
           'office': [],
           'minDate': "",
           'maxDate': ""
@@ -2209,7 +2210,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         //to set min value for vaadin-date-picker
         this.minFromDate = this.searchOptionsMap.minDate
         // console.log("available options: ");
-        // console.log(this.searchOptionsMap)
+        console.log(this.searchOptionsMap)
       }
 
       setSearchFilters() {
@@ -2266,8 +2267,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       applySearchFilters(item) {
         if (typeof this.userSearchInput === 'undefined') {
           return true
-        } else if (typeof this.userSearchInput.user === 'undefined' && typeof this.userSearchInput.project === 'undefined' && typeof this.userSearchInput.office === 'undefined') {
+        } if (typeof this.userSearchInput.user === 'undefined' && typeof this.userSearchInput.project === 'undefined' && typeof this.userSearchInput.office === 'undefined' && this.userSearchInput.minDate === this.searchOptionsMap.minDate && this.userSearchInput.maxDate === this.searchOptionsMap.maxDate) {
           this.$.filterIcon.style.color = '';
+          if (new Date(item.s3_attributes.uploadTime.split(" ")[0]) >= new Date(this.userSearchInput.minDate) && new Date(item.s3_attributes.uploadTime.split(" ")[0]) <= new Date(this.userSearchInput.maxDate)) {
+            console.log(item);
+            return item
+          }
+        } if (typeof this.userSearchInput.user === 'undefined' && typeof this.userSearchInput.project === 'undefined' && typeof this.userSearchInput.office === 'undefined' && (this.userSearchInput.minDate !== this.searchOptionsMap.minDate || this.userSearchInput.maxDate !== this.searchOptionsMap.maxDate) ) {
+          this.$.filterIcon.style.color = '#4CAF50';
           if (new Date(item.s3_attributes.uploadTime.split(" ")[0]) >= new Date(this.userSearchInput.minDate) && new Date(item.s3_attributes.uploadTime.split(" ")[0]) <= new Date(this.userSearchInput.maxDate)) {
             console.log(item);
             return item
@@ -2284,7 +2291,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             console.log(item);
             return item
           }
-        } if (typeof this.userSearchInput.office === 'undefined') {
+        // } if (typeof this.userSearchInput.project === 'non-tagged') {
+        //   this.$.filterIcon.style.color = '#4CAF50';
+        //   if (item.s3_attributes.user === this.userSearchInput.user && item.s3_attributes.project === undefined && item.s3_attributes.office === this.userSearchInput.office && new Date(item.s3_attributes.uploadTime.split(" ")[0]) >= new Date(this.userSearchInput.minDate) && new Date(item.s3_attributes.uploadTime.split(" ")[0]) <= new Date(this.userSearchInput.maxDate)) {
+        //     console.log(item);
+        //     return item
+        //   }
+        // } if (typeof this.userSearchInput.office === 'undefined') {
           this.$.filterIcon.style.color = '#4CAF50';
           if (item.s3_attributes.user === this.userSearchInput.user && item.s3_attributes.project === this.userSearchInput.project && new Date(item.s3_attributes.uploadTime.split(" ")[0]) >= new Date(this.userSearchInput.minDate) && new Date(item.s3_attributes.uploadTime.split(" ")[0]) <= new Date(this.userSearchInput.maxDate)) {
             console.log(item);
@@ -2328,7 +2341,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleDataResponse(event, response) {
         this.currentModelResp = response.response
-        // console.log(this.currentModelResp);
+        console.log(this.currentModelResp);
         // if (typeof this.currentModelResp.modelInformation.project === 'undefined') {
         //   this.currentModelResp.modelInformation.project = this._formatModelName(this.currentModelResp.modelInformation.name)
         // }
