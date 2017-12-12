@@ -467,7 +467,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 12/07/17</paper-item>
+        <paper-item>Build Date: 12/12/17</paper-item>
         <div class="spacer"></div>
         <paper-dialog modal id="loadingData">
           <h3>Pulling data from server, please wait</h3>
@@ -1036,10 +1036,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               throw "modelInformation must contain a 'units' key."
               if (_.has(that.jsonUploadPayload, 'modelInformation.name') === false)
               throw "modelInformation must contain a 'name' key."
-              //add email of user uploading file
+              //add tags
               that.jsonUploadPayload.modelInformation.user = that.userEmail
               that.jsonUploadPayload.modelInformation.project = that.uploadSelectedProject
               that.jsonUploadPayload.modelInformation.office = that.uploadSelectedOffice
+              //the two rows below will create correct object format, but keep the model from uploading to s3 bucket for some reason
+              // that.jsonUploadPayload.modelInformation.untagged = {}
+              // that.jsonUploadPayload.modelInformation.untagged.comments = [that.$.commentBox.value]
+              console.log(that.jsonUploadPayload.modelInformation);
               // check that units are either metric or imperial only
               if (!(that.jsonUploadPayload.modelInformation.units === "metric" ||
               that.jsonUploadPayload.modelInformation.units === "imperial"))
