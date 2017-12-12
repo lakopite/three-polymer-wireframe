@@ -291,6 +291,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         margin: 2em;
       }
 
+      #commentBox {
+        width: -webkit-fill-available;
+        padding: .5em;
+      }
+
     </style>
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="model-request" method="GET" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
@@ -317,6 +322,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <iron-input>
       <input id="modelUpload" type="file" on-change="_enableUploadBtn"></input>
       </iron-input>
+      <iron-input><input id="commentBox" placeholder="Enter comments here..."></iron-input>
       <div class="buttons">
         <paper-button dialog-dismiss on-tap="_clearUploadInput">Cancel</paper-button>
         <paper-button id="acceptUploadBtn" dialog-confirm autofocus disabled on-tap="handleJsonUpload">Upload</paper-button>
