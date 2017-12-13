@@ -2297,7 +2297,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         if (typeof this.userSearchInput.user === 'undefined') {
           this.$.filterIcon.style.color = '#4CAF50';
-          console.log("USER IS UNDEFINED");
           if ((item.s3_attributes.project === this.userSearchInput.project || item.s3_attributes.project === undefined && this.userSearchInput.project === 'non-tagged') && item.s3_attributes.office === this.userSearchInput.office && uploadTimeDate >= userSearchInputMinDate && uploadTimeDate <= userSearchInputMaxDate) {
             console.log(item);
             return item
