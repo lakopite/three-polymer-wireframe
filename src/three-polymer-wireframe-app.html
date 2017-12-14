@@ -1043,7 +1043,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               //the two rows below will create correct object format, but keep the model from uploading to s3 bucket for some reason
               // that.jsonUploadPayload.modelInformation.untagged = {}
               // that.jsonUploadPayload.modelInformation.untagged.comments = [that.$.commentBox.value]
-              console.log(that.jsonUploadPayload.modelInformation);
+              // console.log(that.jsonUploadPayload.modelInformation);
               // check that units are either metric or imperial only
               if (!(that.jsonUploadPayload.modelInformation.units === "metric" ||
               that.jsonUploadPayload.modelInformation.units === "imperial"))
@@ -2241,8 +2241,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'minDate': minDate,
           'maxDate': maxDate
         }
-        console.log("search input: ");
-        console.log(this.userSearchInput);
+        // console.log("search input: ");
+        // console.log(this.userSearchInput);
         this.$.searchFilterModal.close()
         this.$.searchOptions.render();
         var that = this
@@ -2274,8 +2274,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           // console.log(that.selectedModel);
         }, 0)
       }
-
-      // this.$.filterIcon.style.color = '#4CAF50';
 
       applySearchFilters(item) {
         if (typeof this.userSearchInput === 'undefined') {
@@ -2344,7 +2342,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleDataResponse(event, response) {
         this.currentModelResp = response.response
-        console.log(this.currentModelResp);
+        // console.log(this.currentModelResp);
         // if (typeof this.currentModelResp.modelInformation.project === 'undefined') {
         //   this.currentModelResp.modelInformation.project = this._formatModelName(this.currentModelResp.modelInformation.name)
         // }
