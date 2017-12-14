@@ -35,7 +35,6 @@
     "cognito-helper": "lakopite/cognito-helper#master",
     "vaadin-valo-theme": "vaadin/vaadin-valo-theme#^0.3.2",
     "vaadin-date-picker": "vaadin/vaadin-date-picker#^2.0.6",
-    "vaadin-combo-box": "vaadin/vaadin-combo-box#^3.0.1",
     "paper-fab": "PolymerElements/paper-fab#~2.0.0"
   },
   "resolutions": {
