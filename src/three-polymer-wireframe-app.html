@@ -300,6 +300,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="model-request" method="GET" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="[[baseUrl]]post-model"></iron-ajax>
+    <iron-ajax headers="{{authHeaders}}" id="get-model-status" method="GET" handle-as="json" on-response="getModelStatus"></iron-ajax>
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
       <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" on-change="_enableUploadBtn">
@@ -1058,6 +1059,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               }
             //if it does not get stuck on any errors above, it'll make it to the below
             that.uploadJsonModel()
+            that.getModelStatus()
           } catch (err) {
               that._clearUploadInput()
               var toast = Polymer.dom(that.root).querySelector('#validationToast')
@@ -1077,6 +1079,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _isWithinBounds(val, min, max) {
         return val >= min && val <= max
+      }
+
+      getModelStatus(event, response) {
+        this.$['get-model-status'].url = this.baseUrl + "get-model-status/" + "Add-A-Model_171213_215933" //note model is hardcoded in
+        this.$['get-model-status'].generateRequest()
+        this.modelStatusResp = response.response
+        // console.log(this.modelStatusResp.latestStatus);//successfully returns 200
       }
 
       _prettify(n) {
@@ -2343,9 +2352,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       handleDataResponse(event, response) {
         this.currentModelResp = response.response
         console.log(this.currentModelResp);
-        // if (typeof this.currentModelResp.modelInformation.project === 'undefined') {
-        //   this.currentModelResp.modelInformation.project = this._formatModelName(this.currentModelResp.modelInformation.name)
-        // }
         var costTab = Polymer.dom(this.root).querySelector("#cost-tab")
         if (costTab.disabled && this.selectedView === 'cost-view') {
           this.selectedView = 'model-view'
