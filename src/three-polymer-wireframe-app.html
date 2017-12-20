@@ -1085,6 +1085,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       getModelStatus(event, response) {
         this.modelStatusResp = response.response
         console.log(this.modelStatusResp.latestStatus)
+        if (this.modelStatusResp.latestStatus === 200) {
+          this.selectedModel = this.modelStatusResp.name
+          window.location.href = window.location.pathname + '#' + this.modelStatusResp.name
+          this.$['get-models-request'].generateRequest();
+          this.$.uploadSuccessToast.show({ text: "Upload successful!"})
+        }
       }
 
       _prettify(n) {
