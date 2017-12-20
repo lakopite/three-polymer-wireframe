@@ -1090,19 +1090,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       getModelStatus(event, response) {
-        this.modelStatusResp = response.response
-        console.log(this.modelStatusResp)
-        if (this.modelStatusResp.latestStatus === 200) {
-          this.$.uploadSuccessToast.show({ text: "Upload successful!"})
-          this.$['get-models-request'].generateRequest();
-          this.selectedModel = this.modelStatusResp.name
-          window.location.href = window.location.pathname + '#' + this.fullFileNameNoExtension
-        } else if (this.modelStatusResp.latestStatus === 500) {
+        if (response) {
+          this.modelStatusResp = response.response
+          console.log(this.modelStatusResp)
+          if (this.modelStatusResp.latestStatus === 200) {
+            this.$.uploadSuccessToast.show({ text: "Upload successful!"})
+            this.$['get-models-request'].generateRequest();
+            this.selectedModel = this.fullFileNameNoExtension
+            window.location.href = window.location.pathname + '#' + this.fullFileNameNoExtension
+          } else if (this.modelStatusResp.latestStatus === 500) {
             this.$.uploadSuccessToast.show({ text: this.modelStatusResp.latestLogMessage})
-        } else if (this.modelStatusResp.latestStatus === 202) {
-          // account for 202? requestModelStatus and then getModelStatus all over again?
-          this.requestModelStatus()
-          this.getModelStatus()
+          } else if (this.modelStatusResp.latestStatus === 202) {
+            // account for 202? requestModelStatus and then getModelStatus all over again?
+            this.requestModelStatus()
+            this.getModelStatus()
+          }
         }
       }
 
