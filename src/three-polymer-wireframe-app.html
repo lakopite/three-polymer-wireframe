@@ -468,7 +468,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 12/14/17</paper-item>
+        <paper-item>Build Date: 12/20/17</paper-item>
         <div class="spacer"></div>
         <paper-dialog modal id="loadingData">
           <h3>Pulling data from server, please wait</h3>
@@ -973,8 +973,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var that = this
         that.$['json-upload-request'].generateRequest();
         that._clearUploadInput()
-        this.$.uploadSuccessToast.show({ text: "Valid JSON, posted to server" })
-        //console.log(that.dataOptions);
+        that.$.uploadSuccessToast.show({ text: "Valid JSON, posted to server" })
+        that.$['get-model-status'].url = that.baseUrl + "get-model-status/" + "Add-A-Model_171213_215933" //note model is hardcoded in
+        that.$['get-model-status'].generateRequest()
+        that.getModelStatus()
       }
 
       reopenUploadBox(){
@@ -1059,7 +1061,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               }
             //if it does not get stuck on any errors above, it'll make it to the below
             that.uploadJsonModel()
-            that.getModelStatus()
           } catch (err) {
               that._clearUploadInput()
               var toast = Polymer.dom(that.root).querySelector('#validationToast')
@@ -1082,10 +1083,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       getModelStatus(event, response) {
-        this.$['get-model-status'].url = this.baseUrl + "get-model-status/" + "Add-A-Model_171213_215933" //note model is hardcoded in
-        this.$['get-model-status'].generateRequest()
         this.modelStatusResp = response.response
-        // console.log(this.modelStatusResp.latestStatus);//successfully returns 200
+        console.log(this.modelStatusResp.latestStatus)
       }
 
       _prettify(n) {
@@ -2400,7 +2399,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.$.uploadSuccessToast.show({ text: "Upload successful!"})
         } else {
           if ("error" in resp) {
-            this.$.uploadSuccessToast.show({ text: resp["error"]})
+            this.$.uploadSuccessToast.show({ text: resp["Error"]})
           }
           else {
             this.$.uploadSuccessToast.show({ text: "An error occurred"})
