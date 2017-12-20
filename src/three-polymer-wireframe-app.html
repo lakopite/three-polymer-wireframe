@@ -299,7 +299,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="model-request" method="GET" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
-    <iron-ajax headers="{{authHeaders}}" id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="[[baseUrl]]post-model"></iron-ajax>
+    <iron-ajax headers="{{authHeaders}}" id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' url="[[baseUrl]]post-model"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="get-model-status" method="GET" handle-as="json" on-response="getModelStatus"></iron-ajax>
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
@@ -969,13 +969,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
+      requestModelStatus() {
+        this.$['get-model-status'].url = this.baseUrl + "get-model-status/" + "Add-A-Model_171213_215933" //note model is hardcoded in
+        this.$['get-model-status'].generateRequest()
+      }
+
       uploadJsonModel() {
         var that = this
         that.$['json-upload-request'].generateRequest();
         that._clearUploadInput()
         that.$.uploadSuccessToast.show({ text: "Valid JSON, posted to server" })
-        that.$['get-model-status'].url = that.baseUrl + "get-model-status/" + "Add-A-Model_171213_215933" //note model is hardcoded in
-        that.$['get-model-status'].generateRequest()
+        that.requestModelStatus()
         that.getModelStatus()
       }
 
@@ -1086,10 +1090,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.modelStatusResp = response.response
         console.log(this.modelStatusResp.latestStatus)
         if (this.modelStatusResp.latestStatus === 200) {
+          this.$.uploadSuccessToast.show({ text: "Upload successful!"})
+          this.$['get-models-request'].generateRequest();
           this.selectedModel = this.modelStatusResp.name
           window.location.href = window.location.pathname + '#' + this.modelStatusResp.name
-          this.$['get-models-request'].generateRequest();
-          this.$.uploadSuccessToast.show({ text: "Upload successful!"})
+        } else if (this.modelStatusResp.latestStatus === 500) {
+            this.$.uploadSuccessToast.show({ text: this.modelStatusResp.latestLogMessage})
+        } else if (this.modelStatusResp.latestStatus === 202) {
+          // account for 202? requestModelStatus and then getModelStatus all over again?
         }
       }
 
@@ -2398,20 +2406,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$.searchFilterModal.open();
       }
 
-      handleUploadResponse(event, response) {
-        var resp = response.response;
-        if ("success" in resp) {
-          this.$['get-models-request'].generateRequest();
-          this.$.uploadSuccessToast.show({ text: "Upload successful!"})
-        } else {
-          if ("error" in resp) {
-            this.$.uploadSuccessToast.show({ text: resp["Error"]})
-          }
-          else {
-            this.$.uploadSuccessToast.show({ text: "An error occurred"})
-          }
-        }
-      }
+      // handleUploadResponse(event, response) {
+      //   var resp = response.response;
+      //   if ("success" in resp) {
+      //     this.$['get-models-request'].generateRequest();
+      //     this.$.uploadSuccessToast.show({ text: "Upload successful!"})
+      //   } else {
+      //     if ("error" in resp) {
+      //       this.$.uploadSuccessToast.show({ text: resp["Error"]})
+      //     }
+      //     else {
+      //       this.$.uploadSuccessToast.show({ text: "An error occurred"})
+      //     }
+      //   }
+      // }
     }
 
     window.customElements.define(ThreePolymerWireframe.is, ThreePolymerWireframe);
