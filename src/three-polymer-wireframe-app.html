@@ -299,7 +299,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="model-request" method="GET" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
-    <iron-ajax headers="{{authHeaders}}" id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' url="[[baseUrl]]post-model"></iron-ajax>
+    <iron-ajax headers="{{authHeaders}}" id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="[[baseUrl]]post-model"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="get-model-status" method="GET" handle-as="json" on-response="getModelStatus"></iron-ajax>
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
@@ -970,12 +970,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       requestModelStatus() {
-        this.$['get-model-status'].url = this.baseUrl + "get-model-status/" + "Add-A-Model_171213_215933" //note model is hardcoded in
+        console.log(this.fullFileNameNoExtension);
+        this.$['get-model-status'].url = this.baseUrl + "get-model-status/" + this.fullFileNameNoExtension
         this.$['get-model-status'].generateRequest()
       }
 
       uploadJsonModel() {
         var that = this
+        console.log(that.jsonUploadPayload);
         that.$['json-upload-request'].generateRequest();
         that._clearUploadInput()
         that.$.uploadSuccessToast.show({ text: "Valid JSON, posted to server" })
@@ -1008,9 +1010,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       handleJsonUpload(evt) {
         var inputFile = this.$.modelUpload.files[0]
         var fileName = inputFile.name
-        var fileNameNoExtension = fileName.slice(0, fileName.lastIndexOf('.'))
-        // this.jsonUrl = fileNameNoExtension//this won't work because does not include appended timestamp
         var extension = fileName.slice(fileName.indexOf('.'))
+        var fileNameWithTimeStamp = fileName.slice(0, fileName.lastIndexOf('.')) + "_" + this._dateTimeFormat() + extension
+        this.fullFileNameNoExtension = fileNameWithTimeStamp.slice(0, fileNameWithTimeStamp.lastIndexOf('.'))
       	var reader = new FileReader()
         var that = this;
         // Capture the file information
@@ -1025,8 +1027,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               if (fileName.slice(-5) !== ".json")
               throw "file has a " + "\"'" + extension  + "'\"" + " extension, but must be a .json file."
               // check that this json has not already been uplaoded
-              if (_.includes(_.map(that.dataOptions,'model'), fileNameNoExtension))
-              throw "a file with the name " + "\"'" + fileNameNoExtension + "'\"" + " has already been uploaded."
+              if (_.includes(_.map(that.dataOptions,'model'), this.fullFileNameNoExtension))
+              throw "a file with the name " + "\"'" + this.fullFileNameNoExtension + "'\"" + " has already been uploaded."
               //parse JSON
               that.jsonUploadPayload = JSON.parse(e.target.result)
               // check that file name matches name in doc
@@ -1044,6 +1046,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               if (_.has(that.jsonUploadPayload, 'modelInformation.name') === false)
               throw "modelInformation must contain a 'name' key."
               //add tags
+              that.jsonUploadPayload.modelInformation.name = that.fullFileNameNoExtension
               that.jsonUploadPayload.modelInformation.user = that.userEmail
               that.jsonUploadPayload.modelInformation.project = that.uploadSelectedProject
               that.jsonUploadPayload.modelInformation.office = that.uploadSelectedOffice
@@ -1088,16 +1091,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       getModelStatus(event, response) {
         this.modelStatusResp = response.response
-        console.log(this.modelStatusResp.latestStatus)
+        console.log(this.modelStatusResp)
         if (this.modelStatusResp.latestStatus === 200) {
           this.$.uploadSuccessToast.show({ text: "Upload successful!"})
           this.$['get-models-request'].generateRequest();
           this.selectedModel = this.modelStatusResp.name
-          window.location.href = window.location.pathname + '#' + this.modelStatusResp.name
+          window.location.href = window.location.pathname + '#' + this.fullFileNameNoExtension
         } else if (this.modelStatusResp.latestStatus === 500) {
             this.$.uploadSuccessToast.show({ text: this.modelStatusResp.latestLogMessage})
         } else if (this.modelStatusResp.latestStatus === 202) {
           // account for 202? requestModelStatus and then getModelStatus all over again?
+          this.requestModelStatus()
+          this.getModelStatus()
         }
       }
 
@@ -1725,8 +1730,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var curr_year_formatted = curr_year.toString().substring(2)
         var curr_hour = (d.getHours() < 9 ? '0': '') + d.getHours()
         var currMins = (d.getMinutes() < 9 ? '0': '') + d.getMinutes()
-        var timeFormat = curr_year_formatted + curr_month + curr_date + "_" + curr_hour + currMins
-        return "Downloaded on: " + timeFormat + '\r\n'
+        var currSecs = (d.getSeconds() < 9 ? '0': '') + d.getSeconds()
+        var timeFormat = curr_year_formatted + curr_month + curr_date + "_" + curr_hour + currMins + currSecs
+        return timeFormat
       }
 
       _currentFilters() {
@@ -1752,7 +1758,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return h + that._quantUnitLabels(that.selectedContourBy)
           })
           this.numDataHeaders = headers_ + '\r\n'
-          var csvData = this.numDataHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + this._dateTimeFormat()
+          var csvData = this.numDataHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + "Downloaded on: " + this._dateTimeFormat()
           var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
           var link = document.createElement("a");
           link.href = uri;
@@ -1784,7 +1790,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return that.selectedSumField + " " + h + that._quantUnitLabels(that.selectedSumField)
           })
           this.groupDataHeaders = headers_ + '\r\n';
-          var csvData = this.groupDataHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + this._dateTimeFormat()
+          var csvData = this.groupDataHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + "Downloaded on: " + this._dateTimeFormat()
           var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
           var link = document.createElement("a");
           link.href = uri;
@@ -1821,7 +1827,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
           })
           this.costTableHeaders = headers_ + '\r\n';
-          var csvData = this.costTableHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + this._dateTimeFormat()
+          var csvData = this.costTableHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + "Downloaded on: " + this._dateTimeFormat()
           var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
           var link = document.createElement("a");
           link.href = uri;
@@ -2406,20 +2412,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$.searchFilterModal.open();
       }
 
-      // handleUploadResponse(event, response) {
-      //   var resp = response.response;
-      //   if ("success" in resp) {
-      //     this.$['get-models-request'].generateRequest();
-      //     this.$.uploadSuccessToast.show({ text: "Upload successful!"})
-      //   } else {
-      //     if ("error" in resp) {
-      //       this.$.uploadSuccessToast.show({ text: resp["Error"]})
-      //     }
-      //     else {
-      //       this.$.uploadSuccessToast.show({ text: "An error occurred"})
-      //     }
-      //   }
-      // }
+      handleUploadResponse(event, response) {
+        var resp = response.response;
+        console.log(resp);
+        // if ("success" in resp) {
+        //   this.$['get-models-request'].generateRequest();
+        //   this.$.uploadSuccessToast.show({ text: "Upload successful!"})
+        // } else {
+        //   if ("error" in resp) {
+        //     this.$.uploadSuccessToast.show({ text: resp["Error"]})
+        //   }
+        //   else {
+        //     this.$.uploadSuccessToast.show({ text: "An error occurred"})
+        //   }
+        // }
+      }
     }
 
     window.customElements.define(ThreePolymerWireframe.is, ThreePolymerWireframe);
