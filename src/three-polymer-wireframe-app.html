@@ -703,6 +703,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Object,
             value: {}
           },
+          backoffCounter: {
+            type: Number,
+            value: 0
+          },
           baseUrl: {
             type: String,
             //CI pipeline will replace with the production api link
@@ -970,8 +974,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       requestModelStatus() {
-        console.log(this.fullFileNameNoExtension);
+        //console.log(this.fullFileNameNoExtension);
         this.$['get-model-status'].url = this.baseUrl + "get-model-status/" + this.fullFileNameNoExtension
+        // console.log(this.$['get-model-status'].url);
         this.$['get-model-status'].generateRequest()
       }
 
@@ -982,10 +987,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         that._clearUploadInput()
         that.$.uploadSuccessToast.show({ text: "Valid JSON, posted to server" })
         that.requestModelStatus()
-        that.getModelStatus()
       }
 
-      reopenUploadBox(){
+      reopenUploadBox() {
         this.$.validationToast.hide()
         Polymer.dom(this.root).querySelector('#addModelDialog').open();
       }
@@ -1092,20 +1096,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       getModelStatus(event, response) {
         if (response) {
           this.modelStatusResp = response.response
-          console.log(this.modelStatusResp)
-          if (this.modelStatusResp.latestStatus === 200) {
-            this.$.uploadSuccessToast.show({ text: "Upload successful!"})
-            this.$['get-models-request'].generateRequest();
-            this.selectedModel = this.fullFileNameNoExtension
-            window.location.href = window.location.pathname + '#' + this.fullFileNameNoExtension
-          } else if (this.modelStatusResp.latestStatus === 500) {
-            this.$.uploadSuccessToast.show({ text: this.modelStatusResp.latestLogMessage})
-          } else if (this.modelStatusResp.latestStatus === 202) {
-            // account for 202? requestModelStatus and then getModelStatus all over again?
-            this.requestModelStatus()
-            this.getModelStatus()
+          if (_.has(this.modelStatusResp, 'error')) {
+            if (this.modelStatusResp.error === "model not found") {
+                if (this.backoffCounter <= 3) {
+                  var that = this;
+                  setTimeout(function() {
+                    that.backoffCounter++;
+                    that.requestModelStatus();
+                  }, that.backoffCounter * 1000);
+                }
+                else {
+                  this.$.uploadSuccessToast.show({ text: this.modelStatusResp.error}); //not in db
+                }
+            }
+          }
+          else {
+            this.backoffCounter = 0;
+            if (this.modelStatusResp.latestStatus === 200) {
+              this.$.uploadSuccessToast.show({ text: "Upload successful!"})
+              this.$['get-models-request'].generateRequest();
+              this.selectedModel = this.fullFileNameNoExtension
+              window.location.href = window.location.pathname + '#' + this.fullFileNameNoExtension
+            } else if (this.modelStatusResp.latestStatus === 500) {
+              this.$.uploadSuccessToast.show({ text: this.modelStatusResp.latestLogMessage})
+            } else if (this.modelStatusResp.latestStatus === 202) {
+              this.requestModelStatus()
+            }
           }
         }
+        console.log(this.modelStatusResp);
       }
 
       _prettify(n) {
