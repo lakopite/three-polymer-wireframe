@@ -982,7 +982,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       uploadJsonModel() {
         var that = this
-        console.log(that.jsonUploadPayload);
         that.$['json-upload-request'].generateRequest();
         that._clearUploadInput()
         that.$.uploadSuccessToast.show({ text: "Valid JSON, posted to server" })
@@ -1124,7 +1123,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
           }
         }
-        console.log(this.modelStatusResp);
       }
 
       _prettify(n) {
