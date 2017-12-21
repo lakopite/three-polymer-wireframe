@@ -1113,10 +1113,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           else {
             this.backoffCounter = 0;
             if (this.modelStatusResp.latestStatus === 200) {
-              this.$.uploadSuccessToast.show({ text: "Upload successful!"})
               this.$['get-models-request'].generateRequest();
               this.selectedModel = this.fullFileNameNoExtension
               window.location.href = window.location.pathname + '#' + this.fullFileNameNoExtension
+              if (this.filterSelectedUser === undefined &&  this.filterSelectedProject === undefined && this.filterSelectedOffice === undefined) {
+                this.$.uploadSuccessToast.show({ text: "Upload successful"})
+              } else {
+                  this.clearFilterInput()
+                  this.userSearchInput = {
+                    'user': undefined,
+                    'project': undefined,
+                    'office': undefined,
+                    'minDate': this.minFromDate,
+                    'maxDate': this.todaysDate()
+                  }
+                  this.$.searchOptions.render();
+                  this.$.filterIcon.style.color = ''
+                  this.$.uploadSuccessToast.show({ text: "Upload successful, filters removed"})
+              }
             } else if (this.modelStatusResp.latestStatus === 500) {
               this.$.uploadSuccessToast.show({ text: this.modelStatusResp.latestLogMessage})
             } else if (this.modelStatusResp.latestStatus === 202) {
@@ -2299,8 +2313,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$.searchOptions.render();
         var that = this
         setTimeout(function() {
-          var includedModels = _.map(that.$['model-options'].items, function(o) {return o.name})
-          if (includedModels.length === 0) {
+          that.includedModels = _.map(that.$['model-options'].items, function(o) {return o.name})
+          // console.log(that.includedModels);
+          if (that.includedModels.length === 0) {
             that.clearFilterInput()
             that.userSearchInput = {
               'user': undefined,
@@ -2315,11 +2330,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             toast.show({ text: "No search results; filters removed" })
           } else {
             // console.log(that.$.searchOptions.filter);
-            if (!_.includes(includedModels, that.selectedModel)) {
-              for (var m = 0; m < includedModels.length; m++) {
+            if (!_.includes(that.includedModels, that.selectedModel)) {
+              for (var m = 0; m < that.includedModels.length; m++) {
                 //these are all the available Models
                 // console.log(includedModels[m])
-                that.set('selectedModel', includedModels[0])
+                that.set('selectedModel',that. includedModels[0])
               }
             }
           }
