@@ -323,7 +323,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <iron-input>
       <input id="modelUpload" type="file" on-change="_enableUploadBtn"></input>
       </iron-input>
-      <!-- <iron-input><input id="commentBox" placeholder="Enter comments here..."></iron-input> -->
+      <iron-input><input id="commentBox" placeholder="Enter comments here..."></iron-input>
       <div class="buttons">
         <paper-button dialog-dismiss on-tap="_clearUploadInput">Cancel</paper-button>
         <paper-button id="acceptUploadBtn" dialog-confirm autofocus disabled on-tap="handleJsonUpload">Upload</paper-button>
@@ -468,7 +468,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 12/20/17</paper-item>
+        <paper-item>Build Date: 12/21/17</paper-item>
         <div class="spacer"></div>
         <paper-dialog modal id="loadingData">
           <h3>Pulling data from server, please wait</h3>
@@ -1055,9 +1055,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               that.jsonUploadPayload.modelInformation.project = that.uploadSelectedProject
               that.jsonUploadPayload.modelInformation.office = that.uploadSelectedOffice
               //the two rows below will create correct object format, but keep the model from uploading to s3 bucket for some reason
-              // that.jsonUploadPayload.modelInformation.untagged = {}
-              // that.jsonUploadPayload.modelInformation.untagged.comments = [that.$.commentBox.value]
-              // console.log(that.jsonUploadPayload.modelInformation);
+              that.jsonUploadPayload.modelInformation.untagged = {}
+              that.jsonUploadPayload.modelInformation.untagged.comments = [that.$.commentBox.value]
+              console.log(that.jsonUploadPayload.modelInformation);
               // check that units are either metric or imperial only
               if (!(that.jsonUploadPayload.modelInformation.units === "metric" ||
               that.jsonUploadPayload.modelInformation.units === "imperial"))
@@ -1491,8 +1491,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           if (typeof this.selectedSumField === 'undefined' || !_.includes(this.numericalMetadataKeys, this.selectedSumField)) {
             var that = this;
             setTimeout(function() {
-              that.set('selectedSumField', that.numericalMetadataKeys[0])
-              that._createStringTableData()
+              if (that.numericalMetadataKeys) {
+                that.set('selectedSumField', that.numericalMetadataKeys[0])
+                that._createStringTableData()
+              }
             }, 0)
          } else {
            if (!_.includes(this.numDropdownOptions, this.selectedContourBy)) {
@@ -1743,13 +1745,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _dateTimeFormat() {
         var d = new Date();
-        var curr_date = (d.getDate() < 9 ? '0': '') + (d.getDate())
-        var curr_month = (d.getMonth() < 9 ? '0': '') + (d.getMonth()+1)
+        var curr_date = (d.getDate() <= 9 ? '0': '') + (d.getDate())
+        var curr_month = (d.getMonth() <= 9 ? '0': '') + (d.getMonth()+1)
         var curr_year = d.getFullYear();
         var curr_year_formatted = curr_year.toString().substring(2)
-        var curr_hour = (d.getHours() < 9 ? '0': '') + d.getHours()
-        var currMins = (d.getMinutes() < 9 ? '0': '') + d.getMinutes()
-        var currSecs = (d.getSeconds() < 9 ? '0': '') + d.getSeconds()
+        var curr_hour = (d.getHours() <= 9 ? '0': '') + d.getHours()
+        var currMins = (d.getMinutes() <= 9 ? '0': '') + d.getMinutes()
+        var currSecs = (d.getSeconds() <= 9 ? '0': '') + d.getSeconds()
         var timeFormat = curr_year_formatted + curr_month + curr_date + "_" + curr_hour + currMins + currSecs
         return timeFormat
       }
@@ -2196,8 +2198,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       todaysDate() {
         var d = new Date();
-        var curr_date = (d.getDate() < 9 ? '0': '') + (d.getDate())
-        var curr_month = (d.getMonth() < 9 ? '0': '') + (d.getMonth()+1)
+        var curr_date = (d.getDate() <= 9 ? '0': '') + (d.getDate())
+        var curr_month = (d.getMonth() <= 9 ? '0': '') + (d.getMonth()+1)
         var curr_year = d.getFullYear();
         return curr_year + "-" + curr_month + "-" + curr_date
       }
@@ -2389,7 +2391,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleDataResponse(event, response) {
         this.currentModelResp = response.response
-        console.log(this.currentModelResp);
+        // console.log(this.currentModelResp);
         var costTab = Polymer.dom(this.root).querySelector("#cost-tab")
         if (costTab.disabled && this.selectedView === 'cost-view') {
           this.selectedView = 'model-view'
@@ -2433,7 +2435,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleUploadResponse(event, response) {
         var resp = response.response;
-        console.log(resp);
+        // console.log(resp);
         // if ("success" in resp) {
         //   this.$['get-models-request'].generateRequest();
         //   this.$.uploadSuccessToast.show({ text: "Upload successful!"})
