@@ -1121,6 +1121,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               this.$.uploadSuccessToast.show({ text: this.modelStatusResp.latestLogMessage})
             } else if (this.modelStatusResp.latestStatus === 202) {
               this.requestModelStatus()
+              // eventually if this stays at 202 indefinitely it needs to just say sorry something went wrong
             }
           }
         }
@@ -2393,7 +2394,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleDataResponse(event, response) {
         this.currentModelResp = response.response
-        // console.log(this.currentModelResp);
+        console.log(this.currentModelResp);
         var costTab = Polymer.dom(this.root).querySelector("#cost-tab")
         if (costTab.disabled && this.selectedView === 'cost-view') {
           this.selectedView = 'model-view'
