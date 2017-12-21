@@ -987,6 +987,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         that._clearUploadInput()
         that.$.uploadSuccessToast.show({ text: "Valid JSON, posted to server" })
         that.requestModelStatus()
+        this.$.acceptUploadBtn.disabled = true
       }
 
       reopenUploadBox() {
@@ -1084,8 +1085,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _clearUploadInput() {
         Polymer.dom(this.root).querySelector('#modelUpload').value = ''
-        this.uploadSelectedProject = undefined
-        this.uploadSelectedOffice = undefined
+        this.uploadSelectedProject = undefined;
+        this.uploadSelectedOffice = undefined;
         this._acceptUploadDisabled = true;
       }
 
@@ -1104,11 +1105,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     that.backoffCounter++;
                     that.requestModelStatus();
                   }, that.backoffCounter * 1000);
-                }
-                else {
+                } else {
                   this.$.uploadSuccessToast.show({ text: this.modelStatusResp.error}); //not in db
                 }
-            }
+              }
           }
           else {
             this.backoffCounter = 0;
