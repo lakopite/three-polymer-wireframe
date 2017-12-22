@@ -292,11 +292,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .commentBox {
-        width: -webkit-fill-available;
+        width: 93%;
         padding: .5em;
       }
 
-      paper-icon-button#addComment{
+      .wrapComments {
+        text-align: center;
+      }
+
+      paper-icon-button#addComment {
+        color: black;
+      }
+
+      paper-icon-button#addComment[disabled]{
         color: #9E9E9E;
       }
 
@@ -327,12 +335,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <iron-input>
       <input id="modelUpload" type="file" on-change="_enableUploadBtn"></input>
       </iron-input>
-      <!-- <paper-icon-button id="addComment" icon="my-icons:add-circle-outline" title="add comment" on-tap="addCommentBox" disabled="{{_disableAddComment(commentList)}}"></paper-icon-button> -->
-        <!-- <iron-input><input id="commentBox" placeholder="Enter comment here..."></iron-input> -->
-        <template is="dom-repeat" items="{{commentList}}">
-         <input class="commentBox" id="comment-input-[[index]]" is="iron-input" placeholder="Enter comment here..." on-change="_enableAddComment"></input>
-       </template>
-       <paper-button id="addComment" title="add comment" on-tap="addCommentBox" disabled="{{_disableAddComment(commentList)}}">TEMP ADD</paper-button>
+        <div class="wrapComments">
+          <template is="dom-repeat" items="{{commentList}}">
+            <input class="commentBox" id="comment-input-[[index]]" is="iron-input" placeholder="Enter comment here..." on-change="_enableAddComment"></input>
+          </template>
+            <paper-icon-button id="addComment" icon="my-icons:add-circle-outline" title="add comment" on-tap="addCommentBox" disabled="{{_disableAddComment(commentList)}}"></paper-icon-button>
+        </div>
       <div class="buttons">
         <paper-button dialog-dismiss on-tap="_clearUploadInput">Cancel</paper-button>
         <paper-button id="acceptUploadBtn" dialog-confirm autofocus disabled on-tap="handleJsonUpload">Upload</paper-button>
@@ -1015,11 +1023,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       addCommentBox() {
-        //not just if blank, if you've changed the value of one--it should update
         var blankIndex = this.commentList.indexOf('');
         this.commentList[blankIndex] = Polymer.dom(this.root).querySelector('#comment-input-'+blankIndex).value;
         this.commentList = _.concat(this.commentList, '')
-        console.log(this.commentList);
       }
 
       finalCommentArr() {
@@ -1030,7 +1036,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         }
         this.commentListCopy = _.without(this.commentListCopy, '', undefined)
-        console.log(this.commentListCopy);
         return this.commentListCopy
       }
 
@@ -1101,7 +1106,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               that.jsonUploadPayload.modelInformation.office = that.uploadSelectedOffice
               //the two rows below will create correct object format, but keep the model from uploading to s3 bucket for some reason
               that.jsonUploadPayload.modelInformation.untagged = {}
-              console.log(that.finalCommentArr());
               that.jsonUploadPayload.modelInformation.untagged.comments = that.finalCommentArr()
               console.log(that.jsonUploadPayload.modelInformation);
               // check that units are either metric or imperial only
