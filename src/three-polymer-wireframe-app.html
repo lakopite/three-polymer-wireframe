@@ -334,7 +334,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <div class="wrapComments">
         <!-- <iron-input><input id="commentBox" placeholder="Enter comment here..."></iron-input> -->
         <template is="dom-repeat" items="{{commentList}}">
-         <input class="commentBox" id="comment-input-[[index]]" is="iron-input" placeholder="Enter comment here..." bind-value="{{item.value}}" on-change="_enableAddComment"></input>
+         <input class="commentBox" id="comment-input-[[index]]" is="iron-input" placeholder="Enter comment here..." on-change="_enableAddComment"></input>
        </template>
        <paper-icon-button id="addComment" icon="my-icons:add-circle-outline" title="add comment" on-tap="addCommentBox" disabled="{{_disableAddComment(commentList)}}"></paper-icon-button>
       </div>
@@ -1021,11 +1021,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.uploadSelectedOffice = undefined
       }
 
-      addCommentBox(e) {
-        var item = e.model.item
-        console.log(item);
-        var inputIndex = e.model.index
-        console.log(inputIndex);
+      addCommentBox() {
+        console.log(Polymer.dom(this.root).querySelector('.commentBox').value);
+        console.log(Polymer.dom(this.root).querySelector('.commentBox').id);
+        console.log(this.commentList);
       }
 
       _disableAddComment(comments) {
