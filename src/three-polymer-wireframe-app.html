@@ -300,10 +300,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: #9E9E9E;
       }
 
-      .wrapComments {
-        display: flex;
-      }
-
     </style>
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="model-request" method="GET" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
@@ -331,13 +327,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <iron-input>
       <input id="modelUpload" type="file" on-change="_enableUploadBtn"></input>
       </iron-input>
-      <div class="wrapComments">
+      <!-- <paper-icon-button id="addComment" icon="my-icons:add-circle-outline" title="add comment" on-tap="addCommentBox" disabled="{{_disableAddComment(commentList)}}"></paper-icon-button> -->
+        <paper-button id="addComment" title="add comment" on-tap="addCommentBox" disabled="{{_disableAddComment(commentList)}}">TEMP ADD</paper-button>
         <!-- <iron-input><input id="commentBox" placeholder="Enter comment here..."></iron-input> -->
         <template is="dom-repeat" items="{{commentList}}">
          <input class="commentBox" id="comment-input-[[index]]" is="iron-input" placeholder="Enter comment here..." on-change="_enableAddComment"></input>
        </template>
-       <paper-icon-button id="addComment" icon="my-icons:add-circle-outline" title="add comment" on-tap="addCommentBox" disabled="{{_disableAddComment(commentList)}}"></paper-icon-button>
-      </div>
       <!-- <iron-input><input id="commentBox" placeholder="Enter comment here..."></iron-input>
       <iron-input><input id="commentBox" placeholder="Enter comment here..."></iron-input> -->
       <div class="buttons">
@@ -1022,9 +1017,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       addCommentBox() {
-        console.log(Polymer.dom(this.root).querySelector('.commentBox').value);
-        console.log(Polymer.dom(this.root).querySelector('.commentBox').id);
+        //not just if blank, if you've changed the value of one--it should update
+        var blankIndex = this.commentList.indexOf('');
+        this.commentList[blankIndex] = Polymer.dom(this.root).querySelector('#comment-input-'+blankIndex).value;
+        this.commentList = _.concat(this.commentList, '')
         console.log(this.commentList);
+      }
+
+      finalCommentArr() {
+        this.commentListCopy = []
+        for (var i=0; i < this.commentList.length; i++) {
+          if (this.commentListCopy[i] !== '') {
+            this.commentListCopy.push(Polymer.dom(this.root).querySelector('#comment-input-'+i).value);
+          }
+        }
+        this.commentListCopy = _.without(this.commentListCopy, '', undefined)
+        console.log(this.commentListCopy);
+        return this.commentListCopy
       }
 
       _disableAddComment(comments) {
@@ -1094,7 +1103,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               that.jsonUploadPayload.modelInformation.office = that.uploadSelectedOffice
               //the two rows below will create correct object format, but keep the model from uploading to s3 bucket for some reason
               that.jsonUploadPayload.modelInformation.untagged = {}
-              that.jsonUploadPayload.modelInformation.untagged.comments = [that.$.commentBox.value]
+              console.log(that.finalCommentArr());
+              that.jsonUploadPayload.modelInformation.untagged.comments = that.finalCommentArr()
               console.log(that.jsonUploadPayload.modelInformation);
               // check that units are either metric or imperial only
               if (!(that.jsonUploadPayload.modelInformation.units === "metric" ||
@@ -1124,7 +1134,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         Polymer.dom(this.root).querySelector('#modelUpload').value = ''
         this.uploadSelectedProject = undefined;
         this.uploadSelectedOffice = undefined;
-        this.$.commentBox.value = ''
+        this.commentList = [""]
         this._acceptUploadDisabled = true;
       }
 
