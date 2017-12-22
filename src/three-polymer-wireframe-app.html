@@ -296,6 +296,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         padding: .5em;
       }
 
+      paper-icon-button.addComment{
+        color: #9E9E9E;
+      }
+
+      .wrapComments {
+        display: flex;
+      }
+
     </style>
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="model-request" method="GET" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
@@ -323,7 +331,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <iron-input>
       <input id="modelUpload" type="file" on-change="_enableUploadBtn"></input>
       </iron-input>
-      <iron-input><input id="commentBox" placeholder="Enter comments here..."></iron-input>
+      <div class="wrapComments">
+        <iron-input><input id="commentBox" placeholder="Enter comments here..."></iron-input>
+        <paper-icon-button mini class="addComment" id="#" icon="my-icons:add-circle-outline" title="#" on-tap="#"></paper-icon-button>
+      </div>
       <div class="buttons">
         <paper-button dialog-dismiss on-tap="_clearUploadInput">Cancel</paper-button>
         <paper-button id="acceptUploadBtn" dialog-confirm autofocus disabled on-tap="handleJsonUpload">Upload</paper-button>
