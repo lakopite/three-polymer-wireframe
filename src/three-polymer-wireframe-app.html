@@ -291,12 +291,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         margin: 2em;
       }
 
-      #commentBox {
+      .commentBox {
         width: -webkit-fill-available;
         padding: .5em;
       }
 
-      paper-icon-button.addComment{
+      paper-icon-button#addComment{
         color: #9E9E9E;
       }
 
@@ -332,9 +332,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <input id="modelUpload" type="file" on-change="_enableUploadBtn"></input>
       </iron-input>
       <div class="wrapComments">
-        <iron-input><input id="commentBox" placeholder="Enter comments here..."></iron-input>
-        <paper-icon-button class="addComment" id="#" icon="my-icons:add-circle-outline" title="#" on-tap="#"></paper-icon-button>
+        <!-- <iron-input><input id="commentBox" placeholder="Enter comment here..."></iron-input> -->
+        <template is="dom-repeat" items="{{commentList}}">
+         <input class="commentBox" id="comment-input-[[index]]" is="iron-input" placeholder="Enter comment here..." bind-value="{{item.value}}" on-change="_enableAddComment"></input>
+       </template>
+       <paper-icon-button id="addComment" icon="my-icons:add-circle-outline" title="add comment" on-tap="addCommentBox" disabled="{{_disableAddComment(commentList)}}"></paper-icon-button>
       </div>
+      <!-- <iron-input><input id="commentBox" placeholder="Enter comment here..."></iron-input>
+      <iron-input><input id="commentBox" placeholder="Enter comment here..."></iron-input> -->
       <div class="buttons">
         <paper-button dialog-dismiss on-tap="_clearUploadInput">Cancel</paper-button>
         <paper-button id="acceptUploadBtn" dialog-confirm autofocus disabled on-tap="handleJsonUpload">Upload</paper-button>
@@ -479,7 +484,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 12/21/17</paper-item>
+        <paper-item>Build Date: 12/22/17</paper-item>
         <div class="spacer"></div>
         <paper-dialog modal id="loadingData">
           <h3>Pulling data from server, please wait</h3>
@@ -717,6 +722,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           backoffCounter: {
             type: Number,
             value: 0
+          },
+          commentList: {
+            type: Array,
+            value: ['']
           },
           baseUrl: {
             type: String,
@@ -1010,6 +1019,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.userEmail = ''
         this.uploadSelectedProject = undefined
         this.uploadSelectedOffice = undefined
+      }
+
+      addCommentBox(e) {
+        var item = e.model.item
+        console.log(item);
+        var inputIndex = e.model.index
+        console.log(inputIndex);
+      }
+
+      _disableAddComment(comments) {
+        return comments.includes(undefined || '')
+      }
+
+      _enableAddComment() {
+        if (!_.isEmpty(Polymer.dom(this.root).querySelector('.commentBox').value)) {
+          this.$.addComment.disabled = false
+        } else {
+          this.$.addComment.disabled = true
+        }
       }
 
       _enableUploadBtn() {
