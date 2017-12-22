@@ -1029,14 +1029,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       finalCommentArr() {
-        this.commentListCopy = []
+        var commentListCopy = []
         for (var i=0; i < this.commentList.length; i++) {
-          if (this.commentListCopy[i] !== '') {
-            this.commentListCopy.push(Polymer.dom(this.root).querySelector('#comment-input-'+i).value);
+          if (commentListCopy[i] !== '') {
+            commentListCopy.push(Polymer.dom(this.root).querySelector('#comment-input-'+i).value);
           }
         }
-        this.commentListCopy = _.without(this.commentListCopy, '', undefined)
-        return this.commentListCopy
+        commentListCopy = _.without(commentListCopy, '', undefined)
+        return commentListCopy
       }
 
       _disableAddComment(comments) {
