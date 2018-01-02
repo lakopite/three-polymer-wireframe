@@ -1025,8 +1025,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       addCommentBox() {
         var blankIndex = this.commentList.indexOf('');
-        this.commentList[blankIndex] = Polymer.dom(this.root).querySelector('#comment-input-'+blankIndex).value;
-        this.commentList = _.concat(this.commentList, '')
+        if (this.commentList.length <= 5) {
+          this.commentList[blankIndex] = Polymer.dom(this.root).querySelector('#comment-input-'+blankIndex).value;
+          this.commentList = _.concat(this.commentList, '')
+        }
       }
 
       finalCommentArr() {
