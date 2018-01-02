@@ -486,7 +486,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 12/22/17</paper-item>
+        <paper-item>Build Date: 01/02/18</paper-item>
         <div class="spacer"></div>
         <paper-dialog modal id="loadingData">
           <h3>Pulling data from server, please wait</h3>
@@ -1124,7 +1124,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             //if it does not get stuck on any errors above, it'll make it to the below
             that.uploadJsonModel()
           } catch (err) {
-              that._clearUploadInput()
+              Polymer.dom(that.root).querySelector('#modelUpload').value = ''
               var toast = Polymer.dom(that.root).querySelector('#validationToast')
               toast.show({ text: "File could not be uploaded because " + err })
             }
