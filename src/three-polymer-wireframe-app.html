@@ -397,7 +397,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-button on-tap="reopenUploadBox" class="yellow-toast">Try Again</paper-button>
       <paper-button dialog-dismiss on-tap="closeToast" class="yellow-toast">Cancel</paper-button>
     </paper-toast>
-    <paper-toast id="uploadSuccessToast" duration="4000"></paper-toast>
+    <paper-toast id="pollingStatusToast" duration="0"></paper-toast>
+    <paper-toast id="uploadSuccessToast" duration="3000"></paper-toast>
     <paper-toast id="linkFailToast" duration="3000"></paper-toast>
     <app-drawer-layout fullbleed>
     <!-- Drawer content -->
@@ -1011,7 +1012,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var that = this
         that.$['json-upload-request'].generateRequest();
         that._clearUploadInput()
-        that.$.uploadSuccessToast.show({ text: "Valid model posted to server. Waiting for confirmation..." })
+        that.$.pollingStatusToast.show({ text: "Valid model posted to server. Waiting for confirmation..." })
         that.requestModelStatus()
         this.$.acceptUploadBtn.disabled = true
       }
@@ -1195,6 +1196,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             } else if (this.modelStatusResp.latestStatus === 500) {
               this.$.validationToast.show({ text: this.modelStatusResp.latestLogMessage})
             } else if (this.modelStatusResp.latestStatus === 202) {
+              this.$.pollingStatusToast.show({ text: this.modelStatusResp.latestLogMessage})
               this.requestModelStatus()
               // eventually if this stays at 202 indefinitely it needs to just say sorry something went wrong
             }
@@ -2517,7 +2519,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // console.log(resp);
         // if ("success" in resp) {
         //   this.$['get-models-request'].generateRequest();
-        //   this.$.uploadSuccessToast.show({ text: "Upload successful!"})
+        //   this.$.pollingStatusToast.show({ text: "Upload successful!"})
         // } else {
         //   if ("error" in resp) {
         //     this.$.validationToast.show({ text: resp["Error"]})
