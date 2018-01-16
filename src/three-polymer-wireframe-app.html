@@ -128,6 +128,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: #FFF;
       }
 
+      #uploadSuccessToast {
+        --paper-toast-background-color: green;
+        --paper-toast-color: white;
+      }
+
       paper-button[disabled] {
         background: #eaeaea;
         color: #a8a8a8;
@@ -392,7 +397,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-button on-tap="reopenUploadBox" class="yellow-toast">Try Again</paper-button>
       <paper-button dialog-dismiss on-tap="closeToast" class="yellow-toast">Cancel</paper-button>
     </paper-toast>
-    <paper-toast id="uploadSuccessToast" duration="3000"></paper-toast>
+    <paper-toast id="uploadSuccessToast" duration="4000"></paper-toast>
     <paper-toast id="linkFailToast" duration="3000"></paper-toast>
     <app-drawer-layout fullbleed>
     <!-- Drawer content -->
@@ -420,7 +425,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
       <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: {{_uploadedBy(currentModelResp.modelInformation.user)}}<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
-        <paper-dropdown-menu id="main-contour-dropdown" label="Select Contour">
+        <paper-dropdown-menu id="main-contour-dropdown">
           <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
             <template is="dom-repeat" items="{{metadataFields}}">
               <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
@@ -486,7 +491,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 01/02/18</paper-item>
+        <paper-item>Build Date: 01/16/18</paper-item>
         <div class="spacer"></div>
         <paper-dialog modal id="loadingData">
           <h3>Pulling data from server, please wait</h3>
@@ -1006,7 +1011,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var that = this
         that.$['json-upload-request'].generateRequest();
         that._clearUploadInput()
-        that.$.uploadSuccessToast.show({ text: "Valid JSON, posted to server" })
+        that.$.uploadSuccessToast.show({ text: "Valid model posted to server. Waiting for confirmation..." })
         that.requestModelStatus()
         this.$.acceptUploadBtn.disabled = true
       }
@@ -1162,7 +1167,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     that.requestModelStatus();
                   }, that.backoffCounter * 1000);
                 } else {
-                  this.$.uploadSuccessToast.show({ text: this.modelStatusResp.error}); //not in db
+                  this.$.validationToast.show({ text: this.modelStatusResp.error}); //not in db
                 }
               }
           }
@@ -1188,7 +1193,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                   this.$.uploadSuccessToast.show({ text: "Upload successful, filters removed"})
               }
             } else if (this.modelStatusResp.latestStatus === 500) {
-              this.$.uploadSuccessToast.show({ text: this.modelStatusResp.latestLogMessage})
+              this.$.validationToast.show({ text: this.modelStatusResp.latestLogMessage})
             } else if (this.modelStatusResp.latestStatus === 202) {
               this.requestModelStatus()
               // eventually if this stays at 202 indefinitely it needs to just say sorry something went wrong
@@ -2515,10 +2520,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         //   this.$.uploadSuccessToast.show({ text: "Upload successful!"})
         // } else {
         //   if ("error" in resp) {
-        //     this.$.uploadSuccessToast.show({ text: resp["Error"]})
+        //     this.$.validationToast.show({ text: resp["Error"]})
         //   }
         //   else {
-        //     this.$.uploadSuccessToast.show({ text: "An error occurred"})
+        //     this.$.validationToast.show({ text: "An error occurred"})
         //   }
         // }
       }
