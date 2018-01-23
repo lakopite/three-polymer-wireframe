@@ -254,12 +254,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         @apply(--layout-flex);
       }
 
-      paper-icon-button.filter, .clear-filter-input, #apply-all-btn {
+      paper-icon-button.filter, .clear-filter-input {
         @apply(--layout-self-end);
       }
 
-      #apply-all-btn {
+      paper-fab#apply-all-btn {
+        color: black;
+        @apply(--layout-self-center);
+        --paper-fab-background: transparent;
+      }
 
+      paper-fab#apply-all-btn[disabled]{
+        color: #9E9E9E;
       }
 
       #share-model {
@@ -269,11 +275,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       .print-clean {
         border: none;
         background: transparent;
-        width: -webkit-fill-available;
+        width: 150px;
         padding: .5em;
       }
 
-      paper-fab {
+      paper-fab#strPieIcon, #costPieIcon {
          --paper-fab-background: var(--paper-blue-500);
          @apply(--layout-self-center)
       }
@@ -437,16 +443,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <div id="filter-container">
         <paper-item>Model Filters</paper-item>
         <div class="horizontal">
-          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min x" class="inline-input" type="number" value="{{geometryFilter.xMin}}" max="[[_computeMax(boundaries.xMax,geometryFilter.xMax)]]" min="[[boundaries.xMin]]"></paper-input>
-          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max x" class="inline-input" type="number" value="{{geometryFilter.xMax}}" max="[[boundaries.xMax]]" min="[[_computeMin(boundaries.xMin,geometryFilter.xMin)]]"></paper-input>
+          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min x" class="inline-input" type="number" value="{{_roundDown(geometryFilter.xMin)}}" max="[[_computeMax(boundaries.xMax,geometryFilter.xMax)]]" min="[[boundaries.xMin]]"></paper-input>
+          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max x" class="inline-input" type="number" value="{{_roundUp(geometryFilter.xMax)}}" max="[[boundaries.xMax]]" min="[[_computeMin(boundaries.xMin,geometryFilter.xMin)]]"></paper-input>
         </div>
         <div class="horizontal">
-          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min y" class="inline-input" type="number" value="{{geometryFilter.yMin}}" max="[[_computeMax(boundaries.yMax,geometryFilter.yMax)]]" min="[[boundaries.yMin]]"></paper-input>
-          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max y" class="inline-input" type="number" value="{{geometryFilter.yMax}}" max="[[boundaries.yMax]]" min="[[_computeMin(boundaries.yMin,geometryFilter.yMin)]]"></paper-input>
+          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min y" class="inline-input" type="number" value="{{_roundDown(geometryFilter.yMin)}}" max="[[_computeMax(boundaries.yMax,geometryFilter.yMax)]]" min="[[boundaries.yMin]]"></paper-input>
+          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max y" class="inline-input" type="number" value="{{_roundUp(geometryFilter.yMax)}}" max="[[boundaries.yMax]]" min="[[_computeMin(boundaries.yMin,geometryFilter.yMin)]]"></paper-input>
         </div>
         <div class="horizontal">
-          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min z" class="inline-input" type="number" value="{{geometryFilter.zMin}}" max="[[_computeMax(boundaries.zMax,geometryFilter.zMax)]]" min="[[boundaries.zMin]]"></paper-input>
-          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max z" class="inline-input" type="number" value="{{geometryFilter.zMax}}" max="[[boundaries.zMax]]" min="[[_computeMin(boundaries.zMin,geometryFilter.zMin)]]"></paper-input>
+          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min z" class="inline-input" type="number" value="{{_roundDown(geometryFilter.zMin)}}" max="[[_computeMax(boundaries.zMax,geometryFilter.zMax)]]" min="[[boundaries.zMin]]"></paper-input>
+          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max z" class="inline-input" type="number" value="{{_roundUp(geometryFilter.zMax)}}" max="[[boundaries.zMax]]" min="[[_computeMin(boundaries.zMin,geometryFilter.zMin)]]"></paper-input>
         </div>
         <div class="horizontal">
           <paper-button class="filterBtn" raised disabled$="{{_filtersDisabled}}" id="applyBtn" on-tap="applyFilters" type="number">Apply</paper-button>
@@ -492,7 +498,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 01/16/18</paper-item>
+        <paper-item>Build Date: 01/23/18</paper-item>
         <div class="spacer"></div>
         <paper-dialog modal id="loadingData">
           <h3>Pulling data from server, please wait</h3>
@@ -684,7 +690,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                   <input class="print-clean">
                 </iron-input>
               </paper-input-container>
-              <paper-icon-button id="apply-all-btn" on-tap="_applyAllCostResults" icon="my-icons:check-circle" title="apply to all" disabled="{{_disableApplyAllBtn(applyToAll)}}"></paper-icon-button>
+              <paper-fab mini id="apply-all-btn" on-tap="_applyAllCostResults" icon="my-icons:check-circle" title="apply to all" disabled="{{_disableApplyAllBtn(applyToAll)}}"></paper-fab>
             </template>
             <template>
               <paper-input-container>
@@ -1203,6 +1209,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         }
         console.log(this.modelStatusResp);
+      }
+
+      _roundDown(n) {
+        return typeof n !== 'undefined' ? _.floor(n, 1) : ""
+      }
+
+      _roundUp(n) {
+        return typeof n !== 'undefined' ? _.ceil(n, 1) : ""
       }
 
       _prettify(n) {
