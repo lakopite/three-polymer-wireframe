@@ -30,6 +30,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-styles/paper-styles.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
@@ -320,6 +321,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: #9E9E9E;
       }
 
+      paper-card.faq-card {
+        margin: 1em;
+        padding-left: 2em;
+        display: flow-root;
+      }
+
     </style>
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="model-request" method="GET" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
@@ -443,16 +450,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <div id="filter-container">
         <paper-item>Model Filters</paper-item>
         <div class="horizontal">
-          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min x" class="inline-input" type="number" value="{{_roundDown(geometryFilter.xMin)}}" max="[[_computeMax(boundaries.xMax,geometryFilter.xMax)]]" min="[[boundaries.xMin]]"></paper-input>
-          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max x" class="inline-input" type="number" value="{{_roundUp(geometryFilter.xMax)}}" max="[[boundaries.xMax]]" min="[[_computeMin(boundaries.xMin,geometryFilter.xMin)]]"></paper-input>
+          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min x" class="inline-input" type="number" value="{{geometryFilter.xMin}}" max="[[_computeMax(boundaries.xMax,geometryFilter.xMax)]]" min="[[boundaries.xMin]]"></paper-input>
+          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max x" class="inline-input" type="number" value="{{geometryFilter.xMax}}" max="[[boundaries.xMax]]" min="[[_computeMin(boundaries.xMin,geometryFilter.xMin)]]"></paper-input>
         </div>
         <div class="horizontal">
-          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min y" class="inline-input" type="number" value="{{_roundDown(geometryFilter.yMin)}}" max="[[_computeMax(boundaries.yMax,geometryFilter.yMax)]]" min="[[boundaries.yMin]]"></paper-input>
-          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max y" class="inline-input" type="number" value="{{_roundUp(geometryFilter.yMax)}}" max="[[boundaries.yMax]]" min="[[_computeMin(boundaries.yMin,geometryFilter.yMin)]]"></paper-input>
+          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min y" class="inline-input" type="number" value="{{geometryFilter.yMin}}" max="[[_computeMax(boundaries.yMax,geometryFilter.yMax)]]" min="[[boundaries.yMin]]"></paper-input>
+          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max y" class="inline-input" type="number" value="{{geometryFilter.yMax}}" max="[[boundaries.yMax]]" min="[[_computeMin(boundaries.yMin,geometryFilter.yMin)]]"></paper-input>
         </div>
         <div class="horizontal">
-          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min z" class="inline-input" type="number" value="{{_roundDown(geometryFilter.zMin)}}" max="[[_computeMax(boundaries.zMax,geometryFilter.zMax)]]" min="[[boundaries.zMin]]"></paper-input>
-          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max z" class="inline-input" type="number" value="{{_roundUp(geometryFilter.zMax)}}" max="[[boundaries.zMax]]" min="[[_computeMin(boundaries.zMin,geometryFilter.zMin)]]"></paper-input>
+          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min z" class="inline-input" type="number" value="{{geometryFilter.zMin}}" max="[[_computeMax(boundaries.zMax,geometryFilter.zMax)]]" min="[[boundaries.zMin]]"></paper-input>
+          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max z" class="inline-input" type="number" value="{{geometryFilter.zMax}}" max="[[boundaries.zMax]]" min="[[_computeMin(boundaries.zMin,geometryFilter.zMin)]]"></paper-input>
         </div>
         <div class="horizontal">
           <paper-button class="filterBtn" raised disabled$="{{_filtersDisabled}}" id="applyBtn" on-tap="applyFilters" type="number">Apply</paper-button>
@@ -518,6 +525,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <paper-tab name="model-view">Model</paper-tab>
           <paper-tab name="aggregations-view">Quantities</paper-tab>
           <paper-tab name="cost-view" id="cost-tab" disabled$="{{_disableCostTab(metadataFields, currentModelResp, geometryFilter)}}">Cost</paper-tab>
+          <paper-tab name="faq-view" id="faq-tab">FAQ</paper-tab>
         </paper-tabs>
       </app-toolbar>
     </app-header>
@@ -713,6 +721,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <!-- to hold cost pie chart -->
         <div id="cost-chart-container" hidden$="[[!costPieView]]"></div>
       </div>
+    </div>
+  </div>
+  <!-- FAQ -->
+  <div name="faq-view">
+      <paper-card class="faq-card">
+        <h4>1. What is this tool?</h4>
+          <paper-item>a.</paper-item>
+        <h4>2. How do I upload my model?</h4>
+          <paper-item>a.	</paper-item>
+        <h4>3. Contact information</h4>
+          <paper-item>a.	Kermin Chok (Kermin.Chok@arup.com): Structural Engineer, Buildings, Los Angeles</paper-item>
+          <paper-item>b.	Trent Clifton (Trent.Clifton@arup.com): Web Developer, Buildings, Los Angeles</paper-item>
+          <paper-item>c.	Rubi Sanchez (Rubi.Sanchez@arup.com): Web Developer, Buildings, Los Angeles</paper-item>
+        <h4>4. Web Technologies</h4>
+          <paper-item>a.	Front end: Polymer 2.0</paper-item>
+          <paper-item>b.	Charting: Highcharts</paper-item>
+          <paper-item>c.	Backend: Chalice, Node</paper-item>
+          <paper-item>d.	Web server: #</paper-item>
+          <paper-item>e.	Database: MongoDB</paper-item>
+      </paper-card>
     </div>
     </iron-pages>
     </app-header-layout>
