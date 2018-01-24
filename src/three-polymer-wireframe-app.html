@@ -146,7 +146,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       #searchFilterModal {
         padding: 1em;
-        width: 290px;
+        width: 315px;
       }
 
       paper-spinner {
@@ -406,6 +406,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <div class="buttons">
         <paper-button dialog-dismiss on-tap="clearFilterInput">Cancel</paper-button>
         <paper-button on-tap="setSearchFilters">Apply</paper-button>
+        <paper-button dialog-dismiss on-tap="clearAllFilters">Clear all</paper-button>
       </div>
     </paper-dialog>
     <paper-toast id="searchResultMsg"></paper-toast>
@@ -2348,6 +2349,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         }
         this.processSearchOptions();
+      }
+
+      clearAllFilters() {
+        this.filterSelectedUser = undefined,
+        this.filterSelectedProject = undefined,
+        this.filterSelectedOffice = undefined,
+        Polymer.dom(this.root).querySelector("#from-date").value = undefined,
+        Polymer.dom(this.root).querySelector("#to-date").value = undefined
+        this.setSearchFilters()
       }
 
       clearFilterInput() {
