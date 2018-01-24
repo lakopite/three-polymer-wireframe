@@ -273,10 +273,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         margin: 1em;
       }
 
+      #apply-all-input {
+        width: 65px;
+      }
+
       .print-clean {
         border: none;
         background: transparent;
-        width: 150px;
+        width: 60px;
         padding: .5em;
       }
 
@@ -326,8 +330,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         padding-left: 2em;
         display: flow-root;
       }
-
     </style>
+
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="model-request" method="GET" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="[[baseUrl]]post-model"></iron-ajax>
@@ -354,12 +358,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <iron-input>
       <input id="modelUpload" type="file" on-change="_enableUploadBtn"></input>
       </iron-input>
-        <div class="wrapComments">
-          <template is="dom-repeat" items="{{commentList}}">
-            <input class="commentBox" id="comment-input-[[index]]" is="iron-input" placeholder="Enter comment here..." on-change="_enableAddComment"></input>
-          </template>
-            <paper-icon-button id="addComment" icon="my-icons:add-circle-outline" title="add comment" on-tap="addCommentBox" disabled="{{_disableAddComment(commentList)}}"></paper-icon-button>
-        </div>
+      <div class="wrapComments">
+        <template is="dom-repeat" items="{{commentList}}">
+          <input class="commentBox" id="comment-input-[[index]]" is="iron-input" placeholder="Enter comment here..." on-change="_enableAddComment"></input>
+        </template>
+        <paper-icon-button id="addComment" icon="my-icons:add-circle-outline" title="add comment" on-tap="addCommentBox" disabled="{{_disableAddComment(commentList)}}"></paper-icon-button>
+      </div>
       <div class="buttons">
         <paper-button dialog-dismiss on-tap="_clearUploadInput">Cancel</paper-button>
         <paper-button id="acceptUploadBtn" dialog-confirm autofocus disabled on-tap="handleJsonUpload">Upload</paper-button>
@@ -378,25 +382,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-icon-button class="clear-filter-input" id="clearFilterUser" icon="my-icons:clear" title="clear user" on-tap="clearSearchField"></paper-icon-button>
       </div>
       <div class="filter-input">
-      <paper-dropdown-menu id="project-dropdown" label="Select Project">
-        <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{filterSelectedProject}}">
-          <template is="dom-repeat" items="[[searchOptionsMap.project]]">
-            <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
-          </template>
-        </paper-listbox>
-      </paper-dropdown-menu>
-      <paper-icon-button class="clear-filter-input" id="clearFilterProject" icon="my-icons:clear" title="clear project" on-tap="clearSearchField"></paper-icon-button>
+        <paper-dropdown-menu id="project-dropdown" label="Select Project">
+          <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{filterSelectedProject}}">
+            <template is="dom-repeat" items="[[searchOptionsMap.project]]">
+              <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
+            </template>
+          </paper-listbox>
+          </paper-dropdown-menu>
+        <paper-icon-button class="clear-filter-input" id="clearFilterProject" icon="my-icons:clear" title="clear project" on-tap="clearSearchField"></paper-icon-button>
       </div>
       <div class="filter-input">
-      <paper-dropdown-menu id="office-dropdown" label="Select Office">
-        <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{filterSelectedOffice}}">
-          <template is="dom-repeat" items="[[searchOptionsMap.office]]">
-            <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
-          </template>
-        </paper-listbox>
-      </paper-dropdown-menu>
+        <paper-dropdown-menu id="office-dropdown" label="Select Office">
+          <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{filterSelectedOffice}}">
+            <template is="dom-repeat" items="[[searchOptionsMap.office]]">
+              <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
+            </template>
+          </paper-listbox>
+        </paper-dropdown-menu>
       <paper-icon-button class="clear-filter-input" id="clearFilterOffice" icon="my-icons:clear" title="clear office" on-tap="clearSearchField"></paper-icon-button>
-      </div>
       </div>
       <vaadin-date-picker id="from-date" label="From" min="{{minFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
       <vaadin-date-picker id="to-date" label="To" min="{{minFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
@@ -505,7 +508,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 01/23/18</paper-item>
+        <paper-item>Build Date: 01/24/18</paper-item>
         <div class="spacer"></div>
         <paper-dialog modal id="loadingData">
           <h3>Pulling data from server, please wait</h3>
@@ -525,7 +528,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <paper-tab name="model-view">Model</paper-tab>
           <paper-tab name="aggregations-view">Quantities</paper-tab>
           <paper-tab name="cost-view" id="cost-tab" disabled$="{{_disableCostTab(metadataFields, currentModelResp, geometryFilter)}}">Cost</paper-tab>
-          <paper-tab name="faq-view" id="faq-tab">FAQ</paper-tab>
+          <!-- <paper-tab name="faq-view" id="faq-tab">FAQ</paper-tab> -->
         </paper-tabs>
       </app-toolbar>
     </app-header>
@@ -592,49 +595,49 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <div id="sum-chart-container" hidden$="[[!stringPieView]]"></div>
           <!-- data by group table -->
           <div id="group-data-table-section" hidden$="[[stringPieView]]">
-          <vaadin-grid class="data-by-group-table" items="[[groupSumData]]">
-            <vaadin-grid-column width="200px">
-              <template class="header">
-                <vaadin-grid-sorter path="group">group</vaadin-grid-sorter>
-              </template>
-              <template>[[item.group]]</template>
-              <template class="footer">Grand Total</template>
-            </vaadin-grid-column>
-            <vaadin-grid-column>
-              <template class="header">
-                <vaadin-grid-sorter path="elemsPerGroup">elements/group</vaadin-grid-sorter>
-              </template>
-              <template>[[_prettify(item.elemsPerGroup)]]</template>
-              <template class="footer">[[_prettify(totalElements)]]</template>
-            </vaadin-grid-column>
-            <vaadin-grid-column>
-              <template class="header">
-                <vaadin-grid-sorter path="sum">sum [[selectedSumField]] [[_quantUnitLabels(selectedSumField)]]</vaadin-grid-sorter>
-              </template>
-              <template>[[_prettify(item.sum)]]</template>
-              <template class="footer">[[_prettify(grandTotalSum)]] [[_quantUnitLabels(selectedSumField)]]</template>
-            </vaadin-grid-column>
-            <vaadin-grid-column>
-              <template class="header">
-                <vaadin-grid-sorter path="otherUnitSum">sum [[selectedSumField]] [[strOtherUnitLabel]]</vaadin-grid-sorter>
-              </template>
-              <template>[[_prettify(item.otherUnitSum)]]</template>
-              <template class="footer">[[_prettify(grandTotalOtherUnitSum)]] [[strOtherUnitLabel]]</template>
-            </vaadin-grid-column>
-            <!-- NUMERICAL AGGREGATIONS WITHIN STRING AGGREGATION TABLE-->
-            <vaadin-grid-column>
-              <template class="header">min [[selectedSumField]] [[_quantUnitLabels(selectedSumField)]]</template>
-              <template>[[_prettify(item.min)]]</template>
-            </vaadin-grid-column>
-            <vaadin-grid-column>
-              <template class="header">max [[selectedSumField]] [[_quantUnitLabels(selectedSumField)]]</template>
-              <template>[[_prettify(item.max)]]</template>
-            </vaadin-grid-column>
-            <vaadin-grid-column>
-              <template class="header">avg [[selectedSumField]] [[_quantUnitLabels(selectedSumField)]]</template>
-              <template>[[_prettify(item.avg)]]</template>
-            </vaadin-grid-column>
-          </vaadin-grid>
+            <vaadin-grid class="data-by-group-table" items="[[groupSumData]]">
+              <vaadin-grid-column width="200px">
+                <template class="header">
+                  <vaadin-grid-sorter path="group">group</vaadin-grid-sorter>
+                </template>
+                <template>[[item.group]]</template>
+                <template class="footer">Grand Total</template>
+              </vaadin-grid-column>
+              <vaadin-grid-column>
+                <template class="header">
+                  <vaadin-grid-sorter path="elemsPerGroup">elements/group</vaadin-grid-sorter>
+                </template>
+                <template>[[_prettify(item.elemsPerGroup)]]</template>
+                <template class="footer">[[_prettify(totalElements)]]</template>
+              </vaadin-grid-column>
+              <vaadin-grid-column>
+                <template class="header">
+                  <vaadin-grid-sorter path="sum">sum [[selectedSumField]] [[_quantUnitLabels(selectedSumField)]]</vaadin-grid-sorter>
+                </template>
+                <template>[[_prettify(item.sum)]]</template>
+                <template class="footer">[[_prettify(grandTotalSum)]] [[_quantUnitLabels(selectedSumField)]]</template>
+              </vaadin-grid-column>
+              <vaadin-grid-column>
+                <template class="header">
+                  <vaadin-grid-sorter path="otherUnitSum">sum [[selectedSumField]] [[strOtherUnitLabel]]</vaadin-grid-sorter>
+                </template>
+                <template>[[_prettify(item.otherUnitSum)]]</template>
+                <template class="footer">[[_prettify(grandTotalOtherUnitSum)]] [[strOtherUnitLabel]]</template>
+              </vaadin-grid-column>
+              <!-- NUMERICAL AGGREGATIONS WITHIN STRING AGGREGATION TABLE-->
+              <vaadin-grid-column>
+                <template class="header">min [[selectedSumField]] [[_quantUnitLabels(selectedSumField)]]</template>
+                <template>[[_prettify(item.min)]]</template>
+              </vaadin-grid-column>
+              <vaadin-grid-column>
+                <template class="header">max [[selectedSumField]] [[_quantUnitLabels(selectedSumField)]]</template>
+                <template>[[_prettify(item.max)]]</template>
+              </vaadin-grid-column>
+              <vaadin-grid-column>
+                <template class="header">avg [[selectedSumField]] [[_quantUnitLabels(selectedSumField)]]</template>
+                <template>[[_prettify(item.avg)]]</template>
+              </vaadin-grid-column>
+            </vaadin-grid>
           </div>
         </div>
     </div>
@@ -661,62 +664,62 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <div id="wrap-cost-info">
         <div id="cost-table-section" hidden$="[[costPieView]]">
         <!-- cost by group table -->
-        <vaadin-grid class="cost-by-group-table" items="{{costTableData}}">
-        <vaadin-grid-column width="200px">
-          <template class="header">
-            <vaadin-grid-sorter path="group">group</vaadin-grid-sorter>
-          </template>
-          <template>[[item.group]]</template>
-          <template class="footer">Grand Total</template>
-        </vaadin-grid-column>
-        <vaadin-grid-column>
-          <template class="header">
-            <vaadin-grid-sorter path="elemsPerGroup">elements/group</vaadin-grid-sorter>
-          </template>
-          <template>[[_prettify(item.elemsPerGroup)]]</template>
-          <template class="footer">[[_prettify(costTotalElements)]]</template>
-        </vaadin-grid-column>
-          <vaadin-grid-column>
+          <vaadin-grid class="cost-by-group-table" items="{{costTableData}}">
+          <vaadin-grid-column width="200px">
             <template class="header">
-              <vaadin-grid-sorter path="sum">[[material]] sum [[_costUnitLabels(material, unitType)]]</vaadin-grid-sorter>
+              <vaadin-grid-sorter path="group">group</vaadin-grid-sorter>
             </template>
-            <template>[[_prettify(item.sum)]]</template>
-            <template class="footer">[[_prettify(totalMaterialSum)]] [[_costUnitLabels(material, unitType)]]</template>
+            <template>[[item.group]]</template>
+            <template class="footer">Grand Total</template>
           </vaadin-grid-column>
           <vaadin-grid-column>
             <template class="header">
-              <vaadin-grid-sorter path="otherUnitSum">[[material]] sum [[costOtherUnitLabel]]</vaadin-grid-sorter>
+              <vaadin-grid-sorter path="elemsPerGroup">elements/group</vaadin-grid-sorter>
             </template>
-            <template>[[_prettify(item.otherUnitSum)]]</template>
-            <template class="footer">[[_prettify(totalMaterialSumDiffUnit)]] [[costOtherUnitLabel]]</template>
+            <template>[[_prettify(item.elemsPerGroup)]]</template>
+            <template class="footer">[[_prettify(costTotalElements)]]</template>
           </vaadin-grid-column>
+            <vaadin-grid-column>
+              <template class="header">
+                <vaadin-grid-sorter path="sum">[[material]] sum [[_costUnitLabels(material, unitType)]]</vaadin-grid-sorter>
+              </template>
+              <template>[[_prettify(item.sum)]]</template>
+              <template class="footer">[[_prettify(totalMaterialSum)]] [[_costUnitLabels(material, unitType)]]</template>
+            </vaadin-grid-column>
+            <vaadin-grid-column>
+              <template class="header">
+                <vaadin-grid-sorter path="otherUnitSum">[[material]] sum [[costOtherUnitLabel]]</vaadin-grid-sorter>
+              </template>
+              <template>[[_prettify(item.otherUnitSum)]]</template>
+              <template class="footer">[[_prettify(totalMaterialSumDiffUnit)]] [[costOtherUnitLabel]]</template>
+            </vaadin-grid-column>
+            <vaadin-grid-column style="width: 70px;">
+              <template class="header">Cost/[[costOtherUnitLabel]]<div id ="apply-all-div">
+                <paper-input-container>
+                  <label slot="label">Apply all</label>
+                  <iron-input slot="input" id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{applyToAll}}">
+                    <input class="print-clean" style="width: 60px;">
+                  </iron-input>
+                </paper-input-container>
+                <paper-fab mini id="apply-all-btn" on-tap="_applyAllCostResults" icon="my-icons:check-circle" title="apply to all" disabled="{{_disableApplyAllBtn(applyToAll)}}"></paper-fab>
+              </template>
+              <template>
+                <paper-input-container style="width: 70px;">
+                  <label slot="label">Cost per unit</label>
+                  <iron-input slot="input" id="cost-input-[[index]]" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{item.input}}" on-change="_setCostResults">
+                    <input class="print-clean">
+                  </iron-input>
+                </paper-input-container>
+              </template>
+            </vaadin-grid-column>
           <vaadin-grid-column>
-            <template class="header">Cost/[[costOtherUnitLabel]]<div id ="apply-all-div">
-              <paper-input-container>
-                <label slot="label">Apply to all</label>
-                <iron-input slot="input" id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{applyToAll}}">
-                  <input class="print-clean">
-                </iron-input>
-              </paper-input-container>
-              <paper-fab mini id="apply-all-btn" on-tap="_applyAllCostResults" icon="my-icons:check-circle" title="apply to all" disabled="{{_disableApplyAllBtn(applyToAll)}}"></paper-fab>
+            <template class="header">
+              <vaadin-grid-sorter path="costResult">Cost Amount</vaadin-grid-sorter>
             </template>
-            <template>
-              <paper-input-container>
-                <label slot="label">Cost per unit</label>
-                <iron-input slot="input" id="cost-input-[[index]]" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{item.input}}" on-change="_setCostResults">
-                  <input class="print-clean">
-                </iron-input>
-              </paper-input-container>
-            </template>
+            <template>[[_prettifyDollar(item.costResult)]]</template>
+            <template class="footer">[[_prettifyDollar(totalCost)]]</template>
           </vaadin-grid-column>
-        <vaadin-grid-column>
-          <template class="header">
-            <vaadin-grid-sorter path="costResult">Cost Amount</vaadin-grid-sorter>
-          </template>
-          <template>[[_prettifyDollar(item.costResult)]]</template>
-          <template class="footer">[[_prettifyDollar(totalCost)]]</template>
-        </vaadin-grid-column>
-        </vaadin-grid>
+          </vaadin-grid>
         </div>
         <!-- to hold cost pie chart -->
         <div id="cost-chart-container" hidden$="[[!costPieView]]"></div>
@@ -724,24 +727,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </div>
   </div>
   <!-- FAQ -->
-  <div name="faq-view">
-      <paper-card class="faq-card">
-        <h4>1. What is this tool?</h4>
-          <paper-item>a.</paper-item>
-        <h4>2. How do I upload my model?</h4>
-          <paper-item>a.	</paper-item>
-        <h4>3. Contact information</h4>
-          <paper-item>a.	Kermin Chok (Kermin.Chok@arup.com): Structural Engineer, Buildings, Los Angeles</paper-item>
-          <paper-item>b.	Trent Clifton (Trent.Clifton@arup.com): Web Developer, Buildings, Los Angeles</paper-item>
-          <paper-item>c.	Rubi Sanchez (Rubi.Sanchez@arup.com): Web Developer, Buildings, Los Angeles</paper-item>
-        <h4>4. Web Technologies</h4>
-          <paper-item>a.	Front end: Polymer 2.0</paper-item>
-          <paper-item>b.	Charting: Highcharts</paper-item>
-          <paper-item>c.	Backend: Chalice, Node</paper-item>
-          <paper-item>d.	Web server: #</paper-item>
-          <paper-item>e.	Database: MongoDB</paper-item>
-      </paper-card>
-    </div>
+  <!-- <div name="faq-view">
+
+    </div> -->
     </iron-pages>
     </app-header-layout>
     </app-drawer-layout>
@@ -995,6 +983,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _shareModelEmail(message) {
+        //for sending a link of the current model via email
         var email = '';
         var subject = "Arup Model Quickview link has been shared with you";
         var link = document.createElement("a");
@@ -1003,8 +992,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         document.location = "mailto:"+email+"?subject="+subject+"&body="+emailBody;
       }
 
-      //the below 2 functions will have to be altered when backend is adjusted to auto timestamp
       _formatModelName(modelName) {
+        //to get model name without the timestamp (for main item in dropdown)
         var arr = modelName.split("_");
         return _.join(_.filter(arr,function(s) {
           return isNaN(s)
@@ -1012,6 +1001,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _formatModelTimeStamp(modelName) {
+        //to get timestamp of model (for secondary text of item in dropdown)
         var arr = modelName.split("_")
         if (arr.length > 2) {
           if (!isNaN(arr[arr.length-1]) && !isNaN(arr[arr.length-2])) {
@@ -1028,6 +1018,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _uploadedBy(user) {
+        // to display the user that uploaded current model
         if (_.isEmpty(user)) {
           return user = "no user available"
         } else {
@@ -1074,6 +1065,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       finalCommentArr() {
+        // gets final list of comments without blank fields
         var commentListCopy = []
         for (var i=0; i < this.commentList.length; i++) {
           if (commentListCopy[i] !== '') {
@@ -1149,7 +1141,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               that.jsonUploadPayload.modelInformation.user = that.userEmail
               that.jsonUploadPayload.modelInformation.project = that.uploadSelectedProject
               that.jsonUploadPayload.modelInformation.office = that.uploadSelectedOffice
-              //the two rows below will create correct object format, but keep the model from uploading to s3 bucket for some reason
+              //the two rows below create an "untagged" object containing user's comments at upload
               that.jsonUploadPayload.modelInformation.untagged = {}
               that.jsonUploadPayload.modelInformation.untagged.comments = that.finalCommentArr()
               console.log(that.jsonUploadPayload.modelInformation);
@@ -1178,6 +1170,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _clearUploadInput() {
+        //clears user input from upload modal
         Polymer.dom(this.root).querySelector('#modelUpload').value = ''
         this.uploadSelectedProject = undefined;
         this.uploadSelectedOffice = undefined;
@@ -1192,6 +1185,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       getModelStatus(event, response) {
         if (response) {
+          //backoffCounter used to give code a chance to wait for the status
           this.modelStatusResp = response.response
           if (_.has(this.modelStatusResp, 'error')) {
             if (this.modelStatusResp.error === "model not found") {
@@ -1207,14 +1201,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               }
           }
           else {
+            //once status is found, handle succesfully completed upload
             this.backoffCounter = 0;
             if (this.modelStatusResp.latestStatus === 200) {
               this.$['get-models-request'].generateRequest();
               this.selectedModel = this.fullFileNameNoExtension
               window.location.href = window.location.pathname + '#' + this.fullFileNameNoExtension
+              //if no filters were applied at time of upload, simply show succes message to user
               if (this.filterSelectedUser === undefined &&  this.filterSelectedProject === undefined && this.filterSelectedOffice === undefined) {
                 this.$.uploadSuccessToast.show({ text: "Upload successful"})
               } else {
+                //if filters applied at time of upload, remove them so user can be redirected to model without upload needing to be within filter results
                   this.clearFilterInput()
                   this.userSearchInput = {
                     'user': undefined,
@@ -1227,9 +1224,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                   this.$.filterIcon.style.color = ''
                   this.$.uploadSuccessToast.show({ text: "Upload successful, filters removed"})
               }
+              //handles upload failure
             } else if (this.modelStatusResp.latestStatus === 500) {
               this.$.validationToast.show({ text: this.modelStatusResp.latestLogMessage})
             } else if (this.modelStatusResp.latestStatus === 202) {
+              //continue receiving latest statuses
               this.$.pollingStatusToast.show({ text: this.modelStatusResp.latestLogMessage})
               this.requestModelStatus()
               // eventually if this stays at 202 indefinitely it needs to just say sorry something went wrong
@@ -1239,13 +1238,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         console.log(this.modelStatusResp);
       }
 
-      _roundDown(n) {
-        return typeof n !== 'undefined' ? _.floor(n, 1) : ""
-      }
-
-      _roundUp(n) {
-        return typeof n !== 'undefined' ? _.ceil(n, 1) : ""
-      }
+      // _roundDown(n) {
+      //   return typeof n !== 'undefined' ? _.floor(n, 1) : ""
+      // }
+      //
+      // _roundUp(n) {
+      //   return typeof n !== 'undefined' ? _.ceil(n, 1) : ""
+      // }
 
       _prettify(n) {
         return typeof n !== 'undefined' ? parseFloat(n).toLocaleString() : ""
@@ -1260,6 +1259,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _dropdownUnitLabel(item, unitType) {
+        // displays proper units of measurements offered in dropdown
         var that = this;
         item = _.toLower(item)
         var unitType = _.toLower(that.currentModelResp.modelInformation.units)
@@ -1341,7 +1341,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _generateNumDropdownOptions() {
-        // using numDropdownOptions not metadataFields to not mess with metadataFields
+        // using numDropdownOptions not metadataFields to not alter metadataFields
         this.numDropdownOptions = []
         var that = this;
         this.linearNumFilterResult = _.filter(that._modelData.linearElements, function(o) {
@@ -1438,6 +1438,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _setStringPieData() {
+        //for pie chart in string aggrgations
         var _strPieData = []
         for (var i=0; i < this.groupSumData.length; i++) {
           var item = this.groupSumData[i]
@@ -1466,6 +1467,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var resultFilterInput = _.concat(this.linearNumFilterResult, this.planarNumFilterResult)
         this.resultGroupByName = _.groupBy(resultFilterInput, function(o) {
         if (that.selectedContourBy === 'propertyname_1') {
+          //to include parent group to which it belongs
           return o.metadata.propertyname_1 + " (" + o.metadata.propertyname_0 + ")"
         }
           return o.metadata[that.selectedContourBy]
@@ -1489,7 +1491,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             //to include only these in dropdown menu
             //var validSumGroups = ['meta_length', 'length', 'meta_mass', 'mass', 'meta_vol', 'vol', 'volume']
             var ignoreSumGroups = ['area', 'beamnum', 'density', 'shellnum']
-            //but also do an "includes/contains" because names could vary
             // to find unique keys with numeric values for dropdown options
             //&& validSumGroups.indexOf(metadataKeys[j]) !== -1
             if(_.isNumber(metadataValues[j]) && _numericalMetadataKeys.indexOf(metadataKeys[j]) === -1 && ignoreSumGroups.indexOf(metadataKeys[j]) === -1) {
@@ -1559,22 +1560,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
              'max' : maxByGroup,
              'avg' : avgByGroup
            }
-           var groupSumDataSetup = {
-             'group': this.groupKeys[i],
-             'elemsPerGroup': elemsPerGroup,
-             'sum': sumByGroup,
-             'otherUnitSum': this.strOtherUnitSum,
-             'min' : minByGroup,
-             'max' : maxByGroup,
-             'avg' : avgByGroup
-           }
            _groupSumData.push(groupSumDataSetup)
            this.push('allObjectsByGroup', groupObjects)
          }
          this.set('groupSumData',_.sortBy(_groupSumData, [function(o) { return o.group }]))
-         //   //for strOtherUnitLabel
+         // for strOtherUnitLabel (column to the right with different unit)
          this._strOtherUnitLabel()
-         // for chart total sum by group
+         // to display number of elements per group
          this.totalElements = _.round(_.sumBy(this.groupSumData, function(o) {
            return o.elemsPerGroup
          }), 0)
@@ -1667,6 +1659,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _initStrChart() {
+        // initialize chart in string aggregations
         var chartdiv = Polymer.dom(this.root).querySelector("#sum-chart-container")
         this.strPieChart = Highcharts.chart(chartdiv, {
         chart: {
@@ -1693,43 +1686,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
         series: [{
             name: 'Sum',
-            colorByPoint: true,
-            data: []
-          }]
-        });
-      }
-
-      _hideShareBtn(_model) {
-        return typeof this.selectedModel === 'undefined'
-      }
-
-      _initCostChart() {
-        var chartdiv = Polymer.dom(this.root).querySelector("#cost-chart-container")
-        this.costPieChart = Highcharts.chart(chartdiv, {
-        chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: null,
-            plotShadow: false,
-            type: 'pie'
-        },
-        title: {
-            text: 'Cost by Group'
-        },
-        tooltip: {
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-        },
-        plotOptions: {
-            pie: {
-                allowPointSelect: true,
-                cursor: 'pointer',
-                dataLabels: {
-                    enabled: false
-                },
-                showInLegend: true
-            }
-        },
-        series: [{
-            name: 'Cost',
             colorByPoint: true,
             data: []
           }]
@@ -1782,6 +1738,44 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         //console.log(this.strPieChart.series[0].userOptions.data);
       }
 
+      _hideShareBtn(_model) {
+        return typeof this.selectedModel === 'undefined'
+      }
+
+      _initCostChart() {
+        //initialize chart in cost tab
+        var chartdiv = Polymer.dom(this.root).querySelector("#cost-chart-container")
+        this.costPieChart = Highcharts.chart(chartdiv, {
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: 'Cost by Group'
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: false
+                },
+                showInLegend: true
+            }
+        },
+        series: [{
+            name: 'Cost',
+            colorByPoint: true,
+            data: []
+          }]
+        });
+      }
+
       _drawCostChart() {
         var chartdiv = Polymer.dom(this.root).querySelector("#cost-chart-container")
         //console.log(this.strPieData);
@@ -1829,6 +1823,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _disableViewIcon(totalCost, costPieView) {
+        // if total cost is 0, no need to offer chart view
         return totalCost === 0 && !costPieView
       }
 
@@ -1866,6 +1861,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _dateTimeFormat() {
+        //displays current timestamp with format: ymmdd_hhmmss
         var d = new Date();
         var curr_date = (d.getDate() <= 9 ? '0': '') + (d.getDate())
         var curr_month = (d.getMonth() <= 9 ? '0': '') + (d.getMonth()+1)
@@ -1879,6 +1875,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _currentFilters() {
+        // displays currently applied geometry filters
         return "Filters:" + '\r\n' +
         'min x, ' + this.geometryFilter.xMin + '\r\n' + 'max x, ' + this.geometryFilter.xMax + '\r\n' +
         'min y, ' + this.geometryFilter.yMin + '\r\n' + 'max y, ' + this.geometryFilter.yMax + '\r\n' +
@@ -2030,6 +2027,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _applyAllCostResults() {
+        // for apply all button within cost tab
         for (var i=0; i < this.costTableData.length; i++) {
             this.set('costTableData.'+i+'.input', this.applyToAll)
             this.set('costTableData.'+i+'.costResult', this.costTableData[i].input*this.costTableData[i].otherUnitSum);
@@ -2065,6 +2063,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _setCostResults(e) {
+        // when user inserts cost input individually (not the apply all button)
         var item = e.model.item
         var inputIndex = e.model.index
         for (var i=0; i < this.costTableData.length; i++) {
@@ -2099,6 +2098,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _updateCostValues() {
+        // in case user enters a different value, set new input and recalculare cost result
         if (typeof this.costItems !== 'undefined') {
           for (var i=0; i < this.costTableData.length; i++) {
             for (var j=0; j < this.costItems.length; j++) {
@@ -2351,6 +2351,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       clearFilterInput() {
+        // removes user input from search filters modal
         this.filterSelectedUser = undefined,
         this.filterSelectedProject = undefined,
         this.filterSelectedOffice = undefined,
@@ -2359,6 +2360,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       processSearchOptions() {
+        // displays available options to search from according to already uploaded models
         //console.log(this.dataOptions);
         //console.log(JSON.stringify(this.dataOptions));
         //create a set of all the different Options
@@ -2448,6 +2450,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       applySearchFilters(item) {
+        // applies user's search input to return models that meet filters
         if (typeof this.userSearchInput === 'undefined') {
           return true
         }
