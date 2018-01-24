@@ -698,11 +698,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template class="header">Cost/[[costOtherUnitLabel]]<div id ="apply-all-div">
                 <paper-input-container>
                   <label slot="label">Apply all</label>
-                  <iron-input slot="input" id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{applyToAll}}">
+                  <iron-input slot="input" id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{applyToAll}}" on-change="{{_enableApplyAllBtn(applyToAll)}}">
                     <input class="print-clean" style="width: 60px;">
                   </iron-input>
                 </paper-input-container>
-                <paper-fab mini id="apply-all-btn" on-tap="_applyAllCostResults" icon="my-icons:check-circle" title="apply to all" disabled="{{_disableApplyAllBtn(applyToAll)}}"></paper-fab>
+                <paper-fab mini id="apply-all-btn" on-tap="_applyAllCostResults" icon="my-icons:check-circle" title="apply to all" disabled></paper-fab>
               </template>
               <template>
                 <paper-input-container style="width: 70px;">
@@ -2023,8 +2023,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.costPieData = _costPieData;
       }
 
-      _disableApplyAllBtn(applyToAll) {
-        return typeof applyToAll === 'undefined' || applyToAll === '' || applyToAll === 0
+      _enableApplyAllBtn(applyToAll) {
+        if (applyToAll !== undefined && applyToAll !== '' && applyToAll !== 0) {
+          Polymer.dom(this.root).querySelector('#apply-all-btn').disabled = false
+        } else {
+          Polymer.dom(this.root).querySelector('#apply-all-btn').disabled = true
+        }
       }
 
       _applyAllCostResults() {
