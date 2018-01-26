@@ -341,14 +341,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" on-change="_enableUploadBtn">
         <div slot="suffix" label="user">@arup.com</div>
       </paper-input>
-      <paper-dropdown-menu id="project-dropdown" label="Select Project">
+      <paper-dropdown-menu id="project-dropdown" label="Select Project" on-iron-select="_enableUploadBtn">
           <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{uploadSelectedProject}}">
             <template is="dom-repeat" items="[[projectList]]">
               <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
             </template>
           </paper-listbox>
       </paper-dropdown-menu>
-      <paper-dropdown-menu id="office-dropdown" label="Select Office">
+      <paper-dropdown-menu id="office-dropdown" label="Select Office" on-iron-select="_enableUploadBtn">
         <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{uploadSelectedOffice}}">
           <template is="dom-repeat" items="[[officeList]]">
             <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
@@ -509,7 +509,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 01/24/18</paper-item>
+        <paper-item>Build Date: 01/25/18</paper-item>
         <div class="spacer"></div>
         <paper-dialog modal id="loadingData">
           <h3>Pulling data from server, please wait</h3>
@@ -1090,13 +1090,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _enableUploadBtn() {
-          this.userEmail = Polymer.dom(this.root).querySelector('#user-email').value
-          this.file = this.$.modelUpload.files[0]
-          if (!_.isEmpty(this.userEmail) && !_.isEmpty(this.uploadSelectedProject) && !_.isEmpty(this.file.name) && !_.isEmpty(this.uploadSelectedOffice)) {
-            this.$.acceptUploadBtn.disabled = false
-          } else {
-            this.$.acceptUploadBtn.disabled = true
-          }
+        this.userEmail = Polymer.dom(this.root).querySelector('#user-email').value
+        this.file = this.$.modelUpload.files[0]
+        this.uploadSelectedProject = Polymer.dom(this.root).querySelector('#project-dropdown').value
+        this.uploadSelectedOffice = Polymer.dom(this.root).querySelector('#office-dropdown').value
+        console.log("file: " + this.file);
+        console.log("project: " + this.uploadSelectedProject);
+        console.log("office: " + this.uploadSelectedOffice);
+        if (!_.isEmpty(this.userEmail) && !_.isEmpty(this.uploadSelectedProject) && !_.isEmpty(this.file.name) && !_.isEmpty(this.uploadSelectedOffice)) {
+          this.$.acceptUploadBtn.disabled = false
+        } else {
+          this.$.acceptUploadBtn.disabled = true
+        }
       }
 
       handleJsonUpload(evt) {
@@ -2103,7 +2108,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _updateCostValues() {
-        // in case user enters a different value, set new input and recalculare cost result
+        // in case user enters a different value, set new input and recalculate cost result
         if (typeof this.costItems !== 'undefined') {
           for (var i=0; i < this.costTableData.length; i++) {
             for (var j=0; j < this.costItems.length; j++) {
