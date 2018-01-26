@@ -1094,9 +1094,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.file = this.$.modelUpload.files[0]
         this.uploadSelectedProject = Polymer.dom(this.root).querySelector('#project-dropdown').value
         this.uploadSelectedOffice = Polymer.dom(this.root).querySelector('#office-dropdown').value
-        console.log("file: " + this.file);
-        console.log("project: " + this.uploadSelectedProject);
-        console.log("office: " + this.uploadSelectedOffice);
         if (!_.isEmpty(this.userEmail) && !_.isEmpty(this.uploadSelectedProject) && !_.isEmpty(this.file.name) && !_.isEmpty(this.uploadSelectedOffice)) {
           this.$.acceptUploadBtn.disabled = false
         } else {
