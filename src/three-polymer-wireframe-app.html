@@ -239,6 +239,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       #apply-all-div {
         display: flex;
+        width: 100px;
       }
 
       .secondary-item {
@@ -259,13 +260,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         @apply(--layout-self-end);
       }
 
-      paper-fab#apply-all-btn {
+      paper-icon-button#apply-all-btn {
         color: black;
         @apply(--layout-self-center);
-        --paper-fab-background: transparent;
       }
 
-      paper-fab#apply-all-btn[disabled]{
+      paper-icon-button#apply-all-btn[disabled]{
         color: #9E9E9E;
       }
 
@@ -280,7 +280,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       .print-clean {
         border: none;
         background: transparent;
-        width: 60px;
+        width: 55px;
         padding: .5em;
       }
 
@@ -509,7 +509,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 01/25/18</paper-item>
+        <paper-item>Build Date: 01/26/18</paper-item>
         <div class="spacer"></div>
         <paper-dialog modal id="loadingData">
           <h3>Pulling data from server, please wait</h3>
@@ -694,15 +694,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <template>[[_prettify(item.otherUnitSum)]]</template>
               <template class="footer">[[_prettify(totalMaterialSumDiffUnit)]] [[costOtherUnitLabel]]</template>
             </vaadin-grid-column>
-            <vaadin-grid-column style="width: 70px;">
-              <template class="header">Cost/[[costOtherUnitLabel]]<div id ="apply-all-div">
-                <paper-input-container>
-                  <label slot="label">Apply all</label>
-                  <iron-input slot="input" id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{applyToAll}}" on-change="{{_enableApplyAllBtn(applyToAll)}}">
-                    <input class="print-clean" style="width: 60px;">
-                  </iron-input>
-                </paper-input-container>
-                <paper-fab mini id="apply-all-btn" on-tap="_applyAllCostResults" icon="my-icons:check-circle" title="apply to all" disabled></paper-fab>
+            <vaadin-grid-column style="width: 90px;">
+              <template class="header">Cost/[[costOtherUnitLabel]]
+                <div id ="apply-all-div">
+                  <paper-input-container style="width: 75px;">
+                    <label slot="label">Apply all</label>
+                    <iron-input slot="input" id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{applyToAll}}" on-change="{{_enableApplyAllBtn(applyToAll)}}">
+                      <input class="print-clean">
+                    </iron-input>
+                  </paper-input-container>
+                  <paper-icon-button id="apply-all-btn" on-tap="_applyAllCostResults" icon="my-icons:check-circle" title="apply to all" disabled></paper-icon-button>
+                </div>
               </template>
               <template>
                 <paper-input-container style="width: 70px;">
@@ -721,7 +723,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <template class="footer">[[_prettifyDollar(totalCost)]]</template>
           </vaadin-grid-column>
           </vaadin-grid>
-        </div>
         <!-- to hold cost pie chart -->
         <div id="cost-chart-container" hidden$="[[!costPieView]]"></div>
       </div>
