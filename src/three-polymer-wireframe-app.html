@@ -513,8 +513,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>FE Build Date: [[frontEndBuildDate]]</paper-item>
-        <paper-item>BE Build Date: [[backEndBuildDate]]</paper-item>
+        <paper-item>Build Dates</paper-item>
+        <paper-item>FE: [[frontEndBuildDate]]</paper-item>
+        <paper-item>BE: [[backEndBuildDate]]</paper-item>
         <div class="spacer"></div>
         <paper-dialog modal id="loadingData">
           <h3>Pulling data from server, please wait</h3>
@@ -534,7 +535,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <paper-tab name="model-view">Model</paper-tab>
           <paper-tab name="aggregations-view">Quantities</paper-tab>
           <paper-tab name="cost-view" id="cost-tab" disabled$="{{_disableCostTab(metadataFields, currentModelResp, geometryFilter)}}">Cost</paper-tab>
-          <!-- <paper-tab name="faq-view" id="faq-tab">FAQ</paper-tab> -->
+          <paper-tab name="faq-view" id="faq-tab">FAQ</paper-tab>
         </paper-tabs>
       </app-toolbar>
     </app-header>
@@ -734,9 +735,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </div>
   </div>
   <!-- FAQ -->
-  <!-- <div name="faq-view">
-
-    </div> -->
+  <div name="faq-view">
+    <paper-card class="faq-card">
+      <h4>1. What can users do on this site?</h4>
+        <paper-item>a. Upload models and view them in 3D</paper-item>
+        <paper-item>b. Have easy access to automated calculations that represent measurements of their different sticks</paper-item>
+        <paper-item>c. Easily calculate of cost for each group of sticks and their subgroups</paper-item>
+        <paper-item>d. Adjust the options under the Model Filters heading in order to generate the corresponding data</paper-item>
+        <paper-item>e. View data by group/subgroup represented on a table and a a pie chart that illustrates the numerical proportion of each</paper-item>
+        <paper-item>f. Toggle back and forth between table and chart views</paper-item>
+        <paper-item>g. Share a model with a user via email</paper-item>
+        <paper-item>h. Export any of the data to a CSV file</paper-item>
+        <paper-item>i. Find models by project, office, date range, and/or the user that uploaded it using the search filter</paper-item>
+      <h4>2. Contact information</h4>
+        <paper-item>a.	Kermin Chok (Kermin.Chok@arup.com): Structural Engineer, Buildings, Los Angeles</paper-item>
+        <paper-item>b.	Trent Clifton (Trent.Clifton@arup.com): Web Developer, Buildings, Los Angeles</paper-item>
+        <paper-item>c.	Rubi Sanchez (Rubi.Sanchez@arup.com): Web Developer, Buildings, Los Angeles</paper-item>
+      <h4>3. Web Technologies</h4>
+        <paper-item>a.	Front end: Polymer 2.0</paper-item>
+        <paper-item>b.	Tables: Vaadin-Grid</paper-item>
+        <paper-item>c.	Charts: Highcharts</paper-item>
+        <paper-item>d.	Backend: Chalice, Node</paper-item>
+        <paper-item>e.	Web server: Apache</paper-item>
+        <paper-item>f.	Database: MongoDB</paper-item>
+    </paper-card>
+  </div>
     </iron-pages>
     </app-header-layout>
     </app-drawer-layout>
@@ -1873,16 +1896,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleGetLatestFeCommitResp(event, response) {
         var resp = response.response;
-        // console.log(resp);
-        // console.log(resp.object.sha);
+        console.log(resp);
+        console.log(resp.object.sha);
         this.feSha = resp.object.sha
         this.$['get-latest-fe-commit-date'].generateRequest();
       }
 
       handleGetLatestBeCommitResp(event, response) {
         var resp = response.response;
-        // console.log(resp);
-        // console.log(resp.object.sha);
+        console.log(resp);
+        console.log(resp.object.sha);
         this.beSha = resp.object.sha
         this.$['get-latest-be-commit-date'].generateRequest();
       }
@@ -1897,19 +1920,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleGetLatestFeCommitDateResp(event, response) {
           var resp = response.response;
-          // console.log(resp);
+          console.log(resp);
           var date = resp.author.date
-          // console.log(date);
-          // console.log(date.slice(0, 10));
+          console.log(date);
+          console.log(date.slice(0, 10));
           this.frontEndBuildDate = date.slice(0, 10)
       }
 
       handleGetLatestBeCommitDateResp(event, response) {
           var resp = response.response;
-          // console.log(resp);
+          console.log(resp);
           var date = resp.author.date
-          // console.log(date);
-          // console.log(date.slice(0, 10));
+          console.log(date);
+          console.log(date.slice(0, 10));
           this.backEndBuildDate = date.slice(0, 10)
       }
 
