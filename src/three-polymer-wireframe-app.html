@@ -336,6 +336,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <iron-ajax headers="{{authHeaders}}" id="model-request" method="GET" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="[[baseUrl]]post-model"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="get-model-status" method="GET" handle-as="json" on-response="getModelStatus"></iron-ajax>
+    <iron-ajax headers="{{authHeaders}}" id="get-latest-fe-commit" method="GET" url="https://api.github.com/repos/lakopite/three-polymer-wireframe/git/refs/heads/master" handle-as="json" on-response="handleGetLatestFeCommitResp" on-error="handleGetLatestFeCommitError"></iron-ajax>
+    <iron-ajax headers="{{authHeaders}}" id="get-latest-fe-commit-date" method="GET" url="https://api.github.com/repos/lakopite/three-polymer-wireframe/git/commits/[[feSha]]" handle-as="json" on-response="handleGetLatestFeCommitDateResp" on-error="handleGetLatestFeCommitDateError"></iron-ajax>
+    <iron-ajax headers="{{authHeaders}}" id="get-latest-be-commit" method="GET" url="https://api.github.com/repos/lakopite/model-viewer-api/git/refs/heads/master" handle-as="json" on-response="handleGetLatestBeCommitResp" on-error="handleGetLatestBeCommitError"></iron-ajax>
+    <iron-ajax headers="{{authHeaders}}" id="get-latest-be-commit-date" method="GET" url="https://api.github.com/repos/lakopite/model-viewer-api/git/commits/[[beSha]]" handle-as="json" on-response="handleGetLatestBeCommitDateResp" on-error="handleGetLatestBeCommitDateError"></iron-ajax>
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
       <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" on-change="_enableUploadBtn">
@@ -509,7 +513,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Date: 01/26/18</paper-item>
+        <paper-item>FE Build Date: [[frontEndBuildDate]]</paper-item>
+        <paper-item>BE Build Date: [[backEndBuildDate]]</paper-item>
         <div class="spacer"></div>
         <paper-dialog modal id="loadingData">
           <h3>Pulling data from server, please wait</h3>
@@ -1862,6 +1867,54 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$['get-models-request'].generateRequest();
         this._initStrChart();
         this._initCostChart();
+        this.$['get-latest-fe-commit'].generateRequest();
+        this.$['get-latest-be-commit'].generateRequest();
+      }
+
+      handleGetLatestFeCommitResp(event, response) {
+        var resp = response.response;
+        // console.log(resp);
+        // console.log(resp.object.sha);
+        this.feSha = resp.object.sha
+        this.$['get-latest-fe-commit-date'].generateRequest();
+      }
+
+      handleGetLatestBeCommitResp(event, response) {
+        var resp = response.response;
+        // console.log(resp);
+        // console.log(resp.object.sha);
+        this.beSha = resp.object.sha
+        this.$['get-latest-be-commit-date'].generateRequest();
+      }
+
+      handleGetLatestFeCommitError() {
+        console.log("Error retrieving latest commit.");
+      }
+
+      handleGetLatestBeCommitError() {
+        console.log("Error retrieving latest commit.");
+      }
+
+      handleGetLatestFeCommitDateResp(event, response) {
+          var resp = response.response;
+          // console.log(resp);
+          var date = resp.author.date
+          // console.log(date);
+          // console.log(date.slice(0, 10));
+          this.frontEndBuildDate = date.slice(0, 10)
+      }
+
+      handleGetLatestBeCommitDateResp(event, response) {
+          var resp = response.response;
+          // console.log(resp);
+          var date = resp.author.date
+          // console.log(date);
+          // console.log(date.slice(0, 10));
+          this.backEndBuildDate = date.slice(0, 10)
+      }
+
+      handleGetLatestFeCommitDateError() {
+        console.log("Error retrieving date of latest commit.");
       }
 
       _dateTimeFormat() {
