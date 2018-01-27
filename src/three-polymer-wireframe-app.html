@@ -1910,12 +1910,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$['get-latest-be-commit-date'].generateRequest();
       }
 
-      handleGetLatestFeCommitError() {
-        console.log("Error retrieving latest commit.");
+      handleGetLatestFeCommitError(event, response) {
+        this.feSha = 'unavailable';
       }
 
-      handleGetLatestBeCommitError() {
-        console.log("Error retrieving latest commit.");
+      handleGetLatestBeCommitError(event, response) {
+        this.beSha = 'unavailable';
       }
 
       handleGetLatestFeCommitDateResp(event, response) {
