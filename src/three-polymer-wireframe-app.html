@@ -747,7 +747,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <paper-item>g. Share a model with a user via email</paper-item>
                 <paper-item>h. Export any of the data to a CSV file</paper-item>
                 <paper-item>i. Find models by project, office, date range, and/or the user that uploaded it using the search filter</paper-item>
-              <h4>3. How do I upload a model?</h4>
+              <!-- <h4>3. How do I upload a model?</h4>
                 <paper-item>1. Do a pull request on Sourcetree for the "NLVS" project in order to have the latest data</paper-item>
                 <paper-item>2. Open Grasshopper:</paper-item>
                   <ul>open the "NLVS" folder</ul>
@@ -761,7 +761,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                   <ul>toggle the boolean to equal true for the JSON you want to generate (concrete or steel)</ul>
                 <paper-item>This will generate a JSON file that will appear in your specified folder</paper-item>
                 <paper-item>5. Toggle the boolean in the Target JSON File Location box back to false</paper-item>
-                <paper-item>6. Log onto three-polymer-wireframe and select the + icon on the top right corner and fill in the fields on the screen</paper-item>
+                <paper-item>6. Log onto three-polymer-wireframe and select the + icon on the top right corner and fill in the fields on the screen</paper-item> -->
               <h4>3. Contact information</h4>
                 <paper-item>a.	Kermin Chok (Kermin.Chok@arup.com): Structural Engineer, Buildings, Los Angeles</paper-item>
                 <paper-item>b.	Trent Clifton (Trent.Clifton@arup.com): Web Developer, Buildings, Los Angeles</paper-item>
@@ -771,8 +771,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <paper-item>b.	Tables: Vaadin-Grid</paper-item>
                 <paper-item>c.	Charts: Highcharts</paper-item>
                 <paper-item>d.	Backend: Chalice, Node</paper-item>
-                <paper-item>e.	Web server: Apache</paper-item>
-                <paper-item>f.	Database: MongoDB</paper-item>
+                <paper-item>e.	Database: MongoDB</paper-item>
             </paper-card>
           </div>
         </iron-pages>
@@ -1911,7 +1910,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleGetLatestFeCommitResp(event, response) {
         var resp = response.response;
-        // console.log(resp);
+        console.log(resp);
         // console.log(resp.object.sha);
         this.feSha = resp.object.sha
         this.$['get-latest-fe-commit-date'].generateRequest();
@@ -1919,24 +1918,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleGetLatestBeCommitResp(event, response) {
         var resp = response.response;
-        // console.log(resp);
+        console.log(resp);
         // console.log(resp.object.sha);
         this.beSha = resp.object.sha;
         this.$['get-latest-be-commit-date'].generateRequest();
       }
 
       handleGetLatestCommitError(event, response) {
-        // console.log("Error retrieving latest commit.");
+        console.log("Error retrieving latest commit.");
         this.frontEndBuildDate = 'unavailable';
         this.backEndBuildDate = 'unavailable';
       }
 
       handleGetLatestCommitDateResp(event, response) {
           var resp = response.response;
-          // console.log(resp);
+          console.log(resp);
           var date = resp.author.date;
           // console.log(date);
-          // console.log(date.slice(0, 10));
+          console.log(date.slice(0, 10));
           this.frontEndBuildDate = date.slice(0, 10);
           this.backEndBuildDate = date.slice(0, 10);
       }
@@ -1948,7 +1947,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _dateTimeFormat() {
-        //displays current timestamp with format: ymmdd_hhmmss
+        // displays current timestamp with format: ymmdd_hhmmss
         var d = new Date();
         var curr_date = (d.getDate() <= 9 ? '0': '') + (d.getDate())
         var curr_month = (d.getMonth() <= 9 ? '0': '') + (d.getMonth()+1)
