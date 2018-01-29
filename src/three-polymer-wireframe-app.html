@@ -1896,16 +1896,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleGetLatestFeCommitResp(event, response) {
         var resp = response.response;
-        console.log(resp);
-        console.log(resp.object.sha);
+        // console.log(resp);
+        // console.log(resp.object.sha);
         this.feSha = resp.object.sha
         this.$['get-latest-fe-commit-date'].generateRequest();
       }
 
       handleGetLatestBeCommitResp(event, response) {
         var resp = response.response;
-        console.log(resp);
-        console.log(resp.object.sha);
+        // console.log(resp);
+        // console.log(resp.object.sha);
         this.beSha = resp.object.sha
         this.$['get-latest-be-commit-date'].generateRequest();
       }
@@ -1920,10 +1920,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleGetLatestFeCommitDateResp(event, response) {
           var resp = response.response;
-          console.log(resp);
+          // console.log(resp);
           var date = resp.author.date
-          console.log(date);
-          console.log(date.slice(0, 10));
+          // console.log(date);
+          // console.log(date.slice(0, 10));
           this.frontEndBuildDate = date.slice(0, 10)
       }
 
