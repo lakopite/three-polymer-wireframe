@@ -336,10 +336,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <iron-ajax headers="{{authHeaders}}" id="model-request" method="GET" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="[[baseUrl]]post-model"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="get-model-status" method="GET" handle-as="json" on-response="getModelStatus"></iron-ajax>
-    <iron-ajax headers="{{authHeaders}}" id="get-latest-fe-commit" method="GET" url="https://api.github.com/repos/lakopite/three-polymer-wireframe/git/refs/heads/master" handle-as="json" on-response="handleGetLatestFeCommitResp" on-error="handleGetLatestFeCommitError"></iron-ajax>
-    <iron-ajax headers="{{authHeaders}}" id="get-latest-fe-commit-date" method="GET" url="https://api.github.com/repos/lakopite/three-polymer-wireframe/git/commits/[[feSha]]" handle-as="json" on-response="handleGetLatestFeCommitDateResp" on-error="handleGetLatestFeCommitDateError"></iron-ajax>
-    <iron-ajax headers="{{authHeaders}}" id="get-latest-be-commit" method="GET" url="https://api.github.com/repos/lakopite/model-viewer-api/git/refs/heads/master" handle-as="json" on-response="handleGetLatestBeCommitResp" on-error="handleGetLatestBeCommitError"></iron-ajax>
-    <iron-ajax headers="{{authHeaders}}" id="get-latest-be-commit-date" method="GET" url="https://api.github.com/repos/lakopite/model-viewer-api/git/commits/[[beSha]]" handle-as="json" on-response="handleGetLatestBeCommitDateResp" on-error="handleGetLatestBeCommitDateError"></iron-ajax>
+    <iron-ajax id="get-latest-fe-commit" method="GET" url="https://api.github.com/repos/lakopite/three-polymer-wireframe/git/refs/heads/master" handle-as="json" on-response="handleGetLatestFeCommitResp" on-error="handleGetLatestCommitError"></iron-ajax>
+    <iron-ajax id="get-latest-fe-commit-date" method="GET" url="https://api.github.com/repos/lakopite/three-polymer-wireframe/git/commits/[[feSha]]" handle-as="json" on-response="handleGetLatestCommitDateResp" on-error="handleGetLatestCommitDateError"></iron-ajax>
+    <iron-ajax id="get-latest-be-commit" method="GET" url="https://api.github.com/repos/lakopite/model-viewer-api/git/refs/heads/master" handle-as="json" on-response="handleGetLatestBeCommitResp" on-error="handleGetLatestCommitError"></iron-ajax>
+    <iron-ajax id="get-latest-be-commit-date" method="GET" url="https://api.github.com/repos/lakopite/model-viewer-api/git/commits/[[beSha]]" handle-as="json" on-response="handleGetLatestCommitDateResp" on-error="handleGetLatestCommitDateError"></iron-ajax>
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
       <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" on-change="_enableUploadBtn">
@@ -734,34 +734,49 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </div>
     </div>
   </div>
-  <!-- FAQ -->
-  <div name="faq-view">
-    <paper-card class="faq-card">
-      <h4>1. What can users do on this site?</h4>
-        <paper-item>a. Upload models and view them in 3D</paper-item>
-        <paper-item>b. Have easy access to automated calculations that represent measurements of their different sticks</paper-item>
-        <paper-item>c. Easily calculate of cost for each group of sticks and their subgroups</paper-item>
-        <paper-item>d. Adjust the options under the Model Filters heading in order to generate the corresponding data</paper-item>
-        <paper-item>e. View data by group/subgroup represented on a table and a a pie chart that illustrates the numerical proportion of each</paper-item>
-        <paper-item>f. Toggle back and forth between table and chart views</paper-item>
-        <paper-item>g. Share a model with a user via email</paper-item>
-        <paper-item>h. Export any of the data to a CSV file</paper-item>
-        <paper-item>i. Find models by project, office, date range, and/or the user that uploaded it using the search filter</paper-item>
-      <h4>2. Contact information</h4>
-        <paper-item>a.	Kermin Chok (Kermin.Chok@arup.com): Structural Engineer, Buildings, Los Angeles</paper-item>
-        <paper-item>b.	Trent Clifton (Trent.Clifton@arup.com): Web Developer, Buildings, Los Angeles</paper-item>
-        <paper-item>c.	Rubi Sanchez (Rubi.Sanchez@arup.com): Web Developer, Buildings, Los Angeles</paper-item>
-      <h4>3. Web Technologies</h4>
-        <paper-item>a.	Front end: Polymer 2.0</paper-item>
-        <paper-item>b.	Tables: Vaadin-Grid</paper-item>
-        <paper-item>c.	Charts: Highcharts</paper-item>
-        <paper-item>d.	Backend: Chalice, Node</paper-item>
-        <paper-item>e.	Web server: Apache</paper-item>
-        <paper-item>f.	Database: MongoDB</paper-item>
-    </paper-card>
-  </div>
-    </iron-pages>
-    </app-header-layout>
+    <!-- FAQ -->
+          <div name="faq-view">
+            <paper-card class="faq-card">
+              <h4>1. What can users do on this site?</h4>
+                <paper-item>a. Upload models and view them in 3D</paper-item>
+                <paper-item>b. Have easy access to automated calculations that represent measurements of their different sticks</paper-item>
+                <paper-item>c. Easily calculate of cost for each group of sticks and their subgroups</paper-item>
+                <paper-item>d. Adjust the options under the Model Filters heading in order to generate the corresponding data</paper-item>
+                <paper-item>e. View data by group/subgroup represented on a table and a a pie chart that illustrates the numerical proportion of each</paper-item>
+                <paper-item>f. Toggle back and forth between table and chart views</paper-item>
+                <paper-item>g. Share a model with a user via email</paper-item>
+                <paper-item>h. Export any of the data to a CSV file</paper-item>
+                <paper-item>i. Find models by project, office, date range, and/or the user that uploaded it using the search filter</paper-item>
+              <h4>3. How do I upload a model?</h4>
+                <paper-item>1. Do a pull request on Sourcetree for the "NLVS" project in order to have the latest data</paper-item>
+                <paper-item>2. Open Grasshopper:</paper-item>
+                  <ul>open the "NLVS" folder</ul>
+                  <ul>select the "ModelToJSON_Qty.gh" file</ul>
+                <paper-item>3. Within box for Tekla repo:</paper-item>
+                  <ul>toggle boolean to true next to "connect to database"</ul>
+                  <ul>next to "Model Groups" select the group for which you'd like to generate a JSON file</ul>
+                <paper-item>4. In the box titled Target JSON File Location:</paper-item>
+                  <ul>provide the path to the location where you wish to save the generated JSON file</ul>
+                  <ul>select the category within "Steel Models" for which you'd like to generate a JSON file</ul>
+                  <ul>toggle the boolean to equal true for the JSON you want to generate (concrete or steel)</ul>
+                <paper-item>This will generate a JSON file that will appear in your specified folder</paper-item>
+                <paper-item>5. Toggle the boolean in the Target JSON File Location box back to false</paper-item>
+                <paper-item>6. Log onto three-polymer-wireframe and select the + icon on the top right corner and fill in the fields on the screen</paper-item>
+              <h4>3. Contact information</h4>
+                <paper-item>a.	Kermin Chok (Kermin.Chok@arup.com): Structural Engineer, Buildings, Los Angeles</paper-item>
+                <paper-item>b.	Trent Clifton (Trent.Clifton@arup.com): Web Developer, Buildings, Los Angeles</paper-item>
+                <paper-item>c.	Rubi Sanchez (Rubi.Sanchez@arup.com): Web Developer, Buildings, Los Angeles</paper-item>
+              <h4>4. Web Technologies</h4>
+                <paper-item>a.	Front end: Polymer 2.0</paper-item>
+                <paper-item>b.	Tables: Vaadin-Grid</paper-item>
+                <paper-item>c.	Charts: Highcharts</paper-item>
+                <paper-item>d.	Backend: Chalice, Node</paper-item>
+                <paper-item>e.	Web server: Apache</paper-item>
+                <paper-item>f.	Database: MongoDB</paper-item>
+            </paper-card>
+          </div>
+        </iron-pages>
+      </app-header-layout>
     </app-drawer-layout>
   </template>
 
@@ -1906,46 +1921,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var resp = response.response;
         // console.log(resp);
         // console.log(resp.object.sha);
-        this.beSha = resp.object.sha
+        this.beSha = resp.object.sha;
         this.$['get-latest-be-commit-date'].generateRequest();
       }
 
-      handleGetLatestFeCommitError(event, response) {
+      handleGetLatestCommitError(event, response) {
         // console.log("Error retrieving latest commit.");
-        this.frontEndBuildDate = 'unavailable'
+        this.frontEndBuildDate = 'unavailable';
+        this.backEndBuildDate = 'unavailable';
       }
 
-      handleGetLatestBeCommitError(event, response) {
-        // console.log("Error retrieving latest commit.");
-        this.backEndBuildDate = 'unavailable'
-      }
-
-      handleGetLatestFeCommitDateResp(event, response) {
+      handleGetLatestCommitDateResp(event, response) {
           var resp = response.response;
           // console.log(resp);
-          var date = resp.author.date
+          var date = resp.author.date;
           // console.log(date);
           // console.log(date.slice(0, 10));
-          this.frontEndBuildDate = date.slice(0, 10)
+          this.frontEndBuildDate = date.slice(0, 10);
+          this.backEndBuildDate = date.slice(0, 10);
       }
 
-      handleGetLatestBeCommitDateResp(event, response) {
-          var resp = response.response;
-          // console.log(resp);
-          var date = resp.author.date
-          // console.log(date);
-          // console.log(date.slice(0, 10));
-          this.backEndBuildDate = date.slice(0, 10)
-      }
-
-      handleGetLatestFeCommitDateError() {
+      handleGetLatestCommitDateError() {
         // console.log("Error retrieving date of latest commit.");
-        this.frontEndBuildDate = 'unavailable'
-      }
-
-      handleGetLatestBeCommitDateError() {
-        // console.log("Error retrieving date of latest commit.");
-        this.backEndBuildDate = 'unavailable'
+        this.frontEndBuildDate = 'unavailable';
+        this.backEndBuildDate = 'unavailable';
       }
 
       _dateTimeFormat() {
