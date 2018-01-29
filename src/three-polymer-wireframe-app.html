@@ -1911,11 +1911,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       handleGetLatestFeCommitError(event, response) {
-        this.feSha = 'unavailable';
+        // console.log("Error retrieving latest commit.");
+        this.frontEndBuildDate = 'unavailable'
       }
 
       handleGetLatestBeCommitError(event, response) {
-        this.beSha = 'unavailable';
+        // console.log("Error retrieving latest commit.");
+        this.backEndBuildDate = 'unavailable'
       }
 
       handleGetLatestFeCommitDateResp(event, response) {
@@ -1937,7 +1939,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       handleGetLatestFeCommitDateError() {
-        console.log("Error retrieving date of latest commit.");
+        // console.log("Error retrieving date of latest commit.");
+        this.frontEndBuildDate = 'unavailable'
+      }
+
+      handleGetLatestBeCommitDateError() {
+        // console.log("Error retrieving date of latest commit.");
+        this.backEndBuildDate = 'unavailable'
       }
 
       _dateTimeFormat() {
