@@ -103,7 +103,7 @@ See the flowchart below for a visual representation of the different aggregation
     - *_applyAllCostResults()*: If a user enters a number into the *apply all* field and submits it, the *costTableData.input* values are set, their results (*costTableData.costResult*) are calculated, and the input values are set within the *costItems* object.
     - *costItems* : This object saves user input so that it may be available to them in case of leaving a model's cost tab and later going back to it. If the user updates a value they had already input, it updates it in *costItems.input*.
 
-## Different user options that adjust data
+## Dropdown menus and user options that adjust data
 
 ![dropdown menus](./images/tpw_dropdown_menus.png)
 
