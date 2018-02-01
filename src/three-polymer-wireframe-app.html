@@ -1518,10 +1518,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           //to include parent group to which it belongs
           return o.metadata.propertyname_1 + " (" + o.metadata.propertyname_0 + ")"
         }
+        // this is in case the name convention was flawed at the time of generating the JSON on Grasshopper (too many underscores that group the wrong properties together)
+        if (that.selectedContourBy === 'propertyname_3') {
+          var propname = o.metadata.propertyname;
+          var splitPropname = propname.split("_");
+          return splitPropname[splitPropname.length-1]
+        }
           return o.metadata[that.selectedContourBy]
         })
-        // console.log("RESULTGROUPBYNAME");
-        // console.log(resultGroupByName);
+        console.log("RESULTGROUPBYNAME");
+        console.log( this.resultGroupByName);
         this.groupKeys = _.without(_.keys(this.resultGroupByName), 'undefined')
         // console.log(this.groupKeys)
         this.allObjectsByGroup = []
@@ -2248,6 +2254,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if (that.selectedCostGroup === 'propertyname_1') {
               return o.metadata.propertyname_1 + " (" + o.metadata.propertyname_0 + ")"
             }
+            // this is in case the name convention was flawed at the time of generating the JSON on Grasshopper (too many underscores that group the wrong properties together)
+            if (that.selectedCostGroup === 'propertyname_3') {
+              var propname = o.metadata.propertyname;
+              var splitPropname = propname.split("_");
+              return splitPropname[splitPropname.length-1]
+            } 
             return o.metadata[that.selectedCostGroup]
           })
           // ================ repeated pattern for CODE end ==========================================
