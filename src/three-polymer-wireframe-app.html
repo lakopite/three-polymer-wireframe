@@ -1514,7 +1514,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         })
         var resultFilterInput = _.concat(this.linearNumFilterResult, this.planarNumFilterResult)
         this.resultGroupByName = _.groupBy(resultFilterInput, function(o) {
-        delete o.metadata['propertyname_4']
         if (that.selectedContourBy === 'propertyname_1') {
           //to include parent group to which it belongs
           return o.metadata.propertyname_1 + " (" + o.metadata.propertyname_0 + ")"
