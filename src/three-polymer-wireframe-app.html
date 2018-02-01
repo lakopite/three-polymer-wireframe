@@ -555,7 +555,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </app-toolbar>
           <paper-dropdown-menu id="num-contour-dropdown" label="Select Contour">
             <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-              <template is="dom-repeat" items="{{numDropdownOptions}}">
+              <template is="dom-repeat" items="{{metadataFields}}">
                 <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
               </template>
             </paper-listbox>
@@ -582,7 +582,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </app-toolbar>
           <paper-dropdown-menu id="str-contour-dropdown" label="Select Contour">
             <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-              <template is="dom-repeat" items="{{numDropdownOptions}}">
+              <template is="dom-repeat" items="{{metadataFields}}">
                 <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
               </template>
             </paper-listbox>
@@ -1391,8 +1391,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _generateNumDropdownOptions() {
         // using numDropdownOptions not metadataFields to not alter metadataFields
         this.numDropdownOptions = []
-        // propertyname_last makes a category for the very last subgroup so we have that information consolidated in case naming convention included too many underscores at time of generating JSON within GH
-        this.numDropdownOptions = _.concat(this.numDropdownOptions, 'propertyname_last')
         var that = this;
         this.linearNumFilterResult = _.filter(that._modelData.linearElements, function(o) {
           return _.every(o.vertices, function(j) {
@@ -1415,7 +1413,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if (this.numDropdownOptions.indexOf(keys[j]) === -1) {
               this.numDropdownOptions.push(keys[j])
             }
-            this.set('numDropdownOptions', this.numDropdownOptions.sort())
           }
         }
       }
@@ -2365,9 +2362,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _contourPropsChanged(metadataFields) {
         this.metadataFields = this.metadataFields.sort();
-        if (this.numDropdownOptions) {
-          this.numDropdownOptions = this.numDropdownOptions.sort();
-        }
         if (this.metadataFields.indexOf(this.selectedContourBy) === -1) {
           this.selectedContourBy = undefined;
           if (this.metadataFields.length > 0) {
