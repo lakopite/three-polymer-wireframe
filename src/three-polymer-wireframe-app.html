@@ -284,7 +284,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         padding: .5em;
       }
 
-      paper-fab#strPieIcon, #costPieIcon {
+      paper-fab#strViewIcon, #costViewIcon {
          --paper-fab-background: var(--paper-blue-500);
          @apply(--layout-self-center)
       }
@@ -430,6 +430,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </app-toolbar>
     <div class="drawer-list">
       <div class="model-div">
+        <paper-search-panel></paper-search-panel>
         <paper-icon-button id="filterIcon" class="filter" icon="my-icons:filter-list" title="filter models" on-tap="showFilterModal"></paper-icon-button>
         <paper-dropdown-menu label="Model">
         <paper-listbox id="model-options" slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
@@ -594,7 +595,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               </template>
             </paper-listbox>
           </paper-dropdown-menu>
-            <paper-fab mini id="strPieIcon" class="pie-icon" icon="{{_getStringIcon(stringPieView)}}" title="switch view" on-tap="strToggleView"></paper-fab>
+            <paper-fab mini id="strViewIcon" class="pie-icon" icon="{{_getStringIcon(stringPieView)}}" title="switch view" on-tap="strToggleView"></paper-fab>
         </div>
         <!-- wrap all string aggregation info -->
         <div id="wrap-str-info">
@@ -666,7 +667,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </template>
         </paper-listbox>
         </paper-dropdown-menu>
-          <paper-fab mini disabled="{{_disableViewIcon(totalCost, costPieView)}}" id="costPieIcon" class="pie-icon" icon="{{_getCostIcon(costPieView)}}" title="switch view" on-tap="costToggleView"></paper-fab>
+          <paper-fab mini disabled="{{_disableViewIcon(totalCost, costPieView)}}" id="costViewIcon" class="pie-icon" icon="{{_getCostIcon(costPieView)}}" title="switch view" on-tap="costToggleView"></paper-fab>
       </div>
       <div id="wrap-cost-info">
         <div id="cost-table-section" hidden$="[[costPieView]]">
@@ -1039,7 +1040,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _formatModelName(modelName) {
-        //to get model name without the timestamp (for main item in dropdown)
+        //to get model name without the prepended (GH) or appended timestamp (for main item in dropdown)
         var arr = modelName.split("_");
         return _.join(_.filter(arr,function(s) {
           return isNaN(s)
@@ -1047,7 +1048,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _formatModelTimeStamp(modelName) {
-        //to get timestamp of model (for secondary text of item in dropdown)
+        //to get upload timestamp of model (for secondary text of item in dropdown)
         var arr = modelName.split("_")
         if (arr.length > 2) {
           if (!isNaN(arr[arr.length-1]) && !isNaN(arr[arr.length-2])) {
@@ -1101,9 +1102,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       addCommentBox() {
+        // commentList is initialized with one blank field in order to identify the element in the array that we'll lte user assign
         var blankIndex = this.commentList.indexOf('');
         if (this.commentList.length < 5) {
           this.commentList[blankIndex] = Polymer.dom(this.root).querySelector('#comment-input-'+blankIndex).value;
+          //once user input is added to array we add another blank field for the same purpose
           this.commentList = _.concat(this.commentList, '')
         } if (this.commentList.length === 5) {
           this.$.addComment.disabled = true
@@ -1111,7 +1114,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       finalCommentArr() {
-        // gets final list of comments without blank fields
+        // gets final commentList contents without blank fields
         var commentListCopy = []
         for (var i=0; i < this.commentList.length; i++) {
           if (commentListCopy[i] !== '') {
@@ -1135,6 +1138,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _enableUploadBtn() {
+        //inputs fire this on-change and dropdown menus on on-iron-select
         this.userEmail = Polymer.dom(this.root).querySelector('#user-email').value
         this.file = this.$.modelUpload.files[0]
         this.uploadSelectedProject = Polymer.dom(this.root).querySelector('#project-dropdown').value
@@ -1486,7 +1490,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _setStringPieData() {
-        //for pie chart in string aggrgations
+        //for pie chart in string aggregations
         var _strPieData = []
         for (var i=0; i < this.groupSumData.length; i++) {
           var item = this.groupSumData[i]
@@ -1581,14 +1585,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                this.strOtherUnitSum = _.round(sumByGroup/2000, 0)
              } else if (that.selectedSumField.includes('vol')) {
                this.strOtherUnitSum = _.round(sumByGroup/46656, 0)
-             }
-           } else if (that.currentModelResp.modelInformation.units === 'metric') {
-             if (that.selectedSumField.includes('length')) {
-               this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
-             } else if (that.selectedSumField.includes('mass')) {
-               this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
-             } else if (that.selectedSumField.includes('vol')) {
-               this.strOtherUnitSum = _.round(sumByGroup/1000000000, 0)
              }
            } else if (that.currentModelResp.modelInformation.units === 'metric') {
              if (that.selectedSumField.includes('length')) {
@@ -2320,7 +2316,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.totalMaterialSumDiffUnit = _.round(_.sumBy(this.costTableData, function(o) {
             return o.otherUnitSum
           }), 3)
-          //may or may not be the best place for this:
           this._updateCostValues()
         } else {
           this.costTableData = []
@@ -2484,7 +2479,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // displays available options to search from according to already uploaded models
         //console.log(this.dataOptions);
         //console.log(JSON.stringify(this.dataOptions));
-        //create a set of all the different Options
+        //create a set of all the different options
         this.searchOptionsMap = {
           'user': [],
           // 'project': [],
@@ -2495,18 +2490,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         };
         for (var i=0; i < this.dataOptions.length; i++) {
           var item = this.dataOptions[i]
+          // if model has no user/has a user that is not already in the searchOptions map, add them to it
           if (typeof item.s3_attributes.user !== 'undefined' && this.searchOptionsMap.user.indexOf(item.s3_attributes.user) === -1) {
             this.searchOptionsMap.user.push(item.s3_attributes.user)
           }
+          // if model has no project/has a project that is not already in the searchOptions map, add it
           if (typeof item.s3_attributes.project !== 'undefined' && this.searchOptionsMap.project.indexOf(item.s3_attributes.project) === -1) {
             this.searchOptionsMap.project.push(item.s3_attributes.project)
           }
+          // if model has no office/has a office that is not already in the searchOptions map, add it
           if (typeof item.s3_attributes.office !== 'undefined' && this.searchOptionsMap.office.indexOf(item.s3_attributes.office) === -1) {
             this.searchOptionsMap.office.push(item.s3_attributes.office)
           }
+          // if model has no minDate/has a minDate that is not already in the searchOptions map, add it
           if (_.isEmpty(this.searchOptionsMap.minDate) || new Date(this.searchOptionsMap.minDate) > new Date(item.s3_attributes.uploadTime.split(" ")[0])) {
             this.set('searchOptionsMap.minDate', item.s3_attributes.uploadTime.split(" ")[0]);
           }
+          // if model has no maxDate/has a maxDate that is not already in the searchOptions map, add it
           if (_.isEmpty(this.searchOptionsMap.maxDate) || new Date(this.searchOptionsMap.maxDate) < new Date(item.s3_attributes.uploadTime.split(" ")[0])) {
             this.set('searchOptionsMap.maxDate', item.s3_attributes.uploadTime.split(" ")[0]);
           }
@@ -2518,11 +2518,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       setSearchFilters() {
+        //if user didn't select a minDate, assign the date of the first possible model
         if (_.isEmpty(Polymer.dom(this.root).querySelector("#from-date").value)) {
           var minDate = this.searchOptionsMap.minDate
         } else {
           var minDate = Polymer.dom(this.root).querySelector("#from-date").value
         }
+        //if user didn't select a maxDate, assign the date of the latest possible model
         if (_.isEmpty(Polymer.dom(this.root).querySelector("#to-date").value)) {
           var maxDate = this.searchOptionsMap.maxDate
         } else {
@@ -2541,9 +2543,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$.searchOptions.render();
         var that = this
         setTimeout(function() {
+          //to display only the models that meet the requierments of the user's search
           that.includedModels = _.map(that.$['model-options'].items, function(o) {return o.name})
           // console.log(that.includedModels);
           if (that.includedModels.length === 0) {
+            //if user input renders no results, remove search filters
             that.clearFilterInput()
             that.userSearchInput = {
               'user': undefined,
@@ -2558,6 +2562,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             toast.show({ text: "No search results; filters removed" })
           } else {
             // console.log(that.$.searchOptions.filter);
+            // if selectedModel does not meet requirements of user search input, assign the first search result to selectedModel
             if (!_.includes(that.includedModels, that.selectedModel)) {
               for (var m = 0; m < that.includedModels.length; m++) {
                 //these are all the available Models
@@ -2580,8 +2585,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var userSearchInputMaxDate = new Date(this.userSearchInput.maxDate)
         var result = true;
         if (this.userSearchInput.user === undefined && this.userSearchInput.office === undefined && this.userSearchInput.project === undefined && this.userSearchInput.minDate === this.searchOptionsMap.minDate && this.userSearchInput.maxDate === this.searchOptionsMap.maxDate) {
+          // if all of user's input is blank, keep the default color of the filter icon, whenever filter is activated (other if statements) filter icon will turn green
           this.$.filterIcon.style.color = '';
         }
+        // using multiple if statements because all of these conditions must be met
         if (typeof this.userSearchInput.user !== 'undefined') {
           this.$.filterIcon.style.color = '#4CAF50';
           result = item.s3_attributes.user === this.userSearchInput.user
@@ -2607,6 +2614,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           result = item.s3_attributes.project === this.userSearchInput.project
           if (!result) {return result}
         }
+        //each if statement above checks to see if condition is met (true using result); if a model fails on the previous/any of the input conditions: doesn't return the model at all
         return result;
         }
 
