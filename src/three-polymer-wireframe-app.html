@@ -1290,6 +1290,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         console.log(this.modelStatusResp);
       }
 
+      //removed rounding functions because when I applied this to the value of the geometryfilters.#min/Max, applyFilters did not work
       // _roundDown(n) {
       //   return typeof n !== 'undefined' ? _.floor(n, 1) : ""
       // }
@@ -1298,6 +1299,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       //   return typeof n !== 'undefined' ? _.ceil(n, 1) : ""
       // }
 
+      // makes the numbers appear with comma formatting
       _prettify(n) {
         return typeof n !== 'undefined' ? parseFloat(n).toLocaleString() : ""
       }
@@ -2156,7 +2158,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _setCostResults(e) {
-        // when user inserts cost input individually (not the apply all button)
+        // when user inserts cost input individually (not the apply all button), sets input and result (product of input and otherUnitSum)
         var item = e.model.item
         var inputIndex = e.model.index
         for (var i=0; i < this.costTableData.length; i++) {
@@ -2165,17 +2167,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.set('costTableData.'+i+'.costResult', this.costTableData[i].input * this.costTableData[i].otherUnitSum);
           }
         }
+        //if no user input has been saved to costItems object, save the input
         if (this.costItems.length === 0) {
           this.costItems.push({'model': this.selectedModel, 'group': item.group, 'input': item.input})
           // console.log(e.target.value);
           // console.log(item.input);
         } else {
+          // if costItems is not empty then check to see if that item in the group column already exists within costItems
           var found = this.costItems.some(function (el) {
             return el.group === item.group;
           });
+          // if it's not on there then save the user input in costItems object
           if (!found) {
             this.costItems.push({'model': this.selectedModel, 'group': item.group, 'input': item.input})
           } else if (found) {
+            // if it is already in costItems then save the latest input to overwrite the current info within costItems for that group
             for (var i=0; i < this.costItems.length; i++) {
               if (this.costItems[i].group === item.group && this.costItems[i].model === this.selectedModel) {
                 this.costItems[i].input = item.input
@@ -2191,8 +2197,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _updateCostValues() {
-        // in case user enters a different value, set new input and recalculate cost result
+        // in case user enters a different value, set new input and recalculate cost result; use costItems to check if there is any user input that already exists
         if (typeof this.costItems !== 'undefined') {
+          // update if costItems has information saved onto there (overwrite previous input)
           for (var i=0; i < this.costTableData.length; i++) {
             for (var j=0; j < this.costItems.length; j++) {
               if (this.costTableData[i].group == this.costItems[j].group && this.selectedModel === this.costItems[j].model) {
@@ -2405,6 +2412,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       applyFilters() {
+        //so user input on Model Filters adjusts the data that corresponds to it
         this.geometryFilter = {
           'xMin': parseFloat(this.geometryFilter.xMin),
           'xMax': parseFloat(this.geometryFilter.xMax),
