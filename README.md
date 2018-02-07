@@ -12,7 +12,7 @@
 - Find models by project, office, date range, and/or the user that uploaded it using the search filter
 
 ## How do I upload a model?
-1. Do a pull request on *Sourcetree* for the *NLVS* project in order to have the latest data
+1. Do a pull request on *Sourcetree* for the *NLVS* project in order to have the latest data of the repo: <https://gitlab.arup.com/nancy.zekioglu/NLVS>
 2. Open Grasshopper:
     + Open the *NLVS* folder
     + Go into the *JSON_Sample_Tasks* subfolder
