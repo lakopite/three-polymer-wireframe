@@ -1237,7 +1237,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       getModelStatus(event, response) {
         if (response) {
-          //backoffCounter used to give code a chance to wait for the status
+          //backoffCounter used to give code a chance to wait for the model status
           this.modelStatusResp = response.response
           if (_.has(this.modelStatusResp, 'error')) {
             if (this.modelStatusResp.error === "model not found") {
