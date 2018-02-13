@@ -408,9 +408,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <vaadin-date-picker id="from-date" label="From" min="{{minFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
       <vaadin-date-picker id="to-date" label="To" min="{{minFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
       <div class="buttons">
+        <paper-button dialog-dismiss on-tap="clearAllFilters">Clear all</paper-button>
         <paper-button dialog-dismiss on-tap="clearFilterInput">Cancel</paper-button>
         <paper-button on-tap="setSearchFilters">Apply</paper-button>
-        <paper-button dialog-dismiss on-tap="clearAllFilters">Clear all</paper-button>
       </div>
     </paper-dialog>
     <paper-toast id="searchResultMsg"></paper-toast>
