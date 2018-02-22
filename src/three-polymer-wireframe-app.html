@@ -330,6 +330,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         padding-left: 2em;
         display: flow-root;
       }
+
+      .build-dates {
+        padding-top: 2.5em;
+        font-size: .7em;
+      }
+
+      .uploaded-details {
+        font-size: .7em;
+      }
+
     </style>
 
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
@@ -405,8 +415,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </paper-dropdown-menu>
       <paper-icon-button class="clear-filter-input" id="clearFilterOffice" icon="my-icons:clear" title="clear office" on-tap="clearSearchField"></paper-icon-button>
       </div>
-      <vaadin-date-picker id="from-date" label="From" min="{{minFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
-      <vaadin-date-picker id="to-date" label="To" min="{{minFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
+      <vaadin-date-picker id="from-date" label="(Uploaded date) From" min="{{minFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
+      <vaadin-date-picker id="to-date" label="(Uploaded date) To" min="{{minFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
       <div class="buttons">
         <paper-button dialog-dismiss on-tap="clearAllFilters">Clear all</paper-button>
         <paper-button dialog-dismiss on-tap="clearFilterInput">Cancel</paper-button>
@@ -446,7 +456,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </paper-dropdown-menu>
     </div>
       <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
-      <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: {{_uploadedBy(currentModelResp.modelInformation.user)}}<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item>
+      <!-- <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: {{_uploadedBy(currentModelResp.modelInformation.user)}}<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item> -->
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
         <paper-dropdown-menu id="main-contour-dropdown">
           <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
@@ -513,10 +523,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <app-header slot="header" medium-tall>
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-        <div main-title>Arup Model QuickView: [[selectedModel]]</div>
-        <paper-item>Build Dates</paper-item>
-        <paper-item>FE: [[frontEndBuildDate]]</paper-item>
-        <paper-item>BE: [[backEndBuildDate]]</paper-item>
+        <div main-title>
+          Arup Model QuickView: [[_formatModelName(selectedModel)]]
+          <div class="uploaded-details">
+            <!-- JSON generated on:  -->
+            Uploaded on [[currentModelResp.modelInformation.s3_attributes.uploadTime]] by {{_uploadedBy(currentModelResp.modelInformation.user)}}
+          </div>
+        </div>
+        <!-- <paper-item>Build Dates</paper-item> -->
+        <div class="build-dates">
+          <p>FE build date: [[frontEndBuildDate]]</p>
+          <p>BE build date: [[backEndBuildDate]]</p>
+        </div>
         <div class="spacer"></div>
         <paper-dialog modal id="loadingData">
           <h3>Pulling data from server, please wait</h3>
