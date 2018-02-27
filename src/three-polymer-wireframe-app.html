@@ -335,7 +335,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         font-size: .7em;
       }
 
-      .uploaded-details {
+      .uploaded-details, .JSON-generated-details {
         font-size: .7em;
       }
 
@@ -455,7 +455,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </paper-dropdown-menu>
     </div>
       <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
-      <!-- <paper-item id="uploaded-by" label="Uploaded by"><p>Uploaded by: {{_uploadedBy(currentModelResp.modelInformation.user)}}<br/>at [[currentModelResp.modelInformation.s3_attributes.uploadTime]]</p></paper-item> -->
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
         <paper-dropdown-menu id="main-contour-dropdown">
           <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
@@ -524,15 +523,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <div main-title>
           Arup Model QuickView: [[_formatModelName(selectedModel)]]
-          <div class="uploaded-details">
+          <div class="JSON-generated-details">
             <!-- JSON generated on:  -->
-            Uploaded on [[currentModelResp.modelInformation.s3_attributes.uploadTime]] by {{_uploadedBy(currentModelResp.modelInformation.user)}}
+            {{ _jsonGenerated(currentModelResp.modelInformation.JSONCreateDate) }}
+          </div>
+          <div class="uploaded-details">
+            <!-- JSON uploaded on:  -->
+            {{_uploadedInfo(currentModelResp.modelInformation.s3_attributes.uploadTime, currentModelResp.modelInformation.user)}}
           </div>
         </div>
         <!-- <paper-item>Build Dates</paper-item> -->
         <div class="build-dates">
-          <p>FE build date: [[frontEndBuildDate]]</p>
-          <p>BE build date: [[backEndBuildDate]]</p>
+          FE build date: [[frontEndBuildDate]]<span class="pat"></span>
+          BE build date: [[backEndBuildDate]]
         </div>
         <div class="spacer"></div>
         <paper-dialog modal id="loadingData">
@@ -1081,13 +1084,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return ""
       }
 
-      _uploadedBy(user) {
+      _jsonGenerated(_date) {
         // to display the user that uploaded current model
-        if (_.isEmpty(user)) {
-          return user = "no user available"
+        if (_.isEmpty(_date)) {
+          return ''
         } else {
-          return user
+          return "JSON generated on: " + _date
         }
+      }
+
+      _uploadedInfo(uploadTime, user) {
+        if (_.isEmpty(uploadTime)) {
+          uploadTime = "unavailable date"
+        }
+        if (_.isEmpty(user)) {
+          user = "unavailable user"
+        }
+        // to display the user that uploaded current model
+        return "Model uploaded on " + uploadTime + " by " + user
       }
 
       requestModelStatus() {
