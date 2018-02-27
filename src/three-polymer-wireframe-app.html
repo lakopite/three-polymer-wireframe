@@ -346,9 +346,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <iron-ajax headers="{{authHeaders}}" id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="[[baseUrl]]post-model"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="get-model-status" method="GET" handle-as="json" on-response="getModelStatus"></iron-ajax>
     <iron-ajax id="get-latest-fe-commit" method="GET" url="https://api.github.com/repos/lakopite/three-polymer-wireframe/git/refs/heads/master" handle-as="json" on-response="handleGetLatestFeCommitResp" on-error="handleGetLatestCommitError"></iron-ajax>
-    <iron-ajax id="get-latest-fe-commit-date" method="GET" url="https://api.github.com/repos/lakopite/three-polymer-wireframe/git/commits/[[feSha]]" handle-as="json" on-response="handleGetLatestCommitDateResp" on-error="handleGetLatestCommitDateError"></iron-ajax>
+    <iron-ajax id="get-latest-fe-commit-date" method="GET" url="https://api.github.com/repos/lakopite/three-polymer-wireframe/git/commits/[[feSha]]" handle-as="json" on-response="handleGetLatestFeCommitDateResp" on-error="handleGetLatestCommitDateError"></iron-ajax>
     <iron-ajax id="get-latest-be-commit" method="GET" url="https://api.github.com/repos/lakopite/model-viewer-api/git/refs/heads/master" handle-as="json" on-response="handleGetLatestBeCommitResp" on-error="handleGetLatestCommitError"></iron-ajax>
-    <iron-ajax id="get-latest-be-commit-date" method="GET" url="https://api.github.com/repos/lakopite/model-viewer-api/git/commits/[[beSha]]" handle-as="json" on-response="handleGetLatestCommitDateResp" on-error="handleGetLatestCommitDateError"></iron-ajax>
+    <iron-ajax id="get-latest-be-commit-date" method="GET" url="https://api.github.com/repos/lakopite/model-viewer-api/git/commits/[[beSha]]" handle-as="json" on-response="handleGetLatestBeCommitDateResp" on-error="handleGetLatestCommitDateError"></iron-ajax>
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
       <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" on-change="_enableUploadBtn">
@@ -967,7 +967,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           },
           projectList: {
             type: Array,
-            value: ["NLVS North", "NLVS South", "NLVS East", "NLVS West", "NLVS Roof Canopy", "NLVS Roof Support", "NLVS Cable Truss", "NLVS Bowl Concrete", "Samples"]
+            value: ["NLVS East", "NLVS West", "NLVS North", "NLVS South", "NLVS Roof Canopy", "NLVS Roof Support", "NLVS Cable Truss", "NLVS Bowl Concrete", "NLVS Operable Walls", "Samples"]
           },
           officeList: {
             type: Array,
@@ -1952,13 +1952,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.backEndBuildDate = 'unavailable';
       }
 
-      handleGetLatestCommitDateResp(event, response) {
+      handleGetLatestFeCommitDateResp(event, response) {
           var resp = response.response;
           console.log(resp);
           var date = resp.author.date;
           // console.log(date);
           console.log(date.slice(0, 10));
           this.frontEndBuildDate = date.slice(0, 10);
+      }
+
+      handleGetLatestBeCommitDateResp(event, response) {
+          var resp = response.response;
+          console.log(resp);
+          var date = resp.author.date;
+          // console.log(date);
+          console.log(date.slice(0, 10));
           this.backEndBuildDate = date.slice(0, 10);
       }
 
