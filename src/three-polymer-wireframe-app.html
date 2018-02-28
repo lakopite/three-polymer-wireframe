@@ -458,7 +458,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
         <paper-dropdown-menu id="main-contour-dropdown">
           <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-            <template is="dom-repeat" items="{{metadataFields}}">
+            <template is="dom-repeat" items="{{numDropdownOptions}}">
               <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
             </template>
           </paper-listbox>
@@ -576,7 +576,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </app-toolbar>
           <paper-dropdown-menu id="num-contour-dropdown" label="Select Contour">
             <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-              <template is="dom-repeat" items="{{metadataFields}}">
+              <template is="dom-repeat" items="{{numDropdownOptions}}">
                 <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
               </template>
             </paper-listbox>
@@ -603,7 +603,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </app-toolbar>
           <paper-dropdown-menu id="str-contour-dropdown" label="Select Contour">
             <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-              <template is="dom-repeat" items="{{metadataFields}}">
+              <template is="dom-repeat" items="{{numDropdownOptions}}">
                 <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
               </template>
             </paper-listbox>
@@ -1455,14 +1455,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           })
         })
         var resultFilterInput = _.concat(this.linearNumFilterResult, this.planarNumFilterResult)
+        var _numDropdownOptions = []
         for (var i=0; i < resultFilterInput.length; i++) {
           var keys = _.keys(resultFilterInput[i].metadata);
           for (var j=0; j < keys.length; j++) {
-            if (this.numDropdownOptions.indexOf(keys[j]) === -1) {
-              this.numDropdownOptions.push(keys[j])
+            if (_numDropdownOptions.indexOf(keys[j]) === -1 && keys[j] !== 'beamnum') {
+              _numDropdownOptions.push(keys[j])
             }
           }
         }
+        this.set('numDropdownOptions', _numDropdownOptions.sort())
+        // console.log(this.numDropdownOptions);
       }
 
       _numericalAggregations() {
