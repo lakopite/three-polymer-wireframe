@@ -645,7 +645,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <template>[[_prettify(item.sum)]]</template>
                 <template class="footer">[[_prettify(grandTotalSum)]] [[_quantUnitLabels(selectedSumField)]]</template>
               </vaadin-grid-column>
-              <vaadin-grid-column>
+              <vaadin-grid-column id="otherUnitColumn">
                 <template class="header">
                   <vaadin-grid-sorter path="otherUnitSum">sum [[selectedSumField]] [[strOtherUnitLabel]]</vaadin-grid-sorter>
                 </template>
@@ -1356,12 +1356,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return unitType === 'imperial' ? item + ' (lb)' : item + ' (kg)'
         } else if (item.includes('vol')) {
             return unitType === 'imperial' ? item + ' (in\u00B3)' : item + ' (mm\u00B3)'
+        } else if (item.includes('thickness')) {
+            return unitType === 'imperial' ? item + ' (in)' : item + ' (mm)'
         } else {
             return item
           }
       }
 
       _quantUnitLabels(measurement, unitType) {
+        //to display units within the vaadin-grid
       	var that = this;
         measurement = _.toLower(measurement)
         unitType = _.toLower(this.currentModelResp.modelInformation.units)
@@ -1374,6 +1377,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           	 return ' (lb)'
           } else if (measurement.includes('vol')) {
               return ' (in\u00B3)'
+          } else if (measurement.includes('thickness')) {
+              return ' (in)'
           } else {
               return ''
             }
@@ -1386,6 +1391,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               return ' (kg)'
           } else if (measurement.includes('vol')) {
               return ' (mm\u00B3)'
+          } else if (measurement.includes('thickness')) {
+              return ' (mm)'
           } else {
              return ''
            }
@@ -1618,23 +1625,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
            if (that.currentModelResp.modelInformation.units === 'imperial') {
              if (that.selectedSumField.includes('length')) {
                this.strOtherUnitSum = _.round(sumByGroup/12, 0)
+               this.$.otherUnitColumn.hidden = false
              } else if (that.selectedSumField.includes('mass')) {
                this.strOtherUnitSum = _.round(sumByGroup/2000, 0)
+               this.$.otherUnitColumn.hidden = false
              } else if (that.selectedSumField.includes('vol')) {
                this.strOtherUnitSum = _.round(sumByGroup/46656, 0)
-             }
-             else if (that.selectedSumField.includes('area')) {
-               this.strOtherUnitSum = _.round(sumByGroup/144, 0)
+               this.$.otherUnitColumn.hidden = false
+             } else if (that.selectedSumField.includes('area')) {
+               this.$.otherUnitColumn.hidden = true
+               // this.strOtherUnitSum = _.round(sumByGroup/144, 0)
+             } else if (that.selectedSumField.includes('thickness')) {
+               this.$.otherUnitColumn.hidden = true
              }
            } else if (that.currentModelResp.modelInformation.units === 'metric') {
              if (that.selectedSumField.includes('length')) {
                this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
+               this.$.otherUnitColumn.hidden = false
              } else if (that.selectedSumField.includes('mass')) {
                this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
+               this.$.otherUnitColumn.hidden = false
              } else if (that.selectedSumField.includes('vol')) {
                this.strOtherUnitSum = _.round(sumByGroup/1000000000, 0)
+               this.$.otherUnitColumn.hidden = false
+             } else if (that.selectedSumField.includes('thickness')) {
+               this.$.otherUnitColumn.hidden = true
              }
-             // NOTE: IF AREA COMES IN METRIC, WHAT TO CONVER IT TO???
+             // NOTE: IF AREA COMES IN METRIC, WHAT TO CONVERT IT TO???
            }
            var groupSumDataSetup = {
              'group': this.groupKeys[i],
