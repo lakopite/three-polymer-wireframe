@@ -414,6 +414,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </paper-dropdown-menu>
       <paper-icon-button class="clear-filter-input" id="clearFilterOffice" icon="my-icons:clear" title="clear office" on-tap="clearSearchField"></paper-icon-button>
       </div>
+      <vaadin-date-picker id="from-gen-json-date" label="(JSON date) From" min="{{minUploadFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
+      <vaadin-date-picker id="to-gen-json-date" label="(JSON date) To" min="{{minUploadFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
       <vaadin-date-picker id="from-upload-date" label="(Upload date) From" min="{{minUploadFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
       <vaadin-date-picker id="to-upload-date" label="(Upload date) To" min="{{minUploadFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
       <div class="buttons">
@@ -1301,7 +1303,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     'project': undefined,
                     'office': undefined,
                     'minUploadDate': this.minUploadFromDate,
-                    'maxUploadDate': this.todaysDate()
+                    'maxUploadDate': this.todaysDate(),
+                    'minGenJsonDate': this.minUploadFromDate,
+                    'maxGenJsonDate': this.todaysDate()
                   }
                   this.$.searchOptions.render();
                   this.$.filterIcon.style.color = ''
@@ -2528,7 +2532,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.filterSelectedProject = undefined,
         this.filterSelectedOffice = undefined,
         Polymer.dom(this.root).querySelector("#from-upload-date").value = undefined,
-        Polymer.dom(this.root).querySelector("#to-upload-date").value = undefined
+        Polymer.dom(this.root).querySelector("#to-upload-date").value = undefined,
+        Polymer.dom(this.root).querySelector("#from-gen-json-date").value = undefined,
+        Polymer.dom(this.root).querySelector("#to-gen-json-date").value = undefined
         this.setSearchFilters()
       }
 
@@ -2539,14 +2545,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.filterSelectedProject = undefined,
           this.filterSelectedOffice = undefined,
           Polymer.dom(this.root).querySelector("#from-upload-date").value = undefined,
-          Polymer.dom(this.root).querySelector("#to-upload-date").value = undefined
+          Polymer.dom(this.root).querySelector("#to-upload-date").value = undefined,
+          Polymer.dom(this.root).querySelector("#from-gen-json-date").value = undefined,
+          Polymer.dom(this.root).querySelector("#to-gen-json-date").value = undefined
         } else {
           //if filters applied keep user's input
           this.filterSelectedUser = this.userSearchInput.user,
           this.filterSelectedProject = this.userSearchInput.project,
           this.filterSelectedOffice = this.userSearchInput.office,
           Polymer.dom(this.root).querySelector("#from-upload-date").value = this.userSearchInput.minUploadDate,
-          Polymer.dom(this.root).querySelector("#to-upload-date").value = this.userSearchInput.maxUploadDate
+          Polymer.dom(this.root).querySelector("#to-upload-date").value = this.userSearchInput.maxUploadDate,
+          Polymer.dom(this.root).querySelector("#from-gen-json-date").value = this.userSearchInput.minGenJsonDate,
+          Polymer.dom(this.root).querySelector("#to-gen-json-date").value = this.userSearchInput.maxGenJsonDate
         }
       }
 
@@ -2560,7 +2570,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'project': _.concat([], "non-tagged"),
           'office': [],
           'minUploadDate': "",
-          'maxUploadDate': ""
+          'maxUploadDate': "",
+          'minGenJsonDate': "",
+          'maxGenJsonDate': ""
         };
         for (var i=0; i < this.dataOptions.length; i++) {
           var item = this.dataOptions[i]
@@ -2584,6 +2596,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           if (_.isEmpty(this.searchOptionsMap.maxUploadDate) || new Date(this.searchOptionsMap.maxUploadDate) < new Date(item.s3_attributes.uploadTime.split(" ")[0])) {
             this.set('searchOptionsMap.maxUploadDate', item.s3_attributes.uploadTime.split(" ")[0]);
           }
+          /////
+          // if model has no minGenJsonDate/uploadTime is not less than the minDate, set it
+          if (_.isEmpty(this.searchOptionsMap.minGenJsonDate) || new Date(this.searchOptionsMap.minGenJsonDate) > new Date(item.s3_attributes.uploadTime.split(" ")[0])) {
+            this.set('searchOptionsMap.minGenJsonDate', item.s3_attributes.uploadTime.split(" ")[0]);
+          }
+          // if model has no maxGenJsonDate/uploadTime is not greater than the minDate, set it
+          if (_.isEmpty(this.searchOptionsMap.maxGenJsonDate) || new Date(this.searchOptionsMap.maxGenJsonDate) < new Date(item.s3_attributes.uploadTime.split(" ")[0])) {
+            this.set('searchOptionsMap.maxGenJsonDate', item.s3_attributes.uploadTime.split(" ")[0]);
+          }
+          //////
         }
         //to set min value for vaadin-date-picker
         this.minUploadFromDate = this.searchOptionsMap.minUploadDate
@@ -2594,9 +2616,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       setSearchFilters() {
         //if user didn't select a minUploadDate, assign the date of the first possible model
         if (_.isEmpty(Polymer.dom(this.root).querySelector("#from-upload-date").value)) {
-          var minUploadDate = this.searchOptionsMap.minUploadDate
+          var minUploadDate = this.searchOptionsMap.minUploadDate;
         } else {
-          var minUploadDate = Polymer.dom(this.root).querySelector("#from-upload-date").value
+          var minUploadDate = Polymer.dom(this.root).querySelector("#from-upload-date").value;
         }
         //if user didn't select a maxUploadDate, assign the date of the latest possible model
         if (_.isEmpty(Polymer.dom(this.root).querySelector("#to-upload-date").value)) {
@@ -2604,12 +2626,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         } else {
           var maxUploadDate = Polymer.dom(this.root).querySelector("#to-upload-date").value
         }
+        ///////////////
+        //if user didn't select a minGenJsonDate, assign the date of the first possible model
+        if (_.isEmpty(Polymer.dom(this.root).querySelector("#from-gen-json-date").value)) {
+          var minGenJsonDate = this.searchOptionsMap.minGenJsonDate;
+        } else {
+          var minGenJsonDate = Polymer.dom(this.root).querySelector("#from-gen-json-date").value;
+        }
+        //if user didn't select a maxGenJsonDate, assign the date of the latest possible model
+        if (_.isEmpty(Polymer.dom(this.root).querySelector("#to-gen-json-date").value)) {
+          var maxGenJsonDate = this.searchOptionsMap.maxGenJsonDate
+        } else {
+          var maxGenJsonDate = Polymer.dom(this.root).querySelector("#to-gen-json-date").value
+        }
+        //////////
         this.userSearchInput = {
           'user': this.filterSelectedUser,
           'project': this.filterSelectedProject,
           'office': this.filterSelectedOffice,
           'minUploadDate': minUploadDate,
-          'maxUploadDate': maxUploadDate
+          'maxUploadDate': maxUploadDate,
+          'minGenJsonDate': minGenJsonDate,
+          'maxGenJsonDate': maxGenJsonDate
         }
         // console.log("search input: ");
         // console.log(this.userSearchInput);
@@ -2628,7 +2666,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               'project': undefined,
               'office': undefined,
               'minUploadDate': that.minUploadFromDate,
-              'maxUploadDate': that.todaysDate()
+              'maxUploadDate': that.todaysDate(),
+              'minGenJsonDate': that.minUploadFromDate,
+              'maxGenJsonDate': that.todaysDate()
+
             }
             that.$.searchOptions.render();
             var toast = Polymer.dom(that.root).querySelector('#searchResultMsg')
@@ -2657,8 +2698,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var uploadTimeDate = new Date(item.s3_attributes.uploadTime.split(" ")[0])
         var userSearchInputMinUploadDate = new Date(this.userSearchInput.minUploadDate)
         var userSearchInputMaxUploadDate = new Date(this.userSearchInput.maxUploadDate)
+        if (item.s3_attributes.JSONCreateDate !== undefined) { var jsonCreateDate = new Date(item.s3_attributes.JSONCreateDate.split(" ")[0]) } else { var jsonCreateDate = new Date(item.s3_attributes.uploadTime.split(" ")[0]) }
+        var userSearchInputMinGenJsonDate = new Date(this.userSearchInput.minGenJsonDate)
+        var userSearchInputMaxGenJsonDate = new Date(this.userSearchInput.maxGenJsonDate)
         var result = true;
-        if (this.userSearchInput.user === undefined && this.userSearchInput.office === undefined && this.userSearchInput.project === undefined && this.userSearchInput.minUploadDate === this.searchOptionsMap.minUploadDate && this.userSearchInput.maxUploadDate === this.searchOptionsMap.maxUploadDate) {
+        if (this.userSearchInput.user === undefined && this.userSearchInput.office === undefined && this.userSearchInput.project === undefined && this.userSearchInput.minUploadDate === this.searchOptionsMap.minUploadDate && this.userSearchInput.maxUploadDate === this.searchOptionsMap.maxUploadDate && this.userSearchInput.minGenJsonDate === this.searchOptionsMap.minGenJsonDate && this.userSearchInput.maxGenJsonDate === this.searchOptionsMap.maxGenJsonDate) {
           // if all of user's input is blank, keep the default color of the filter icon, whenever filter is activated (other if statements) filter icon will turn green
           this.$.filterIcon.style.color = '';
         }
@@ -2678,6 +2722,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             result = uploadTimeDate >= userSearchInputMinUploadDate && uploadTimeDate <= userSearchInputMaxUploadDate
             if (!result) {return result}
         }
+        //////////////
+        if (this.userSearchInput.minGenJsonDate !== this.searchOptionsMap.minGenJsonDate || this.userSearchInput.maxGenJsonDate !== this.searchOptionsMap.maxGenJsonDate) {
+          this.$.filterIcon.style.color = '#4CAF50';
+            result = jsonCreateDate >= userSearchInputMinGenJsonDate && jsonCreateDate <= userSearchInputMaxGenJsonDate
+            if (!result) {return result}
+        }
+        //////////////
         if (this.userSearchInput.project === 'non-tagged') {
           this.$.filterIcon.style.color = '#4CAF50';
           result = item.s3_attributes.project === undefined
