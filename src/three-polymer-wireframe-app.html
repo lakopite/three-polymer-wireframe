@@ -1274,7 +1274,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.modelStatusResp = response.response
           if (_.has(this.modelStatusResp, 'error')) {
             if (this.modelStatusResp.error === "model not found") {
-                if (this.backoffCounter <= 5) {
+              //backoffcounter gives time to find model in db
+                if (this.backoffCounter <= 10) {
                   var that = this;
                   setTimeout(function() {
                     that.backoffCounter++;
@@ -1289,6 +1290,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             //once status is found, handle succesfully completed upload
             this.backoffCounter = 0;
             if (this.modelStatusResp.latestStatus === 200) {
+              //reload dataoptions to get new model now that it's added
               this.$['get-models-request'].generateRequest();
               this.selectedModel = this.fullFileNameNoExtension
               window.location.href = window.location.pathname + '#' + this.fullFileNameNoExtension
