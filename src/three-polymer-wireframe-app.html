@@ -2540,7 +2540,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       clearFilterInput() {
         // removes user input from search filters modal only if no filters are currently applied
-        if (this.userSearchInput.user === undefined && this.userSearchInput.project === undefined && this.userSearchInput.office === undefined && this.userSearchInput.minUploadDate === this.minUploadFromDate && this.userSearchInput.maxUploadDate === this.todaysDate()) {
+        if (this.userSearchInput.user === undefined && this.userSearchInput.project === undefined && this.userSearchInput.office === undefined && this.userSearchInput.minUploadDate === this.minUploadFromDate && this.userSearchInput.maxUploadDate === this.todaysDate() && this.userSearchInput.minGenJsonDate === this.minUploadFromDate && this.userSearchInput.maxGenJsonDate === this.todaysDate()) {
           this.filterSelectedUser = undefined,
           this.filterSelectedProject = undefined,
           this.filterSelectedOffice = undefined,
