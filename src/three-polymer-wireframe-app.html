@@ -458,7 +458,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </div>
       <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
       <div hidden$="{{_hideMainDropdown(selectedView)}}">
-        <paper-dropdown-menu id="main-contour-dropdown">
+        <paper-dropdown-menu label="Contour" id="main-contour-dropdown">
           <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
             <template is="dom-repeat" items="{{numDropdownOptions}}">
               <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
