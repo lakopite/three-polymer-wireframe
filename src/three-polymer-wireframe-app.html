@@ -32,6 +32,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
@@ -339,6 +340,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         font-size: .65em;
       }
 
+      .buttons {
+        display: flex;
+      }
+
     </style>
 
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
@@ -351,32 +356,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <iron-ajax id="get-latest-be-commit-date" method="GET" url="https://api.github.com/repos/lakopite/model-viewer-api/git/commits/[[beSha]]" handle-as="json" on-response="handleGetLatestBeCommitDateResp" on-error="handleGetLatestCommitDateError"></iron-ajax>
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
-      <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" on-change="_enableUploadBtn">
-        <div slot="suffix" label="user">@arup.com</div>
-      </paper-input>
-      <paper-dropdown-menu id="project-dropdown" label="Select Project" on-iron-select="_enableUploadBtn">
-          <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{uploadSelectedProject}}">
-            <template is="dom-repeat" items="[[projectList]]">
+      <paper-dialog-scrollable>
+        <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" on-change="_enableUploadBtn">
+          <div slot="suffix" label="user">@arup.com</div>
+        </paper-input>
+        <paper-dropdown-menu id="project-dropdown" label="Select Project" on-iron-select="_enableUploadBtn">
+            <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{uploadSelectedProject}}">
+              <template is="dom-repeat" items="[[projectList]]">
+                <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
+              </template>
+            </paper-listbox>
+        </paper-dropdown-menu>
+        <paper-dropdown-menu id="office-dropdown" label="Select Office" on-iron-select="_enableUploadBtn">
+          <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{uploadSelectedOffice}}">
+            <template is="dom-repeat" items="[[officeList]]">
               <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
             </template>
           </paper-listbox>
-      </paper-dropdown-menu>
-      <paper-dropdown-menu id="office-dropdown" label="Select Office" on-iron-select="_enableUploadBtn">
-        <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{uploadSelectedOffice}}">
-          <template is="dom-repeat" items="[[officeList]]">
-            <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
+        </paper-dropdown-menu>
+      </paper-dialog-scrollable>
+        <iron-input>
+        <input id="modelUpload" type="file" on-change="_enableUploadBtn"></input>
+        </iron-input>
+        <div class="wrapComments">
+          <template is="dom-repeat" items="{{commentList}}">
+            <input class="commentBox" id="comment-input-[[index]]" is="iron-input" placeholder="Enter comment here..." on-change="_enableAddComment"></input>
           </template>
-        </paper-listbox>
-      </paper-dropdown-menu>
-      <iron-input>
-      <input id="modelUpload" type="file" on-change="_enableUploadBtn"></input>
-      </iron-input>
-      <div class="wrapComments">
-        <template is="dom-repeat" items="{{commentList}}">
-          <input class="commentBox" id="comment-input-[[index]]" is="iron-input" placeholder="Enter comment here..." on-change="_enableAddComment"></input>
-        </template>
-        <paper-icon-button id="addComment" icon="my-icons:add-circle-outline" title="add comment" on-tap="addCommentBox" disabled="{{_disableAddComment(commentList)}}"></paper-icon-button>
-      </div>
+          <paper-icon-button id="addComment" icon="my-icons:add-circle-outline" title="add comment" on-tap="addCommentBox" disabled="{{_disableAddComment(commentList)}}"></paper-icon-button>
+        </div>
       <div class="buttons">
         <paper-button dialog-dismiss on-tap="_clearUploadInput">Cancel</paper-button>
         <paper-button id="acceptUploadBtn" dialog-confirm autofocus disabled on-tap="handleJsonUpload">Upload</paper-button>
@@ -384,43 +391,45 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </paper-dialog>
     <paper-dialog modal id="searchFilterModal">
       <h2>Filter Models</h2>
-      <div class="filter-input">
-        <paper-dropdown-menu id="user-dropdown" label="Select User">
-          <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{filterSelectedUser}}">
-            <template is="dom-repeat" items="[[searchOptionsMap.user]]">
-              <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
-            </template>
-          </paper-listbox>
-        </paper-dropdown-menu>
-        <paper-icon-button class="clear-filter-input" id="clearFilterUser" icon="my-icons:clear" title="clear user" on-tap="clearSearchField"></paper-icon-button>
-      </div>
-      <div class="filter-input">
-        <paper-dropdown-menu id="project-dropdown" label="Select Project">
-          <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{filterSelectedProject}}">
-            <template is="dom-repeat" items="[[searchOptionsMap.project]]">
-              <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
-            </template>
-          </paper-listbox>
+      <paper-dialog-scrollable>
+        <div class="filter-input">
+          <paper-dropdown-menu id="user-dropdown" label="Select User">
+            <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{filterSelectedUser}}">
+              <template is="dom-repeat" items="[[searchOptionsMap.user]]">
+                <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
+              </template>
+            </paper-listbox>
           </paper-dropdown-menu>
-        <paper-icon-button class="clear-filter-input" id="clearFilterProject" icon="my-icons:clear" title="clear project" on-tap="clearSearchField"></paper-icon-button>
-      </div>
-      <div class="filter-input">
-        <paper-dropdown-menu id="office-dropdown" label="Select Office">
-          <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{filterSelectedOffice}}">
-            <template is="dom-repeat" items="[[searchOptionsMap.office]]">
-              <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
-            </template>
-          </paper-listbox>
-        </paper-dropdown-menu>
-      <paper-icon-button class="clear-filter-input" id="clearFilterOffice" icon="my-icons:clear" title="clear office" on-tap="clearSearchField"></paper-icon-button>
-      </div>
-      <vaadin-date-picker id="from-upload-date" label="(Upload date) From" min="{{minUploadFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
-      <vaadin-date-picker id="to-upload-date" label="(Upload date) To" min="{{minUploadFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
-      <div class="buttons">
-        <paper-button dialog-dismiss on-tap="clearAllFilters">Clear all</paper-button>
-        <paper-button dialog-dismiss on-tap="clearFilterInput">Cancel</paper-button>
-        <paper-button on-tap="setSearchFilters">Apply</paper-button>
-      </div>
+          <paper-icon-button class="clear-filter-input" id="clearFilterUser" icon="my-icons:clear" title="clear user" on-tap="clearSearchField"></paper-icon-button>
+        </div>
+        <div class="filter-input">
+          <paper-dropdown-menu id="project-dropdown" label="Select Project">
+            <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{filterSelectedProject}}">
+              <template is="dom-repeat" items="[[searchOptionsMap.project]]">
+                <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
+              </template>
+            </paper-listbox>
+            </paper-dropdown-menu>
+          <paper-icon-button class="clear-filter-input" id="clearFilterProject" icon="my-icons:clear" title="clear project" on-tap="clearSearchField"></paper-icon-button>
+        </div>
+        <div class="filter-input">
+          <paper-dropdown-menu id="office-dropdown" label="Select Office">
+            <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{filterSelectedOffice}}">
+              <template is="dom-repeat" items="[[searchOptionsMap.office]]">
+                <paper-item class="dropdown-item" name="[[item]]">[[item]]</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
+        <paper-icon-button class="clear-filter-input" id="clearFilterOffice" icon="my-icons:clear" title="clear office" on-tap="clearSearchField"></paper-icon-button>
+        </div>
+        <vaadin-date-picker id="from-upload-date" label="(Upload date) From" min="{{minUploadFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
+        <vaadin-date-picker id="to-upload-date" label="(Upload date) To" min="{{minUploadFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
+        <div class="buttons">
+          <paper-button dialog-dismiss on-tap="clearAllFilters">Clear all</paper-button>
+          <paper-button dialog-dismiss on-tap="clearFilterInput">Cancel</paper-button>
+          <paper-button on-tap="setSearchFilters">Apply</paper-button>
+        </div>
+      </paper-dialog-scrollable>
     </paper-dialog>
     <paper-toast id="searchResultMsg"></paper-toast>
     <paper-toast id="validationToast" duration="0" class="fit-bottom">
@@ -1224,6 +1233,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               that.jsonUploadPayload.modelInformation.user = that.userEmail
               that.jsonUploadPayload.modelInformation.project = that.uploadSelectedProject
               that.jsonUploadPayload.modelInformation.office = that.uploadSelectedOffice
+              //add tag for JSONCreateDate too
+              that.jsonUploadPayload.modelInformation.JSONCreateDate = that.jsonUploadPayload.modelInformation.JSONCreateDate
               //the two rows below create an "untagged" object containing user's comments at upload
               that.jsonUploadPayload.modelInformation.untagged = {}
               that.jsonUploadPayload.modelInformation.untagged.comments = that.finalCommentArr()
