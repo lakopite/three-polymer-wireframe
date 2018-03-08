@@ -297,6 +297,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: #448AFF;
       }
 
+      paper-dialog#archiveModal {
+        border: 2px solid;
+        border-color: var(--app-primary-color);
+      }
+
       paper-spinner.loading {
         --paper-spinner-layer-1-color: var(--paper-blue-grey-500);
         --paper-spinner-layer-2-color: var(--paper-blue-grey-500);
@@ -350,6 +355,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <iron-ajax headers="{{authHeaders}}" id="model-request" method="GET" handle-as="json" on-response="handleDataResponse" on-error="handleDataError"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="json-upload-request" method="POST" content-type="application/json" body='[[jsonUploadPayload]]' on-response="handleUploadResponse" url="[[baseUrl]]post-model"></iron-ajax>
     <iron-ajax headers="{{authHeaders}}" id="get-model-status" method="GET" handle-as="json" on-response="getModelStatus"></iron-ajax>
+    <iron-ajax headers="{{authHeaders}}" id="archive-model" method="GET" handle-as="json" on-response="archiveModel"></iron-ajax>
     <iron-ajax id="get-latest-fe-commit" method="GET" url="https://api.github.com/repos/lakopite/three-polymer-wireframe/git/refs/heads/master" handle-as="json" on-response="handleGetLatestFeCommitResp" on-error="handleGetLatestCommitError"></iron-ajax>
     <iron-ajax id="get-latest-fe-commit-date" method="GET" url="https://api.github.com/repos/lakopite/three-polymer-wireframe/git/commits/[[feSha]]" handle-as="json" on-response="handleGetLatestFeCommitDateResp" on-error="handleGetLatestCommitDateError"></iron-ajax>
     <iron-ajax id="get-latest-be-commit" method="GET" url="https://api.github.com/repos/lakopite/model-viewer-api/git/refs/heads/master" handle-as="json" on-response="handleGetLatestBeCommitResp" on-error="handleGetLatestCommitError"></iron-ajax>
@@ -530,8 +536,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <app-header slot="header" medium-tall>
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
+        <paper-icon-button class="archive-icon" icon="my-icons:archive" on-tap="confirmArchive"></paper-icon-button>
+
+        <paper-dialog id="archiveModal">
+          <h3>Are you sure you want to remove the following model?</h3>
+           <h4>[[selectedModel]]</h4>
+           <br />
+          <paper-button dialog-dismiss>Cancel</paper-button>
+          <paper-button dialog-dismiss on-tap="agreeToArchive">Yes</paper-button>
+        </paper-dialog>
+
         <div main-title>
-          Arup Model QuickView: [[_formatModelName(selectedModel)]]
+            Arup Model QuickView: [[_formatModelName(selectedModel)]]
           <div class="JSON-generated-details">
             <!-- JSON generated on:  -->
             {{ _jsonGenerated(currentModelResp.modelInformation.JSONCreateDate) }}
@@ -1334,6 +1350,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         console.log(this.modelStatusResp);
       }
 
+      confirmArchive() {
+        this.$.archiveModal.open()
+      }
+
+      agreeToArchive() {
+        this.$['archive-model'].url = this.baseUrl + "archive-model/" + this.selectedModel;
+        this.$['archive-model'].generateRequest();
+        //reload dataoptions to get new model now that it's added
+        this.$['get-models-request'].generateRequest();
+      }
+
+      archiveModel(event, response) {
+        console.log(this.selectedModel + " archive status", response.response);
+      }
+
       //removed rounding functions because when I applied this to the value of the geometryfilters.#min/Max, applyFilters did not work
       // _roundDown(n) {
       //   return typeof n !== 'undefined' ? _.floor(n, 1) : ""
@@ -1649,8 +1680,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                this.strOtherUnitSum = _.round(sumByGroup/46656, 0)
                this.$.otherUnitColumn.hidden = false
              } else if (that.selectedSumField.includes('area')) {
-               this.$.otherUnitColumn.hidden = true
-               // this.strOtherUnitSum = _.round(sumByGroup/144, 0)
+               this.$.otherUnitColumn.hidden = false
+               this.strOtherUnitSum = _.round(sumByGroup/144, 0)
              } else if (that.selectedSumField.includes('thickness')) {
                this.$.otherUnitColumn.hidden = true
              }
@@ -1668,6 +1699,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                this.$.otherUnitColumn.hidden = true
              }
              // NOTE: IF AREA COMES IN METRIC, WHAT TO CONVERT IT TO???
+             else if (that.selectedSumField.includes('area')) {
+               this.$.otherUnitColumn.hidden = false
+               // this.strOtherUnitSum = _.round(sumByGroup/?, 0)
+             }
            }
            var groupSumDataSetup = {
              'group': this.groupKeys[i],
