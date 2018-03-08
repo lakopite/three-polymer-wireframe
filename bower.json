@@ -37,7 +37,7 @@
     "vaadin-date-picker": "vaadin/vaadin-date-picker#^2.0.6",
     "paper-fab": "PolymerElements/paper-fab#~2.0.0",
     "paper-card": "PolymerElements/paper-card#^2.0.0",
-    "paper-dialog-scrollable": "PolymerElements\\paper-dialog-scrollable#^2.2.0"
+    "paper-dialog-scrollable": "PolymerElements/paper-dialog-scrollable#^2.2.0"
   },
   "resolutions": {
     "polymer": "2.1.0",
