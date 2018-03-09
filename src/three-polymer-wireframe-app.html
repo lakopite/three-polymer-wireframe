@@ -349,6 +349,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: flex;
       }
 
+      #hold-header {
+        display: block;
+      }
+
     </style>
 
     <iron-ajax headers="{{authHeaders}}" id="get-models-request" method="GET" url="[[baseUrl]]get-models" handle-as="json" on-response="handleOptionsResponse" on-error="handleOptionsError"></iron-ajax>
@@ -536,17 +540,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <app-header slot="header" medium-tall>
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-        <paper-icon-button class="archive-icon" icon="my-icons:archive" on-tap="confirmArchive"></paper-icon-button>
+        <paper-icon-button class="archive-icon" icon="my-icons:archive" title="remove model" on-tap="confirmArchive"></paper-icon-button>
 
         <paper-dialog id="archiveModal">
-          <h3>Are you sure you want to remove the following model?</h3>
+          <h3>Are you sure you want to archive the following model?</h3>
            <h4>[[selectedModel]]</h4>
            <br />
           <paper-button dialog-dismiss>Cancel</paper-button>
-          <paper-button dialog-dismiss on-tap="agreeToArchive">Yes</paper-button>
+          <paper-button class="filterBtn" dialog-dismiss on-tap="agreeToArchive">Archive</paper-button>
         </paper-dialog>
 
-        <div main-title>
+        <div id="hold-header" main-title>
             Arup Model QuickView: [[_formatModelName(selectedModel)]]
           <div class="JSON-generated-details">
             <!-- JSON generated on:  -->
