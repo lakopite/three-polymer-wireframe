@@ -547,7 +547,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
            <h4>[[selectedModel]]</h4>
            <br />
           <paper-button dialog-dismiss>Cancel</paper-button>
-          <paper-button class="filterBtn" dialog-dismiss on-tap="agreeToArchive">Archive</paper-button>
+          <paper-button raised class="filterBtn" dialog-dismiss on-tap="agreeToArchive">Archive</paper-button>
         </paper-dialog>
 
         <div id="hold-header" main-title>
@@ -1320,9 +1320,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.backoffCounter = 0;
             if (this.modelStatusResp.latestStatus === 200) {
               //reload dataoptions to get new model now that it's added
-              this.$['get-models-request'].generateRequest();
-              this.selectedModel = this.fullFileNameNoExtension
-              window.location.href = window.location.pathname + '#' + this.fullFileNameNoExtension
+              // console.log(this.handleUploadResponse());
+              // this.$['get-models-request'].generateRequest();
+              // this.selectedModel = this.fullFileNameNoExtension
+              // window.location.href = window.location.pathname + '#' + this.fullFileNameNoExtension
               //if no filters were applied at time of upload, simply show succes message to user
               if (this.filterSelectedUser === undefined &&  this.filterSelectedProject === undefined && this.filterSelectedOffice === undefined) {
                 this.$.uploadSuccessToast.show({ text: "Upload successful"})
@@ -1361,12 +1362,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       agreeToArchive() {
         this.$['archive-model'].url = this.baseUrl + "archive-model/" + this.selectedModel;
         this.$['archive-model'].generateRequest();
-        //reload dataoptions to get new model now that it's added
-        this.$['get-models-request'].generateRequest();
       }
 
       archiveModel(event, response) {
         console.log(this.selectedModel + " archive status", response.response);
+        //reload dataoptions now that this model has been removed
+        if ("success" in response.response) {
+          this.$['get-models-request'].generateRequest();
+          this.selectedModel = this.dataOptions[0];
+        }
       }
 
       //removed rounding functions because when I applied this to the value of the geometryfilters.#min/Max, applyFilters did not work
@@ -2026,7 +2030,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleGetLatestFeCommitResp(event, response) {
         var resp = response.response;
-        console.log(resp);
+        // console.log(resp);
         // console.log(resp.object.sha);
         this.feSha = resp.object.sha
         this.$['get-latest-fe-commit-date'].generateRequest();
@@ -2034,7 +2038,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleGetLatestBeCommitResp(event, response) {
         var resp = response.response;
-        console.log(resp);
+        // console.log(resp);
         // console.log(resp.object.sha);
         this.beSha = resp.object.sha;
         this.$['get-latest-be-commit-date'].generateRequest();
@@ -2048,19 +2052,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       handleGetLatestFeCommitDateResp(event, response) {
           var resp = response.response;
-          console.log(resp);
+          // console.log(resp);
           var date = resp.author.date;
           // console.log(date);
-          console.log(date.slice(0, 10));
+          // console.log(date.slice(0, 10));
           this.frontEndBuildDate = date.slice(0, 10);
       }
 
       handleGetLatestBeCommitDateResp(event, response) {
           var resp = response.response;
-          console.log(resp);
+          // console.log(resp);
           var date = resp.author.date;
           // console.log(date);
-          console.log(date.slice(0, 10));
+          // console.log(date.slice(0, 10));
           this.backEndBuildDate = date.slice(0, 10);
       }
 
@@ -2817,10 +2821,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       handleUploadResponse(event, response) {
         var resp = response.response;
         // console.log(resp);
-        // if ("success" in resp) {
-        //   this.$['get-models-request'].generateRequest();
-        //   this.$.pollingStatusToast.show({ text: "Upload successful!"})
-        // } else {
+        if ("success" in resp) {
+          this.$['get-models-request'].generateRequest();
+          this.selectedModel = this.fullFileNameNoExtension
+          window.location.href = window.location.pathname + '#' + this.fullFileNameNoExtension
+        //   // this.$.pollingStatusToast.show({ text: "Upload successful!"})
+        }
+        // else {
         //   if ("error" in resp) {
         //     this.$.validationToast.show({ text: resp["Error"]})
         //   }
