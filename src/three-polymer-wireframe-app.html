@@ -1747,7 +1747,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var resultFilterInput = _.concat(this.linearStringFilterResult, this.planarStringFilterResult)
         // this is to add a propertyname field that groups together anything after the last underscore in case naming convention divided this
         resultFilterInput = _.forEach(resultFilterInput, function(o) {
-          var propname = o.metadata.propertyname;
+          if (o.metadata.propertyname) {
+            var propname = o.metadata.propertyname;
+          } else {
+            var propname = o.metadata.meta_propname_1;
+          }
           var splitPropname = propname.split("_");
           return o.metadata.propertyname_last = splitPropname[splitPropname.length-1];
         })
@@ -2362,7 +2366,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var resultFilterInput = _.concat(this.linearStringFilterResult, this.planarStringFilterResult)
         // this is to add a propertyname field that groups together anything after the last underscore in case naming convention divided this
         resultFilterInput = _.forEach(resultFilterInput, function(o) {
-          var propname = o.metadata.propertyname;
+          if (o.metadata.propertyname) {
+            var propname = o.metadata.propertyname;
+          } else {
+            var propname = o.metadata.meta_propname_1;
+          }
           var splitPropname = propname.split("_");
           return o.metadata.propertyname_last = splitPropname[splitPropname.length-1];
         })
