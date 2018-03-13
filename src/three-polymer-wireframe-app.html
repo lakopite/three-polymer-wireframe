@@ -449,6 +449,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-toast id="pollingStatusToast" duration="0"></paper-toast>
     <paper-toast id="uploadSuccessToast" duration="3000"></paper-toast>
     <paper-toast id="linkFailToast" duration="3000"></paper-toast>
+    <paper-toast id="archivingToast" duration="5000"></paper-toast>
     <app-drawer-layout fullbleed>
     <!-- Drawer content -->
     <app-drawer id="drawer" slot="drawer">
@@ -503,33 +504,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
       </div>
       <!-- for numerical aggregations -->
-      <div hidden$="{{_hideQuantCsvButton(selectedView)}}">
+      <div hidden$="{{_hideCsvButton(selectedView)}}">
         <div class="csv-wrapper">
-          <div hidden$="[[!showNumericalAggregations]]">
-            <div class="csv-button">
-              <paper-button id="csv-button" on-tap="createNumericalCsv">Export Table to CSV</paper-button>
-            </div>
+          <div class="csv-button">
+            <paper-button id="csv-button" on-tap="createCsv">Export Table to CSV</paper-button>
           </div>
         </div>
       </div>
-      <!-- for string aggregations -->
-      <div hidden$="{{_hideQuantCsvButton(selectedView)}}">
-        <div class="csv-wrapper">
-          <div hidden$="[[!showStringAggregations]]">
-            <div class="csv-button">
-              <paper-button id="csv-button" on-tap="createGroupDataCsv">Export Table to CSV</paper-button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- for cost aggregations -->
-      <div hidden$="{{_hideCostCsvButton(selectedView)}}">
-        <div class="csv-wrapper">
-            <div class="csv-button">
-              <paper-button id="csv-button" on-tap="createCostDataCsv">Export Table to CSV</paper-button>
-            </div>
-        </div>
-      </div>
+      <!-- end button -->
     </div>
     </div>
   </div>
@@ -566,6 +548,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           FE build date: [[frontEndBuildDate]]<span class="pat"></span>
           BE build date: [[backEndBuildDate]]
         </div>
+        <span class="pat"></span>
         <div class="spacer"></div>
         <paper-dialog modal id="loadingData">
           <h3>Pulling data from server, please wait</h3>
@@ -1198,7 +1181,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _enableUploadBtn() {
-        //inputs fire this on-change and dropdown menus on on-iron-select
+        //input fires this on-input file on-change) and dropdown menus on on-iron-select
         this.userEmail = Polymer.dom(this.root).querySelector('#user-email').value
         this.file = this.$.modelUpload.files[0]
         this.uploadSelectedProject = Polymer.dom(this.root).querySelector('#project-dropdown').value
@@ -1364,6 +1347,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       agreeToArchive() {
         this.$['archive-model'].url = this.baseUrl + "archive-model/" + this.selectedModel;
         this.$['archive-model'].generateRequest();
+        this.$.archivingToast.show({ text: "Archiving model, please wait"});
       }
 
       archiveModel(event, response) {
@@ -2199,12 +2183,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return this.selectedView === 'aggregations-view' || this.selectedView === 'cost-view';
       }
 
-      _hideQuantCsvButton(_currentPage) {
-        return this.selectedView === 'model-view' || this.selectedView === 'cost-view';
+      _hideCsvButton(_currentPage) {
+        return this.selectedView !== 'aggregations-view' && this.selectedView !== 'cost-view';
       }
 
-      _hideCostCsvButton(_currentPage) {
-        return this.selectedView !== 'cost-view';
+      createCsv() {
+        if (this.selectedView === 'aggregations-view') {
+          if (this.showNumericalAggregations) {
+            this.createNumericalCsv();
+          }
+          else if (this.showStringAggregations) {
+            this.createGroupDataCsv();
+          }
+        } else if (this.selectedView === 'cost-view') {
+          this.createCostDataCsv();
+        }
       }
 
       _disableCostTab(_currentMetadataFields, _currentModel, _geoFilter) {
