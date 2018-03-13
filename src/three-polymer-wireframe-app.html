@@ -2561,7 +2561,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _initData(dataOptions_) {
         //this.set('dataOptions', dataOptions_)
         //sort by date
-        this.set('dataOptions', _.sortBy(dataOptions_, [function(o) { return o.s3_attributes.uploadTime }]));
+        this.set('dataOptions', _.orderBy(dataOptions_, [function(o) { return o.s3_attributes.uploadTime; }], ['desc']));
+        console.log(this.dataOptions);
         if (this.dataOptions.length > 0) {
           var link_ = window.location.hash.replace("#","");
           var linkIndex = -1;
