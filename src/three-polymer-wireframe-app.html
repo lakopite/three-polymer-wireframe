@@ -367,7 +367,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
       <paper-dialog-scrollable>
-        <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" on-change="_enableUploadBtn">
+        <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" on-input="_enableUploadBtn">
           <div slot="suffix" label="user">@arup.com</div>
         </paper-input>
         <paper-dropdown-menu id="project-dropdown" label="Select Project" on-iron-select="_enableUploadBtn">
@@ -1203,10 +1203,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.file = this.$.modelUpload.files[0]
         this.uploadSelectedProject = Polymer.dom(this.root).querySelector('#project-dropdown').value
         this.uploadSelectedOffice = Polymer.dom(this.root).querySelector('#office-dropdown').value
-        if (!_.isEmpty(this.userEmail) && !_.isEmpty(this.uploadSelectedProject) && !_.isEmpty(this.file.name) && !_.isEmpty(this.uploadSelectedOffice)) {
-          this.$.acceptUploadBtn.disabled = false
-        } else {
-          this.$.acceptUploadBtn.disabled = true
+        if (this.file) {
+          if (!_.isEmpty(this.userEmail) && !_.isEmpty(this.uploadSelectedProject) && !_.isEmpty(this.file.name) && !_.isEmpty(this.uploadSelectedOffice)) {
+            this.$.acceptUploadBtn.disabled = false
+          } else {
+            this.$.acceptUploadBtn.disabled = true
+          }
         }
       }
 
