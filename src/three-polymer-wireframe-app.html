@@ -503,19 +503,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <paper-button class="filterBtn" raised disabled$="{{modelLoading}}" id="resetBtn" on-tap="resetFilters" type="number">Reset</paper-button>
         </div>
       </div>
-      <!-- for numerical aggregations -->
+      <!-- for csv xport button -->
       <div hidden$="{{_hideCsvButton(selectedView)}}">
-        <div class="csv-wrapper">
-          <div class="csv-button">
-            <paper-button id="csv-button" on-tap="createCsv">Export Table to CSV</paper-button>
-          </div>
+        <div class="csv-button">
+          <paper-button id="csv-button" on-tap="createCsv">Export Table to CSV</paper-button>
         </div>
       </div>
       <!-- end button -->
     </div>
     </div>
-  </div>
-  </div>
+  <!-- </div>
+  </div> -->
   </app-drawer>
   <!-- Main content -->
     <app-header-layout has-scrolling-region>
@@ -2091,7 +2089,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (this.numericalAggregationsTableData.length > 0) {
           for (var i=0; i < this.numericalAggregationsTableData.length; i++) {
             this.numDataHeaders = _.keys(this.numericalAggregationsTableData[i])
-            var el = [_.values(this.numericalAggregationsTableData[i])] + '\r\n'
+            var el = _.values(this.numericalAggregationsTableData[i]) + '\r\n'
           	rowData += el
           }
           var that = this;
@@ -2119,7 +2117,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (this.groupSumData.length > 0) {
           for (var i=0; i < this.groupSumData.length; i++) {
             this.groupDataHeaders = _.keys(this.groupSumData[i])
-            var el = [_.values(this.groupSumData[i])] + '\r\n'
+            var el = _.values(this.groupSumData[i]) + '\r\n'
             rowData += el
           }
           var that = this;
@@ -2151,7 +2149,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (this.costTableData.length > 0) {
           for (var i=0; i < this.costTableData.length; i++) {
             this.costTableHeaders = _.keys(this.costTableData[i])
-            var el = [_.values(this.costTableData[i])] + '\r\n'
+            var el = _.values(this.costTableData[i]) + '\r\n'
             rowData += el
           }
           var that = this;
