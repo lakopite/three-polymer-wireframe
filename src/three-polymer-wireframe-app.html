@@ -436,7 +436,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <vaadin-date-picker id="to-upload-date" label="(Upload date) To" min="{{minUploadFromDate}}" max="[[todaysDate()]]"></vaadin-date-picker>
         <div class="buttons">
           <paper-button dialog-dismiss on-tap="clearAllFilters">Clear all</paper-button>
-          <paper-button dialog-dismiss on-tap="clearFilterInput">Cancel</paper-button>
+          <paper-button dialog-dismiss on-tap="cancelFilterInput">Cancel</paper-button>
           <paper-button on-tap="setSearchFilters">Apply</paper-button>
         </div>
       </paper-dialog-scrollable>
@@ -1302,23 +1302,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             //once status is found, handle succesfully completed upload
             this.backoffCounter = 0;
             if (this.modelStatusResp.latestStatus === 200) {
-              //if no filters were applied at time of upload, simply show success message to user
-              if (this.filterSelectedUser === undefined &&  this.filterSelectedProject === undefined && this.filterSelectedOffice === undefined) {
-                this.$.uploadSuccessToast.show({ text: "Upload successful"})
-              } else {
-                //if filters applied at time of upload, remove them so user can be redirected to model without upload needing to be within filter results
-                  this.clearFilterInput()
-                  this.userSearchInput = {
-                    'user': undefined,
-                    'project': undefined,
-                    'office': undefined,
-                    'minUploadDate': this.minUploadFromDate,
-                    'maxUploadDate': this.todaysDate()
-                  }
-                  this.$.searchOptions.render();
-                  this.$.filterIcon.style.color = ''
-                  this.$.uploadSuccessToast.show({ text: "Upload successful, filters removed"})
-              }
+              //remove all filters so user can be redirected to model without upload needing to be within filter results
+              this.clearAllFilters();
+              this.$.uploadSuccessToast.show({ text: "Upload successful, filters removed"})
               //refresh models and redirect to new model
               this.$['get-models-request'].generateRequest();
               this.selectedModel = this.fullFileNameNoExtension
@@ -2586,10 +2572,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.filterSelectedOffice = undefined,
         Polymer.dom(this.root).querySelector("#from-upload-date").value = undefined,
         Polymer.dom(this.root).querySelector("#to-upload-date").value = undefined
-        this.setSearchFilters()
+        this.setSearchFilters();
+        this.$.searchOptions.render();
+        this.$.filterIcon.style.color = '';
       }
 
-      clearFilterInput() {
+      cancelFilterInput() {
         // removes user input from search filters modal only if no filters are currently applied
         if (this.userSearchInput === undefined) {
           this.filterSelectedUser = undefined,
@@ -2679,17 +2667,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           // console.log(that.includedModels);
           if (that.includedModels.length === 0) {
             //if user input renders no results, remove search filters
-            that.clearFilterInput()
-            that.userSearchInput = {
-              'user': undefined,
-              'project': undefined,
-              'office': undefined,
-              'minUploadDate': that.minUploadFromDate,
-              'maxUploadDate': that.todaysDate()
-            }
-            that.$.searchOptions.render();
+            that.clearAllFilters();
             var toast = Polymer.dom(that.root).querySelector('#searchResultMsg')
-            that.$.filterIcon.style.color = ''
             toast.show({ text: "No search results; filters removed" })
           } else {
             // console.log(that.$.searchOptions.filter);
