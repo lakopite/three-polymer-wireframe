@@ -1304,9 +1304,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if (this.modelStatusResp.latestStatus === 200) {
               //reload dataoptions to get new model now that it's added
               // console.log(this.handleUploadResponse());
-              this.$['get-models-request'].generateRequest();
-              this.selectedModel = this.fullFileNameNoExtension
-              window.location.href = window.location.pathname + '#' + this.fullFileNameNoExtension
+              // this.$['get-models-request'].generateRequest();
+              // this.selectedModel = this.fullFileNameNoExtension
+              // window.location.href = window.location.pathname + '#' + this.fullFileNameNoExtension
               //if no filters were applied at time of upload, simply show succes message to user
               if (this.filterSelectedUser === undefined &&  this.filterSelectedProject === undefined && this.filterSelectedOffice === undefined) {
                 this.$.uploadSuccessToast.show({ text: "Upload successful"})
@@ -1324,6 +1324,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                   this.$.filterIcon.style.color = ''
                   this.$.uploadSuccessToast.show({ text: "Upload successful, filters removed"})
               }
+              //refresh models and redirect to new model
+              this.$['get-models-request'].generateRequest();
+              this.selectedModel = this.fullFileNameNoExtension
+              window.location.href = window.location.pathname + '#' + this.fullFileNameNoExtension
               //handles upload failure
             } else if (this.modelStatusResp.latestStatus === 500) {
               this.$.validationToast.show({ text: this.modelStatusResp.latestLogMessage})
