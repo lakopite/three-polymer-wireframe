@@ -341,8 +341,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         font-size: .7em;
       }
 
-      .uploaded-details, .JSON-generated-details {
-        font-size: .65em;
+      .model-version-details, .uploaded-details, .JSON-generated-details {
+        font-size: .6em;
       }
 
       .buttons {
@@ -350,6 +350,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       #hold-header {
+        margin-top: 1em;
         display: block;
       }
 
@@ -467,7 +468,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <paper-item id="model-dropdown" class="dropdown-item" name="[[item.model]]">
               <paper-item-body two-line>
                 <div class="primary-item">[[_formatModelName(item.model)]]</div>
-                <div secondary class="secondary-item">[[_formatModelTimeStamp(item.model)]]</div>
+                <div secondary class="secondary-item">[[_formatModelTimeStamp(item.s3_attributes.uploadTime)]]</div>
               </paper-item-body>
           </paper-item>
         </template>
@@ -529,13 +530,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <paper-button dialog-dismiss>Cancel</paper-button>
           <paper-button raised class="filterBtn" dialog-dismiss on-tap="agreeToArchive">Archive</paper-button>
         </paper-dialog>
-
         <div id="hold-header" main-title>
             Arup Model QuickView: [[_formatModelName(selectedModel)]]
-          <div class="JSON-generated-details">
-            <!-- JSON generated on:  -->
-            {{ _jsonGenerated(currentModelResp.modelInformation.JSONCreateDate) }}
+          <div class="model-version-details">
+            <!-- model version date:  -->
+            {{ _modelVersion(currentModelResp.modelInformation.VersionDate) }}
           </div>
+          <!-- <div class="JSON-generated-details"> -->
+            <!-- JSON generated on:  -->
+            <!-- {{ _jsonGenerated(currentModelResp.modelInformation.JSONCreateDate) }} -->
+          <!-- </div> -->
           <div class="uploaded-details">
             <!-- JSON uploaded on:  -->
             {{_uploadedInfo(currentModelResp.modelInformation.s3_attributes.uploadTime, currentModelResp.modelInformation.user)}}
@@ -1077,22 +1081,40 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }),' ')
       }
 
-      _formatModelTimeStamp(modelName) {
-        //to get upload timestamp of model (for secondary text of item in dropdown)
-        var arr = modelName.split("_")
-        if (arr.length > 2) {
-          if (!isNaN(arr[arr.length-1]) && !isNaN(arr[arr.length-2])) {
-            return arr[arr.length-2] + " " + arr[arr.length-1]
-          }
-          if (!isNaN(arr[0]) && !isNaN(arr[1])) {
-            return arr[0] + " " + arr[1]
-          }
-          if (!isNaN(arr[0])) {
-            return arr[0]
-          }
-        }
-        return ""
+      _formatModelTimeStamp(_date) {
+        var date = new Date(_date);
+        var utcDate = new Date(date.toUTCString());
+        utcDate.setHours(utcDate.getHours()-7);
+        var pacificDate = new Date(utcDate);
+        //format: yymmdd_hhmmss
+        var _date = (pacificDate.getDate() <= 9 ? '0': '') + (pacificDate.getDate())
+        var _month = (pacificDate.getMonth() <= 9 ? '0': '') + (pacificDate.getMonth()+1)
+        var _year = pacificDate.getFullYear();
+        var _year_formatted = _year.toString().substring(2)
+        var _hour = (pacificDate.getHours() <= 9 ? '0': '') + pacificDate.getHours()
+        var Mins = (pacificDate.getMinutes() <= 9 ? '0': '') + pacificDate.getMinutes()
+        var Secs = (pacificDate.getSeconds() <= 9 ? '0': '') + pacificDate.getSeconds()
+        // var timeFormat = _year_formatted + _month + _date + "_" + _hour + Mins + Secs
+        var timeFormat = _year_formatted + _month + _date + " " + _hour  + ':' + Mins + ':' + Secs
+        return timeFormat
       }
+
+      // _formatModelTimeStamp(modelName) {
+      //   //to get FE generated timestamp of model (for secondary text of item in dropdown)
+      //   var arr = modelName.split("_")
+      //   if (arr.length > 2) {
+      //     if (!isNaN(arr[arr.length-1]) && !isNaN(arr[arr.length-2])) {
+      //       return arr[arr.length-2] + " " + arr[arr.length-1]
+      //     }
+      //     if (!isNaN(arr[0]) && !isNaN(arr[1])) {
+      //       return arr[0] + " " + arr[1]
+      //     }
+      //     if (!isNaN(arr[0])) {
+      //       return arr[0]
+      //     }
+      //   }
+      //   return ""
+      // }
 
       _jsonGenerated(_date) {
         // to display the user that uploaded current model
@@ -1111,7 +1133,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           user = "unavailable user"
         }
         // to display the user that uploaded current model
-        return "Model uploaded on " + uploadTime + " by " + user
+        return "Model uploaded on " + this._convertUTCToPacific(uploadTime) + " by " + user
+      }
+
+      _modelVersion(_date) {
+        // to display the user that uploaded current model
+        if (_.isEmpty(_date)) {
+          return ''
+        } else {
+          return "Model version date: " + _date
+        }
       }
 
       requestModelStatus() {
@@ -1197,7 +1228,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var inputFile = this.$.modelUpload.files[0]
         var fileName = inputFile.name
         var extension = fileName.slice(fileName.indexOf('.'))
-        var fileNameWithTimeStamp = fileName.slice(0, fileName.lastIndexOf('.')) + "_" + this._dateTimeFormat() + extension
+        var fileNameWithTimeStamp = fileName.slice(0, fileName.lastIndexOf('.')) + "_" + this._currentDateTimeFormat() + extension
         this.fullFileNameNoExtension = fileNameWithTimeStamp.slice(0, fileNameWithTimeStamp.lastIndexOf('.'))
       	var reader = new FileReader()
         var that = this;
@@ -2047,8 +2078,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.backEndBuildDate = 'unavailable';
       }
 
-      _dateTimeFormat() {
-        // displays current timestamp with format: ymmdd_hhmmss
+      _currentDateTimeFormat() {
+        // displays current timestamp with format: yymmdd_hhmmss
         var d = new Date();
         var curr_date = (d.getDate() <= 9 ? '0': '') + (d.getDate())
         var curr_month = (d.getMonth() <= 9 ? '0': '') + (d.getMonth()+1)
@@ -2060,6 +2091,40 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var timeFormat = curr_year_formatted + curr_month + curr_date + "_" + curr_hour + currMins + currSecs
         return timeFormat
       }
+
+      _convertUTCToPacific(_date) {
+        var date = new Date(_date);
+        var utcDate = new Date(date.toUTCString());
+        utcDate.setHours(utcDate.getHours()-7);
+        var pacificDate = new Date(utcDate);
+        //format: yymmdd_hhmmss
+        var _date = (pacificDate.getDate() <= 9 ? '0': '') + (pacificDate.getDate())
+        var _month = (pacificDate.getMonth() <= 9 ? '0': '') + (pacificDate.getMonth()+1)
+        var _year = pacificDate.getFullYear();
+        var _year_formatted = _year.toString().substring(2)
+        var _hour = (pacificDate.getHours() <= 9 ? '0': '') + pacificDate.getHours()
+        var Mins = (pacificDate.getMinutes() <= 9 ? '0': '') + pacificDate.getMinutes()
+        var Secs = (pacificDate.getSeconds() <= 9 ? '0': '') + pacificDate.getSeconds()
+        // var timeFormat = _year_formatted + _month + _date + "_" + _hour + Mins + Secs
+        var timeFormat = _year + '-' + _month  + '-' + _date + " " + _hour  + ':' + Mins + ':' + Secs
+        return timeFormat
+      }
+
+      // _toUTCFormat(date) {
+      //   //convert a date to utc
+      //   var date = new Date(date);
+      //   var utc = new Date( date.getTime() + (date.getTimezoneOffset() * 60000));
+      //   //format: yymmdd_hhmmss
+      //   var curr_date = (utc.getDate() <= 9 ? '0': '') + (utc.getDate())
+      //   var curr_month = (utc.getMonth() <= 9 ? '0': '') + (utc.getMonth()+1)
+      //   var curr_year = utc.getFullYear();
+      //   var curr_year_formatted = curr_year.toString().substring(2)
+      //   var curr_hour = (utc.getHours() <= 9 ? '0': '') + utc.getHours()
+      //   var currMins = (utc.getMinutes() <= 9 ? '0': '') + utc.getMinutes()
+      //   var currSecs = (utc.getSeconds() <= 9 ? '0': '') + utc.getSeconds()
+      //   var timeFormat = curr_year_formatted + curr_month + curr_date + "_" + curr_hour + currMins + currSecs
+      //   return timeFormat
+      // }
 
       _currentFilters() {
         // displays currently applied geometry filters
@@ -2085,7 +2150,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return h + that._quantUnitLabels(that.selectedContourBy)
           })
           this.numDataHeaders = headers_ + '\r\n'
-          var csvData = this.numDataHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + "Downloaded on: " + this._dateTimeFormat()
+          var csvData = this.numDataHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + "Downloaded on: " + this._currentDateTimeFormat()
           var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
           var link = document.createElement("a");
           link.href = uri;
@@ -2117,7 +2182,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return that.selectedSumField + " " + h + that._quantUnitLabels(that.selectedSumField)
           })
           this.groupDataHeaders = headers_ + '\r\n';
-          var csvData = this.groupDataHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + "Downloaded on: " + this._dateTimeFormat()
+          var csvData = this.groupDataHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + "Downloaded on: " + this._currentDateTimeFormat()
           var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
           var link = document.createElement("a");
           link.href = uri;
@@ -2154,7 +2219,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
           })
           this.costTableHeaders = headers_ + '\r\n';
-          var csvData = this.costTableHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + "Downloaded on: " + this._dateTimeFormat()
+          var csvData = this.costTableHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + "Downloaded on: " + this._currentDateTimeFormat()
           var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
           var link = document.createElement("a");
           link.href = uri;
@@ -2545,7 +2610,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         //this.set('dataOptions', dataOptions_)
         //sort by date
         this.set('dataOptions', _.orderBy(dataOptions_, [function(o) { return o.s3_attributes.uploadTime; }], ['desc']));
-        console.log(this.dataOptions);
         if (this.dataOptions.length > 0) {
           var link_ = window.location.hash.replace("#","");
           var linkIndex = -1;
