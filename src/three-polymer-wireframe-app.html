@@ -1084,6 +1084,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _formatModelTimeStamp(_date) {
         var date = new Date(_date);
         var utcDate = new Date(date.toUTCString());
+        //this does not account for daylight savings (when -8)
         utcDate.setHours(utcDate.getHours()-7);
         var pacificDate = new Date(utcDate);
         //format: yymmdd_hhmmss
@@ -1335,11 +1336,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if (this.modelStatusResp.latestStatus === 200) {
               //remove all filters so user can be redirected to model without upload needing to be within filter results
               this.clearAllFilters();
-              this.$.uploadSuccessToast.show({ text: "Upload successful, filters removed"})
+              this.$.uploadSuccessToast.show({ text: "Upload successful, filters removed. Please wait to be redirected to new model."})
               //refresh models and redirect to new model
               this.$['get-models-request'].generateRequest();
-              this.selectedModel = this.fullFileNameNoExtension
-              window.location.href = window.location.pathname + '#' + this.fullFileNameNoExtension
+              //below not necessary now that we are sorting by latest to oldest. the below made sure to redirect to new upload, this will refresh dataoptions and take you to it anyway
+              // this.selectedModel = this.fullFileNameNoExtension
+              // window.location.href = window.location.pathname + '#' + this.fullFileNameNoExtension
               //handles upload failure
             } else if (this.modelStatusResp.latestStatus === 500) {
               this.$.validationToast.show({ text: this.modelStatusResp.latestLogMessage})
@@ -2758,7 +2760,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var userSearchInputMinUploadDate = new Date(this.userSearchInput.minUploadDate)
         var userSearchInputMaxUploadDate = new Date(this.userSearchInput.maxUploadDate)
         var result = true;
-        if (this.userSearchInput.user === undefined && this.userSearchInput.office === undefined && this.userSearchInput.project === undefined && this.userSearchInput.minUploadDate === this.searchOptionsMap.minUploadDate && this.userSearchInput.maxUploadDate === this.searchOptionsMap.maxUploadDate) {
+        if (this.userSearchInput.user === undefined && this.userSearchInput.project === undefined && this.userSearchInput.office === undefined && this.userSearchInput.minUploadDate === this.searchOptionsMap.minUploadDate && this.userSearchInput.maxUploadDate === this.searchOptionsMap.maxUploadDate) {
           // if all of user's input is blank, keep the default color of the filter icon, whenever filter is activated (other if statements) filter icon will turn green
           this.$.filterIcon.style.color = '';
         }
