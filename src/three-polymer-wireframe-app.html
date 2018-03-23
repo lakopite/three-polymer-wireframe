@@ -2803,7 +2803,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var userSearchInputMinModelVersionDate = new Date(this.userSearchInput.minModelVersionDate)
         var userSearchInputMaxModelVersionDate = new Date(this.userSearchInput.maxModelVersionDate)
         var result = true;
-        if (this.userSearchInput.user === undefined && this.userSearchInput.project === undefined && this.userSearchInput.office === undefined && this.userSearchInput.minUploadDate === this.searchOptionsMap.minUploadDate && this.userSearchInput.maxUploadDate === this.searchOptionsMap.maxUploadDate && userSearchInputMinModelVersionDate === this.searchOptionsMap.minModelVersionDate && userSearchInputMaxModelVersionDate === this.searchOptionsMap.maxModelVersionDate) {
+        if (this.userSearchInput.user === undefined && this.userSearchInput.project === undefined && this.userSearchInput.office === undefined && this.userSearchInput.minUploadDate === this.searchOptionsMap.minUploadDate && this.userSearchInput.maxUploadDate === this.searchOptionsMap.maxUploadDate && this.userSearchInput.minModelVersionDate === this.searchOptionsMap.minModelVersionDate && this.userSearchInput.maxModelVersionDate === this.searchOptionsMap.maxModelVersionDate) {
           // if all of user's input is blank, keep the default color of the filter icon, whenever filter is activated (other if statements) filter icon will turn green
           this.$.filterIcon.style.color = '';
         }
