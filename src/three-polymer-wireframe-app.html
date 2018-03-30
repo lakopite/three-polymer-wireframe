@@ -2346,7 +2346,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         //if no user input has been saved to costItems object, save the input
         if (this.costItems.length === 0) {
           this.costItems.push({'model': this.selectedModel, 'group': item.group, 'input': item.input})
-          // console.log(e.target.value);
+          console.log(e.target.value);
           // console.log(item.input);
         } else {
           // if costItems is not empty then check to see if that item in the group column already exists within costItems
@@ -2794,6 +2794,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       applySearchFilters(item) {
         // applies user's search input to return models that meet filters
         if (typeof this.userSearchInput === 'undefined') {
+          this.$.filterIcon.style.color = '';
           return true
         }
         var uploadTimeDate = new Date(item.s3_attributes.uploadTime.split(" ")[0])
@@ -2803,10 +2804,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var userSearchInputMinModelVersionDate = new Date(this.userSearchInput.minModelVersionDate)
         var userSearchInputMaxModelVersionDate = new Date(this.userSearchInput.maxModelVersionDate)
         var result = true;
-        if (this.userSearchInput.user === undefined && this.userSearchInput.project === undefined && this.userSearchInput.office === undefined && this.userSearchInput.minUploadDate === this.searchOptionsMap.minUploadDate && this.userSearchInput.maxUploadDate === this.searchOptionsMap.maxUploadDate && this.userSearchInput.minModelVersionDate === this.searchOptionsMap.minModelVersionDate && this.userSearchInput.maxModelVersionDate === this.searchOptionsMap.maxModelVersionDate) {
-          // if all of user's input is blank, keep the default color of the filter icon, whenever filter is activated (other if statements) filter icon will turn green
-          this.$.filterIcon.style.color = '';
-        }
+        // if (this.userSearchInput.user === undefined && this.userSearchInput.project === undefined && this.userSearchInput.office === undefined
+        //   && this.userSearchInput.minUploadDate === this.searchOptionsMap.minUploadDate && this.userSearchInput.maxUploadDate === this.searchOptionsMap.maxUploadDate
+        //   && this.userSearchInput.minModelVersionDate === this.searchOptionsMap.minModelVersionDate && this.userSearchInput.maxModelVersionDate === this.searchOptionsMap.maxModelVersionDate) {
+        //   // if all of user's input is blank, keep the default color of the filter icon, whenever filter is activated (other if statements) filter icon will turn green
+        //   this.$.filterIcon.style.color = '';
+        // }
         // using multiple if statements because all of these conditions must be met
         if (typeof this.userSearchInput.user !== 'undefined') {
           this.$.filterIcon.style.color = '#4CAF50';
@@ -2820,14 +2823,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         if (this.userSearchInput.minUploadDate !== this.searchOptionsMap.minUploadDate || this.userSearchInput.maxUploadDate !== this.searchOptionsMap.maxUploadDate) {
           this.$.filterIcon.style.color = '#4CAF50';
-            result = uploadTimeDate >= userSearchInputMinUploadDate && uploadTimeDate <= userSearchInputMaxUploadDate
-            if (!result) {return result}
+          result = uploadTimeDate >= userSearchInputMinUploadDate && uploadTimeDate <= userSearchInputMaxUploadDate
+          if (!result) {return result}
         }
         //////////////
         if (this.userSearchInput.minModelVersionDate !== this.searchOptionsMap.minModelVersionDate || this.userSearchInput.maxModelVersionDate !== this.searchOptionsMap.maxModelVersionDate) {
           this.$.filterIcon.style.color = '#4CAF50';
-            result = modelVersionDateTime >= userSearchInputMinModelVersionDate && modelVersionDateTime <= userSearchInputMaxModelVersionDate
-            if (!result) {return result}
+          result = modelVersionDateTime >= userSearchInputMinModelVersionDate && modelVersionDateTime <= userSearchInputMaxModelVersionDate
+          if (!result) {return result}
         }
         //////////////
         if (this.userSearchInput.project === 'non-tagged') {
