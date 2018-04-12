@@ -452,7 +452,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-button dialog-dismiss on-tap="closeToast" class="yellow-toast">Cancel</paper-button>
     </paper-toast>
     <paper-toast id="pollingStatusToast" duration="0"></paper-toast>
-    <paper-toast id="uploadSuccessToast" duration="3000"></paper-toast>
+    <paper-toast id="uploadSuccessToast" duration="5000"></paper-toast>
     <paper-toast id="linkFailToast" duration="3000"></paper-toast>
     <paper-toast id="archivingToast" duration="5000"></paper-toast>
     <app-drawer-layout fullbleed>
@@ -988,7 +988,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           },
           projectList: {
             type: Array,
-            value: ["NLVS East", "NLVS West", "NLVS North", "NLVS South", "NLVS Roof Canopy", "NLVS Roof Support", "NLVS Cable Truss", "NLVS Bowl Concrete", "NLVS Operable Walls", "Samples"]
+            value: ["NLVS East", "NLVS West", "NLVS North", "NLVS South", "NLVS Operable Walls", "NLVS Roof Support", "NLVS Roof Canopy", "NLVS Cable Truss", "NLVS Bowl Concrete", "Samples"]
           },
           officeList: {
             type: Array,
@@ -1339,13 +1339,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.backoffCounter = 0;
             if (this.modelStatusResp.latestStatus === 200) {
               //remove all filters so user can be redirected to model without upload needing to be within filter results
-              this.clearAllFilters();
               this.$.uploadSuccessToast.show({ text: "Upload successful, filters removed. Please wait to be redirected to new model."})
-              //refresh models and redirect to new model
               this.$['get-models-request'].generateRequest();
-              //below not necessary now that we are sorting by latest to oldest. the below made sure to redirect to new upload, this will refresh dataoptions and take you to it anyway
+              this.clearAllFilters();
               // this.selectedModel = this.fullFileNameNoExtension
-              // window.location.href = window.location.pathname + '#' + this.fullFileNameNoExtension
+              //refresh models and redirect to new model
               //handles upload failure
             } else if (this.modelStatusResp.latestStatus === 500) {
               this.$.validationToast.show({ text: this.modelStatusResp.latestLogMessage})
@@ -2637,16 +2635,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       clearAllFilters() {
-        this.filterSelectedUser = undefined,
-        this.filterSelectedProject = undefined,
-        this.filterSelectedOffice = undefined,
-        Polymer.dom(this.root).querySelector("#from-upload-date").value = undefined,
-        Polymer.dom(this.root).querySelector("#to-upload-date").value = undefined,
-        Polymer.dom(this.root).querySelector("#from-model-version-date").value = undefined,
-        Polymer.dom(this.root).querySelector("#to-model-version-date").value = undefined
-        this.setSearchFilters();
-        this.$.searchOptions.render();
-        this.$.filterIcon.style.color = '';
+        if (this.userSearchInput !== undefined) {
+          this.filterSelectedUser = undefined,
+          this.filterSelectedProject = undefined,
+          this.filterSelectedOffice = undefined,
+          Polymer.dom(this.root).querySelector("#from-upload-date").value = undefined,
+          Polymer.dom(this.root).querySelector("#to-upload-date").value = undefined,
+          Polymer.dom(this.root).querySelector("#from-model-version-date").value = undefined,
+          Polymer.dom(this.root).querySelector("#to-model-version-date").value = undefined
+          this.setSearchFilters();
+          // render searchOptions already exists within setSearchFilters()
+          // this.$.searchOptions.render();
+          this.$.filterIcon.style.color = '';
+        }
       }
 
       cancelFilterInput() {
@@ -2863,8 +2864,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.appLoading = false
           this._initData(this.getModelsResp);
         } else {
-          this.handleOptionsError();
-        }
+            this.handleOptionsError();
+          }
       }
 
       handleOptionsError(event, response) {
