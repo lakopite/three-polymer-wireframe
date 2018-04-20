@@ -1401,20 +1401,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _dropdownUnitLabel(item, unitType) {
         // displays proper units of measurements offered in dropdown
-        var that = this;
-        item = _.toLower(item)
-        var unitType = _.toLower(that.currentModelResp.modelInformation.units)
-        if (item.includes('area')) {
-          return unitType === 'imperial' ? item + ' (in\u00B2)' : item + ' (mm\u00B2)'
-        } else if (item.includes('length')) {
+          var that = this;
+          item = _.toLower(item)
+          unitType = _.toLower(that.currentModelResp.modelInformation.units)
+          if (item.includes('area')) {
+            return unitType === 'imperial' ? item + ' (in\u00B2)' : item + ' (mm\u00B2)'
+          } else if (item.includes('length')) {
             return unitType === 'imperial' ? item + ' (in)' : item + ' (mm)'
-        } else if (item.includes('mass')) {
+          } else if (item.includes('mass')) {
             return unitType === 'imperial' ? item + ' (lb)' : item + ' (kg)'
-        } else if (item.includes('vol')) {
+          } else if (item.includes('vol')) {
             return unitType === 'imperial' ? item + ' (in\u00B3)' : item + ' (mm\u00B3)'
-        } else if (item.includes('thickness')) {
+          } else if (item.includes('thickness')) {
             return unitType === 'imperial' ? item + ' (in)' : item + ' (mm)'
-        } else {
+          } else {
             return item
           }
       }
@@ -1468,14 +1468,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               this.strOtherUnitLabel = ' (ft\u00B2)'
             }
         } else if (this.currentModelResp.modelInformation.units === 'metric') {
-          if (this._quantUnitLabels(this.selectedSumField) === ' (mm)') {
+          if (this._quantUnitLabels(this.selectedSumField) === ' (mm\u00B2)') {
+              this.strOtherUnitLabel = ' (m\u00B2)'
+          } else if (this._quantUnitLabels(this.selectedSumField) === ' (mm)') {
               this.strOtherUnitLabel = ' (m)'
           } else if (this._quantUnitLabels(this.selectedSumField) === ' (kg)') {
               this.strOtherUnitLabel = ' (tonne)'
           } else if (this._quantUnitLabels(this.selectedSumField) === ' (mm\u00B3)') {
               this.strOtherUnitLabel = ' (m\u00B3)'
           }
-          //NOTE: IF AREA COMES IN METRIC, WHAT TO CONVER IT TO???
         }
       }
 
@@ -1713,7 +1714,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
              // NOTE: IF AREA COMES IN METRIC, WHAT TO CONVERT IT TO???
              else if (that.selectedSumField.includes('area')) {
                this.$.otherUnitColumn.hidden = false
-               // this.strOtherUnitSum = _.round(sumByGroup/?, 0)
+               this.strOtherUnitSum = _.round(sumByGroup/1000000, 0)
              }
            }
            var groupSumDataSetup = {
