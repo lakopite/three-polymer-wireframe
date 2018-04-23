@@ -1456,29 +1456,39 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _strOtherUnitLabel(unitType, selectedSumField) {
-        console.log("changed");
+        var propertiesWithUnits = ['area', 'length', 'mass', 'volume']
         if (this.currentModelResp.modelInformation.units === 'imperial') {
             if (this.selectedSumField.includes('area')) {
+              this.$.otherUnitColumn.hidden = false
               this.strOtherUnitLabel = ' (ft\u00B2)'
             } else if (this.selectedSumField.includes('length')) {
+              this.$.otherUnitColumn.hidden = false
               this.strOtherUnitLabel = ' (ft)'
             } else if (this.selectedSumField.includes('mass')) {
+              this.$.otherUnitColumn.hidden = false
               this.strOtherUnitLabel = ' (ton)'
             } else if (this.selectedSumField.includes('vol')) {
+              this.$.otherUnitColumn.hidden = false
               this.strOtherUnitLabel = ' (yd\u00B3)'
-            } else {
+            } else if (propertiesWithUnits.indexOf(this.selectedSumField) === -1)  {
+              this.$.otherUnitColumn.hidden = true
               this.strOtherUnitLabel = ''
             }
         } else if (this.currentModelResp.modelInformation.units === 'metric') {
           if (this.selectedSumField.includes('area')) {
-              this.strOtherUnitLabel = ' (m\u00B2)'
+            this.$.otherUnitColumn.hidden = false
+            this.strOtherUnitLabel = ' (m\u00B2)'
           } else if (this.selectedSumField.includes('length')) {
+            this.$.otherUnitColumn.hidden = false
             this.strOtherUnitLabel = ' (m)'
           } else if (this.selectedSumField.includes('mass')) {
+            this.$.otherUnitColumn.hidden = false
             this.strOtherUnitLabel = ' (tonne)'
           } else if (this.selectedSumField.includes('vol')) {
+            this.$.otherUnitColumn.hidden = false
             this.strOtherUnitLabel = ' (m\u00B3)'
-          } else {
+          } else if (propertiesWithUnits.indexOf(this.selectedSumField) === -1)  {
+            this.$.otherUnitColumn.hidden = true
             this.strOtherUnitLabel = ''
           }
         }
@@ -1496,7 +1506,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return ''
         }
       }
-      
+
       _generateNumDropdownOptions() {
         // using numDropdownOptions not metadataFields to not alter metadataFields
         this.numDropdownOptions = []
@@ -1665,23 +1675,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var that = this;
         var _groupSumData = [];
         console.log(this.selectedSumField);
+        console.log(_groupSumData);
        // console.log(this.groupSumData);
          for (var i = 0; i < this.groupKeys.length; i++) {
          //reusing var groupObjects below (was local variable in previous loop for numericalMetadataKeys)
-           var groupObjects = this.resultGroupByName[this.groupKeys[i]]
-           console.log(groupObjects);
+          var groupObjects = this.resultGroupByName[this.groupKeys[i]]
            var elemsPerGroup = groupObjects.length
            var sumByGroup = _.round(_.sumBy(groupObjects, function(o) {
-             return o.metadata[that.selectedSumField]
+             if (o.metadata[that.selectedSumField] !== undefined) {
+               return o.metadata[that.selectedSumField]
+             }
            }), 0)
-           ////////////////////////////
+           console.log(sumByGroup);
            var minByGroup = _.round(_.minBy(groupObjects, function(o) {
-             return o.metadata[that.selectedSumField]
+             if (o.metadata[that.selectedSumField] !== undefined) {
+               return o.metadata[that.selectedSumField]
+            }
            }).metadata[that.selectedSumField], 0)
+           console.log(minByGroup);
            var maxByGroup = _.round(_.maxBy(groupObjects, function(o) {
-             return o.metadata[that.selectedSumField]
+             if (o.metadata[that.selectedSumField] !== undefined) {
+               return o.metadata[that.selectedSumField]
+             }
            }).metadata[that.selectedSumField], 0)
-
            var _average = []
            var average = _.forEach(groupObjects, function(o) {
              if (typeof o.metadata[that.selectedSumField] !== 'undefined') {
@@ -1689,14 +1705,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
              }
            })
            var avgByGroup =  _.round(_.mean(_average), 3);
-           //for conversion
+           // //for conversion
            if (that.currentModelResp.modelInformation.units === 'imperial') {
              if (that.selectedSumField.includes('length')) {
                this.strOtherUnitSum = _.round(sumByGroup/12, 0)
-               // this.$.otherUnitColumn.hidden = false
              } else if (that.selectedSumField.includes('mass')) {
                this.strOtherUnitSum = _.round(sumByGroup/2000, 0)
-               this.$.otherUnitColumn.hidden = false
+               // this.$.otherUnitColumn.hidden = false
              } else if (that.selectedSumField.includes('vol')) {
                this.strOtherUnitSum = _.round(sumByGroup/46656, 0)
                // this.$.otherUnitColumn.hidden = false
