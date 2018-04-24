@@ -1683,53 +1683,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
            var elemsPerGroup = groupObjects.length
            var vals = []
            for (var j = 0; j < groupObjects.length; j++) {
-             console.log(groupObjects[j].metadata[that.selectedSumField])
              if (groupObjects[j].metadata[that.selectedSumField] !== undefined) {
                vals.push(groupObjects[j].metadata[that.selectedSumField])
              }
            }
            var sumByGroup = _.round(_.sum(vals), 0)
-           console.log(sumByGroup);
-           var minByGroup = isFinite(Math.min(...vals)) ? Math.min(...vals) : 'NA'
-           console.log(minByGroup);
-           var maxByGroup = isFinite(Math.max(...vals)) ? Math.max(...vals) : 'NA'
-           console.log(maxByGroup);
+           var minByGroup = isFinite(Math.min(...vals)) ? _.round(Math.min(...vals), 0) : 'NA'
+           var maxByGroup = isFinite(Math.max(...vals)) ? _.round(Math.max(...vals), 0) : 'NA'
            var avgByGroup = isFinite(minByGroup) && isFinite(maxByGroup)  ? _.round(sumByGroup/elemsPerGroup, 3) : 'NA'
-           console.log(avgByGroup);
+           //if they do not have other unit label; _strOtherUnitLabel() will hide the otherUnitColumn 
            if (that.currentModelResp.modelInformation.units === 'imperial') {
              if (that.selectedSumField.includes('length')) {
                this.strOtherUnitSum = _.round(sumByGroup/12, 0)
-               // this.$.otherUnitColumn.hidden = false
              } else if (that.selectedSumField.includes('mass')) {
                this.strOtherUnitSum = _.round(sumByGroup/2000, 0)
-               // this.$.otherUnitColumn.hidden = false
              } else if (that.selectedSumField.includes('vol')) {
                this.strOtherUnitSum = _.round(sumByGroup/46656, 0)
-               // this.$.otherUnitColumn.hidden = false
              } else if (that.selectedSumField.includes('area')) {
-               // this.$.otherUnitColumn.hidden = false
                this.strOtherUnitSum = _.round(sumByGroup/144, 0)
-             } else if (that.selectedSumField.includes('thickness')) {
-               console.log(this.$.otherUnitColumn.hidden);
-               // this.$.otherUnitColumn.hidden = true
-               console.log(this.$.otherUnitColumn.hidden);
              }
            } else if (that.currentModelResp.modelInformation.units === 'metric') {
              if (that.selectedSumField.includes('length')) {
                this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
-               // this.$.otherUnitColumn.hidden = false
              } else if (that.selectedSumField.includes('mass')) {
                this.strOtherUnitSum = _.round(sumByGroup/1000, 0)
-               // this.$.otherUnitColumn.hidden = false
              } else if (that.selectedSumField.includes('vol')) {
                this.strOtherUnitSum = _.round(sumByGroup/1000000000, 0)
-               // this.$.otherUnitColumn.hidden = false
-             } else if (that.selectedSumField.includes('thickness')) {
-               // this.$.otherUnitColumn.hidden = true
-             }
-             // NOTE: IF AREA COMES IN METRIC, WHAT TO CONVERT IT TO???
-             else if (that.selectedSumField.includes('area')) {
-               this.$.otherUnitColumn.hidden = false
+             } else if (that.selectedSumField.includes('area')) {
                this.strOtherUnitSum = _.round(sumByGroup/1000000, 0)
              }
            }
