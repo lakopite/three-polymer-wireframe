@@ -484,7 +484,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-dropdown-menu label="Contour" id="main-contour-dropdown">
           <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
             <template is="dom-repeat" items="{{numDropdownOptions}}">
-              <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
+              <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
             </template>
           </paper-listbox>
         </paper-dropdown-menu>
@@ -595,7 +595,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <paper-dropdown-menu id="num-contour-dropdown" label="Select Contour">
             <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
               <template is="dom-repeat" items="{{numDropdownOptions}}">
-                <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
+                <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
               </template>
             </paper-listbox>
             </paper-dropdown-menu>
@@ -622,7 +622,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <paper-dropdown-menu id="str-contour-dropdown" label="Select Contour">
             <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
               <template is="dom-repeat" items="{{numDropdownOptions}}">
-                <paper-item class="dropdown-item" name="{{item}}">{{_dropdownUnitLabel(item)}}</paper-item>
+                <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
               </template>
             </paper-listbox>
           </paper-dropdown-menu>
@@ -1388,7 +1388,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       // makes the numbers appear with comma formatting
       _prettify(n) {
-        return typeof n !== 'undefined' ? parseFloat(n).toLocaleString() : ""
+        if (typeof n !== 'undefined' && !isNaN(n)) {
+          return parseFloat(n).toLocaleString()
+        } else if(n === 'undefined') {
+          return ""
+        } else if (isNaN(n)) {
+          return "NA"
+        }
       }
 
       _prettifyDollar(n) {
@@ -1399,25 +1405,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return typeof str !== 'undefined' ? _.capitalize(str) : ""
       }
 
-      _dropdownUnitLabel(item, unitType) {
-        // displays proper units of measurements offered in dropdown
-        var that = this;
-        item = _.toLower(item)
-        unitType = _.toLower(that.currentModelResp.modelInformation.units)
-        if (item.includes('area')) {
-          return unitType === 'imperial' ? item + ' (in\u00B2)' : item + ' (mm\u00B2)'
-        } else if (item.includes('length')) {
-          return unitType === 'imperial' ? item + ' (in)' : item + ' (mm)'
-        } else if (item.includes('mass')) {
-          return unitType === 'imperial' ? item + ' (lb)' : item + ' (kg)'
-        } else if (item.includes('vol')) {
-          return unitType === 'imperial' ? item + ' (in\u00B3)' : item + ' (mm\u00B3)'
-        } else if (item.includes('thickness')) {
-          return unitType === 'imperial' ? item + ' (in)' : item + ' (mm)'
-        } else {
-          return item
-        }
-      }
+      // _dropdownUnitLabel(item, unitType) {
+      //   // displays proper units of measurements offered in dropdown
+      //   var that = this;
+      //   item = _.toLower(item)
+      //   unitType = _.toLower(that.currentModelResp.modelInformation.units)
+      //   if (item.includes('area')) {
+      //     return unitType === 'imperial' ? item + ' (in\u00B2)' : item + ' (mm\u00B2)'
+      //   } else if (item.includes('length')) {
+      //     return unitType === 'imperial' ? item + ' (in)' : item + ' (mm)'
+      //   } else if (item.includes('mass')) {
+      //     return unitType === 'imperial' ? item + ' (lb)' : item + ' (kg)'
+      //   } else if (item.includes('vol')) {
+      //     return unitType === 'imperial' ? item + ' (in\u00B3)' : item + ' (mm\u00B3)'
+      //   } else if (item.includes('thickness')) {
+      //     return unitType === 'imperial' ? item + ' (in)' : item + ' (mm)'
+      //   } else {
+      //     return item
+      //   }
+      // }
 
       _quantUnitLabels(measurement, unitType) {
         //to display units within the vaadin-grid
@@ -1456,25 +1462,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _strOtherUnitLabel(unitType, selectedSumField) {
-<<<<<<< HEAD
-        var propertiesWithUnits = ['area', 'length', 'mass', 'volume']
-        if (this.currentModelResp.modelInformation.units === 'imperial') {
-            if (this.selectedSumField.includes('area')) {
-              this.$.otherUnitColumn.hidden = false
-              this.strOtherUnitLabel = ' (ft\u00B2)'
-            } else if (this.selectedSumField.includes('length')) {
-              this.$.otherUnitColumn.hidden = false
-              this.strOtherUnitLabel = ' (ft)'
-            } else if (this.selectedSumField.includes('mass')) {
-              this.$.otherUnitColumn.hidden = false
-              this.strOtherUnitLabel = ' (ton)'
-            } else if (this.selectedSumField.includes('vol')) {
-              this.$.otherUnitColumn.hidden = false
-              this.strOtherUnitLabel = ' (yd\u00B3)'
-            } else if (propertiesWithUnits.indexOf(this.selectedSumField) === -1)  {
-              this.$.otherUnitColumn.hidden = true
-=======
-        console.log("changed");
+        var otherUnitVals = ['area', 'length', 'mass', 'volume']
+        if (otherUnitVals.indexOf(this.selectedSumField) === -1) {
+          this.$.otherUnitColumn.hidden = true;
+        } else {
+          this.$.otherUnitColumn.hidden = false;
+        }
         if (this.currentModelResp.modelInformation.units === 'imperial') {
             if (this.selectedSumField.includes('area')) {
               this.strOtherUnitLabel = ' (ft\u00B2)'
@@ -1485,26 +1478,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             } else if (this.selectedSumField.includes('vol')) {
               this.strOtherUnitLabel = ' (yd\u00B3)'
             } else {
->>>>>>> moved office dropdown above project dropdown
               this.strOtherUnitLabel = ''
             }
         } else if (this.currentModelResp.modelInformation.units === 'metric') {
           if (this.selectedSumField.includes('area')) {
-<<<<<<< HEAD
-            this.$.otherUnitColumn.hidden = false
-            this.strOtherUnitLabel = ' (m\u00B2)'
-          } else if (this.selectedSumField.includes('length')) {
-            this.$.otherUnitColumn.hidden = false
-            this.strOtherUnitLabel = ' (m)'
-          } else if (this.selectedSumField.includes('mass')) {
-            this.$.otherUnitColumn.hidden = false
-            this.strOtherUnitLabel = ' (tonne)'
-          } else if (this.selectedSumField.includes('vol')) {
-            this.$.otherUnitColumn.hidden = false
-            this.strOtherUnitLabel = ' (m\u00B3)'
-          } else if (propertiesWithUnits.indexOf(this.selectedSumField) === -1)  {
-            this.$.otherUnitColumn.hidden = true
-=======
               this.strOtherUnitLabel = ' (m\u00B2)'
           } else if (this.selectedSumField.includes('length')) {
             this.strOtherUnitLabel = ' (m)'
@@ -1513,7 +1490,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           } else if (this.selectedSumField.includes('vol')) {
             this.strOtherUnitLabel = ' (m\u00B3)'
           } else {
->>>>>>> moved office dropdown above project dropdown
             this.strOtherUnitLabel = ''
           }
         }
@@ -1700,57 +1676,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var that = this;
         var _groupSumData = [];
         console.log(this.selectedSumField);
-<<<<<<< HEAD
-        console.log(_groupSumData);
-       // console.log(this.groupSumData);
-         for (var i = 0; i < this.groupKeys.length; i++) {
-         //reusing var groupObjects below (was local variable in previous loop for numericalMetadataKeys)
-          var groupObjects = this.resultGroupByName[this.groupKeys[i]]
-=======
        // console.log(this.groupSumData);
          for (var i = 0; i < this.groupKeys.length; i++) {
          //reusing var groupObjects below (was local variable in previous loop for numericalMetadataKeys)
            var groupObjects = this.resultGroupByName[this.groupKeys[i]]
-           console.log(groupObjects);
->>>>>>> moved office dropdown above project dropdown
            var elemsPerGroup = groupObjects.length
-           var sumByGroup = _.round(_.sumBy(groupObjects, function(o) {
-             if (o.metadata[that.selectedSumField] !== undefined) {
-               return o.metadata[that.selectedSumField]
+           var vals = []
+           for (var j = 0; j < groupObjects.length; j++) {
+             console.log(groupObjects[j].metadata[that.selectedSumField])
+             if (groupObjects[j].metadata[that.selectedSumField] !== undefined) {
+               vals.push(groupObjects[j].metadata[that.selectedSumField])
              }
-           }), 0)
-<<<<<<< HEAD
+           }
+           var sumByGroup = _.round(_.sum(vals), 0)
            console.log(sumByGroup);
-=======
-           ////////////////////////////
->>>>>>> moved office dropdown above project dropdown
-           var minByGroup = _.round(_.minBy(groupObjects, function(o) {
-             if (o.metadata[that.selectedSumField] !== undefined) {
-               return o.metadata[that.selectedSumField]
-            }
-           }).metadata[that.selectedSumField], 0)
+           var minByGroup = isFinite(Math.min(...vals)) ? Math.min(...vals) : 'NA'
            console.log(minByGroup);
-           var maxByGroup = _.round(_.maxBy(groupObjects, function(o) {
-             if (o.metadata[that.selectedSumField] !== undefined) {
-               return o.metadata[that.selectedSumField]
-             }
-           }).metadata[that.selectedSumField], 0)
-
-           var _average = []
-           var average = _.forEach(groupObjects, function(o) {
-             if (typeof o.metadata[that.selectedSumField] !== 'undefined') {
-               _average.push(o.metadata[that.selectedSumField])
-             }
-           })
-           var avgByGroup =  _.round(_.mean(_average), 3);
-           // //for conversion
+           var maxByGroup = isFinite(Math.max(...vals)) ? Math.max(...vals) : 'NA'
+           console.log(maxByGroup);
+           var avgByGroup = isFinite(minByGroup) && isFinite(maxByGroup)  ? _.round(sumByGroup/elemsPerGroup, 3) : 'NA'
+           console.log(avgByGroup);
            if (that.currentModelResp.modelInformation.units === 'imperial') {
              if (that.selectedSumField.includes('length')) {
                this.strOtherUnitSum = _.round(sumByGroup/12, 0)
-<<<<<<< HEAD
-=======
                // this.$.otherUnitColumn.hidden = false
->>>>>>> moved office dropdown above project dropdown
              } else if (that.selectedSumField.includes('mass')) {
                this.strOtherUnitSum = _.round(sumByGroup/2000, 0)
                // this.$.otherUnitColumn.hidden = false
@@ -1780,7 +1729,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
              }
              // NOTE: IF AREA COMES IN METRIC, WHAT TO CONVERT IT TO???
              else if (that.selectedSumField.includes('area')) {
-               // this.$.otherUnitColumn.hidden = false
+               this.$.otherUnitColumn.hidden = false
                this.strOtherUnitSum = _.round(sumByGroup/1000000, 0)
              }
            }
