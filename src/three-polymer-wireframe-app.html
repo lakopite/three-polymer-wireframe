@@ -233,7 +233,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: #9E9E9E;
       }
 
-      #concrete-tab[disabled], #steel-tab[disabled] {
+      #linear-tab[disabled], #planar-tab[disabled] {
         font-style: italic;
         color: #9E9E9E;
       }
@@ -587,6 +587,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <!-- Quantities tab -->
       <!-- For numerical aggregations -->
     <div name="aggregations-view">
+      <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedElementType}}">
+        <paper-tab name="linear-view" id="linear-tab" disabled$="{{_disableLinearTab(linearNumFilterResult, linearStringFilterResult)}}">Linear Elements</paper-tab>
+        <paper-tab name="planar-view" id="planar-tab" disabled$="{{_disablePlanarTab(planarNumFilterResult, planarStringFilterResult)}}">Planar Elements</paper-tab>
+      </paper-tabs>
       <div hidden$="[[!showNumericalAggregations]]">
         <div class="num-wrapper">
           <app-toolbar class="aggregation-toolbar">
@@ -690,10 +694,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </div>
     <!-- Cost Tab -->
     <div name="cost-view">
-      <!-- <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedMaterial}}">
-        <paper-tab name="concrete" id="concrete-tab" disabled$="{{_disableConcreteTab(materials)}}">Concrete</paper-tab>
-        <paper-tab name="steel" id="steel-tab" disabled$="{{_disableSteelTab(materials)}}">Steel</paper-tab>
-      </paper-tabs> -->
+      <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedElementType}}">
+        <paper-tab name="linear-view" id="linear-tab" disabled$="{{_disableLinearTab(linearNumFilterResult, linearStringFilterResult)}}">Linear Elements</paper-tab>
+        <paper-tab name="planar-view" id="planar-tab" disabled$="{{_disablePlanarTab(planarNumFilterResult, planarStringFilterResult)}}">Planar Elements</paper-tab>
+      </paper-tabs>
       <div class="num-wrapper">
         <app-toolbar class="aggregation-toolbar">
           <div main-title>Cost of [[_capitalize(material)]] by Group</div>
@@ -1011,7 +1015,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_loadingChanged(modelLoading)',
           '_contourPropsChanged(metadataFields)',
           '_getModelData(selectedModel)',
-          '_aggregations(_modelData, selectedContourBy, selectedView)',
+          '_aggregations(_modelData, selectedContourBy, selectedView, selectedElementType)',
           '_getAggregationLabels(_modelData, selectedContourBy)',
           '_getSumByForSelectedSumField(selectedSumField)',
           '_drawStrChart(strPieData)',
@@ -1526,7 +1530,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
           })
         })
-        var resultFilterInput = _.concat(this.linearNumFilterResult, this.planarNumFilterResult)
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        var resultFilterInput = this.selectedElementType === 'linear-view' ?  this.linearNumFilterResult : this.planarNumFilterResult
+        console.log(resultFilterInput);
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // var resultFilterInput = _.concat(this.linearNumFilterResult, this.planarNumFilterResult)
         var _numDropdownOptions = []
         for (var i=0; i < resultFilterInput.length; i++) {
           var keys = _.keys(resultFilterInput[i].metadata);
@@ -1537,7 +1545,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         }
         this.set('numDropdownOptions', _numDropdownOptions.sort())
-        // console.log(this.numDropdownOptions);
+        console.log(this.numDropdownOptions);
       }
 
       _numericalAggregations() {
@@ -1558,7 +1566,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
           })
         })
-        var resultFilterInput = _.concat(this.linearNumFilterResult, this.planarNumFilterResult)
+        var resultFilterInput = this.selectedElementType === 'linear-view' ?  this.linearNumFilterResult : this.planarNumFilterResult
         if (resultFilterInput.length > 0 && _.includes(this.numDropdownOptions, this.selectedContourBy)) {
           this.minResult = _.round(_.minBy(resultFilterInput, function(o) {
             return o.metadata[that.selectedContourBy]
@@ -1620,7 +1628,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _generateNumMetadataKeys() {
         var that = this;
-        var that = this;
         this.linearNumFilterResult = _.filter(that._modelData.linearElements, function(o) {
           return _.every(o.vertices, function(j) {
             return that._isWithinBounds(j[0], that.geometryFilter.xMin, that.geometryFilter.xMax) &&
@@ -1675,7 +1682,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _createStringTableData() {
         var that = this;
         var _groupSumData = [];
-        console.log(this.selectedSumField);
        // console.log(this.groupSumData);
          for (var i = 0; i < this.groupKeys.length; i++) {
          //reusing var groupObjects below (was local variable in previous loop for numericalMetadataKeys)
@@ -1799,7 +1805,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.showStringAggregations = true;
       }
 
-      _aggregations(_modelData, selectedContourBy, _currentPage) {
+      _aggregations(_modelData, selectedContourBy, _currentPage, _selectedElementType) {
         if(this.selectedView === 'cost-view') {
           this._disableCostTab()
         }
@@ -2387,13 +2393,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
 
-      // _disableConcreteTab(materials) {
-      //   return !_.includes(this.materials, "concrete")
-      // }
-      //
-      // _disableSteelTab(materials) {
-      //   return !_.includes(this.materials, "steel")
-      // }
+      _disableLinearTab(linearNumFilterResult, linearStringFilterResult) {
+        return _.isEmpty(linearNumFilterResult) && _.isEmpty(linearStringFilterResult)
+      }
+
+      _disablePlanarTab(planarNumFilterResult, planarStringFilterResult) {
+        return _.isEmpty(planarNumFilterResult) && _.isEmpty(planarStringFilterResult)
+      }
 
       _costAggregations() {
         var that = this
@@ -2580,7 +2586,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       resetFilters() {
         this.geometryFilter = _.cloneDeep(this.boundaries);
         this.checkValidInput();
-        this._aggregations(this._modelData, this.selectedContourBy, this.selectedView);
+        this._aggregations(this._modelData, this.selectedContourBy, this.selectedView, this.selectedElementType);
         //reset filter selection to the model boundaries
         //console.log(this.geometryFilter)
         //console.log(this.boundaries)
@@ -2596,7 +2602,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'zMin': parseFloat(this.geometryFilter.zMin),
           'zMax': parseFloat(this.geometryFilter.zMax)
         }
-        this._aggregations(this._modelData, this.selectedContourBy, this.selectedView);
+        this._aggregations(this._modelData, this.selectedContourBy, this.selectedView, this.selectedElementType);
       }
 
       todaysDate() {
@@ -2884,11 +2890,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             'linearElements': this.currentModelResp.payload.linearElements,
             'planarElements': this.currentModelResp.payload.planarElements
           });
-          //set selectedSumField to undefined in order to trigger stringAggregtions initialization
-          this.selectedSumField = undefined
           console.log(this._modelData)
           console.log(_.isEmpty(this._modelData.linearElements));
           console.log(_.isEmpty(this._modelData.planarElements));
+          this.selectedElementType = _.isEmpty(this._modelData.linearElements) ? 'planar-view' : 'linear-view'
+          console.log(this.selectedElementType);
+          //set selectedSumField to undefined in order to trigger stringAggregtions initialization
+          this.selectedSumField = undefined
         } else {
           this.handleDataError()
         }
