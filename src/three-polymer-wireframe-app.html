@@ -1691,7 +1691,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
            var minByGroup = isFinite(Math.min(...vals)) ? _.round(Math.min(...vals), 0) : 'NA'
            var maxByGroup = isFinite(Math.max(...vals)) ? _.round(Math.max(...vals), 0) : 'NA'
            var avgByGroup = isFinite(minByGroup) && isFinite(maxByGroup)  ? _.round(sumByGroup/elemsPerGroup, 3) : 'NA'
-           //if they do not have other unit label; _strOtherUnitLabel() will hide the otherUnitColumn 
+           //if they do not have other unit label; _strOtherUnitLabel() will hide the otherUnitColumn
            if (that.currentModelResp.modelInformation.units === 'imperial') {
              if (that.selectedSumField.includes('length')) {
                this.strOtherUnitSum = _.round(sumByGroup/12, 0)
@@ -2886,7 +2886,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           });
           //set selectedSumField to undefined in order to trigger stringAggregtions initialization
           this.selectedSumField = undefined
-          //console.log(this._modelData)
+          console.log(this._modelData)
+          console.log(_.isEmpty(this._modelData.linearElements));
+          console.log(_.isEmpty(this._modelData.planarElements));
         } else {
           this.handleDataError()
         }
