@@ -1530,11 +1530,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
           })
         })
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         var resultFilterInput = this.selectedElementType === 'linear-view' ?  this.linearNumFilterResult : this.planarNumFilterResult
-        console.log(resultFilterInput);
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // var resultFilterInput = _.concat(this.linearNumFilterResult, this.planarNumFilterResult)
         var _numDropdownOptions = []
         for (var i=0; i < resultFilterInput.length; i++) {
           var keys = _.keys(resultFilterInput[i].metadata);
@@ -1545,7 +1541,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         }
         this.set('numDropdownOptions', _numDropdownOptions.sort())
-        console.log(this.numDropdownOptions);
+        if (this.numDropdownOptions.indexOf(this.selectedContourBy) === -1) {
+          this.set('selectedContourBy', this.numDropdownOptions[0])
+        }
       }
 
       _numericalAggregations() {
@@ -1642,7 +1640,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
           })
         })
-        var resultFilterInput = _.concat(this.linearNumFilterResult, this.planarNumFilterResult)
+        var resultFilterInput = this.selectedElementType === 'linear-view' ?  this.linearNumFilterResult : this.planarNumFilterResult
         this.resultGroupByName = _.groupBy(resultFilterInput, function(o) {
         if (that.selectedContourBy === 'propertyname_1') {
           //to include parent group to which it belongs
@@ -1765,7 +1763,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
           })
         })
-        var resultFilterInput = _.concat(this.linearStringFilterResult, this.planarStringFilterResult)
+        var resultFilterInput = this.selectedElementType === 'linear-view' ?  this.linearStringFilterResult : this.planarStringFilterResult
         // this is to add a propertyname field that groups together anything after the last underscore in case naming convention divided this
         resultFilterInput = _.forEach(resultFilterInput, function(o) {
           if (o.metadata.propertyname) {
@@ -2261,7 +2259,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _disableCostTab(_currentMetadataFields, _currentModel, _geoFilter) {
        if (!_.isEmpty(this.geometryFilter) && this.metadataFields.includes('material')) {
-         var payloadElems = _.concat(this.currentModelResp.payload.linearElements, this.currentModelResp.payload.planarElements)
+         // var payloadElems = _.concat(this.currentModelResp.payload.linearElements, this.currentModelResp.payload.planarElements)
+         var payloadElems = this.selectedElementType === 'linear-view' ?  this.currentModelResp.payload.linearElements : this.currentModelResp.payload.planarElements
          for (var i=0; i < payloadElems.length; i++) {
            this.material = _.toLower(payloadElems[i].metadata.material)
            //console.log(payloadElems[i]);
@@ -2418,7 +2417,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             that._isWithinBounds(j[2], that.geometryFilter.zMin, that.geometryFilter.zMax)
           })
         })
-        var resultFilterInput = _.concat(this.linearStringFilterResult, this.planarStringFilterResult)
+        var resultFilterInput = this.selectedElementType === 'linear-view' ?  this.linearStringFilterResult : this.planarStringFilterResult
         // this is to add a propertyname field that groups together anything after the last underscore in case naming convention divided this
         resultFilterInput = _.forEach(resultFilterInput, function(o) {
           if (o.metadata.propertyname) {
@@ -2890,11 +2889,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             'linearElements': this.currentModelResp.payload.linearElements,
             'planarElements': this.currentModelResp.payload.planarElements
           });
-          console.log(this._modelData)
-          console.log(_.isEmpty(this._modelData.linearElements));
-          console.log(_.isEmpty(this._modelData.planarElements));
           this.selectedElementType = _.isEmpty(this._modelData.linearElements) ? 'planar-view' : 'linear-view'
-          console.log(this.selectedElementType);
           //set selectedSumField to undefined in order to trigger stringAggregtions initialization
           this.selectedSumField = undefined
         } else {
