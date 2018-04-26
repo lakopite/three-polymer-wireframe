@@ -611,11 +611,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <three-view id="view" legend-position="top-left" scene-background-color="#F5F5F5">
         <three-model id="model" slot="model" metadata-fields="{{metadataFields}}" is-loading="{{modelLoading}}" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[_modelData]]"></three-model>
       </three-view>
-      <div id="instructions" class="test">
+      <!-- <div id="instructions" class="test">
         <div class="test2">left click & drag to rotate model<paper-icon-button style="height: 2.5em; width: 2.5em;" on-tap="hideInstructions" icon="my-icons:clear" title="clear" on-tap=""></paper-icon-button></div>
         <div id="nditem" class="test2" style="padding: 0em;">right click & drag to move model</div>
         <div class="test2">scroll wheel to zoom in/out</div>
-      </div>
+      </div> -->
     </div>
     <!-- Quantities tab -->
       <!-- For numerical aggregations -->
@@ -1566,7 +1566,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         for (var i=0; i < resultFilterInput.length; i++) {
           var keys = _.keys(resultFilterInput[i].metadata);
           for (var j=0; j < keys.length; j++) {
-            if (_numDropdownOptions.indexOf(keys[j]) === -1 && keys[j] !== 'beamnum') {
+            if (_numDropdownOptions.indexOf(keys[j]) === -1 && keys[j] !== 'beamnum' && _numDropdownOptions.indexOf(keys[j]) === -1 && keys[j] !== 'shellnum') {
               _numDropdownOptions.push(keys[j])
             }
           }
