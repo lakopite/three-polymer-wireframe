@@ -257,7 +257,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         @apply(--layout-flex);
       }
 
-      paper-icon-button.filter, .clear-filter-input {
+      paper-icon-button.filter, .clear-filter-input, .archive-icon {
         @apply(--layout-self-end);
       }
 
@@ -526,7 +526,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-toolbar>
         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
         <paper-icon-button class="archive-icon" icon="my-icons:archive" title="remove model" on-tap="confirmArchive"></paper-icon-button>
-
         <paper-dialog id="archiveModal">
           <h3>Are you sure you want to archive the following model?</h3>
            <h4>[[selectedModel]]</h4>
@@ -538,7 +537,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             Arup Model QuickView: [[_formatModelName(selectedModel)]]
           <div class="model-version-details">
             <!-- model version date:  -->
-            {{ _modelVersion(currentModelResp.modelInformation.VersionDate) }}
+            <!-- {{ _modelVersion(currentModelResp.modelInformation.VersionDate) }} -->
           </div>
           <!-- <div class="JSON-generated-details"> -->
             <!-- JSON generated on:  -->
@@ -546,13 +545,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <!-- </div> -->
           <div class="uploaded-details">
             <!-- JSON uploaded on:  -->
-            {{_uploadedInfo(currentModelResp.modelInformation.s3_attributes.uploadTime, currentModelResp.modelInformation.user)}}
+            <!-- {{_uploadedInfo(currentModelResp.modelInformation.s3_attributes.uploadTime, currentModelResp.modelInformation.user)}} -->
           </div>
         </div>
         <!-- <paper-item>Build Dates</paper-item> -->
         <div class="build-dates">
-          FE build date: [[frontEndBuildDate]]<span class="pat"></span>
-          BE build date: [[backEndBuildDate]]
+          <!-- FE build date: [[frontEndBuildDate]]<span class="pat"></span>
+          BE build date: [[backEndBuildDate]] -->
         </div>
         <span class="pat"></span>
         <div class="spacer"></div>
@@ -561,6 +560,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <span class="pat"></span> <paper-spinner class="loading" active></paper-spinner>
         </paper-dialog>
         <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
+        <span class="pat"></span>
+        <!--  -->
+        <paper-menu-button horizontal-align="right">
+          <paper-icon-button class="clock-icon" icon="my-icons:access-time" title="view important dates" slot="dropdown-trigger"></paper-icon-button>
+          <paper-listbox slot="dropdown-content">
+            <paper-item disabled>{{ _modelVersion(currentModelResp.modelInformation.VersionDate) }}</paper-item>
+            <paper-item disabled>{{ _jsonGenerated(currentModelResp.modelInformation.JSONCreateDate) }}</paper-item>
+            <paper-item disabled>{{_uploadedInfo(currentModelResp.modelInformation.s3_attributes.uploadTime, currentModelResp.modelInformation.user)}}</paper-item>
+            <paper-item disabled>FE build date: [[frontEndBuildDate]]</paper-item>
+            <paper-item disabled>BE build date: [[backEndBuildDate]]</paper-item>
+          </paper-listbox>
+        </paper-menu-button>
+        <!--  -->
         <paper-icon-button on-tap="showDialog" icon="my-icons:add"></paper-icon-button>
         <paper-menu-button horizontal-align="right">
           <paper-icon-button icon="my-icons:account-circle" slot="dropdown-trigger"></paper-icon-button>
@@ -790,22 +802,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <paper-item>g. Share a model with a user via email</paper-item>
                 <paper-item>h. Export any of the data to a CSV file</paper-item>
                 <paper-item>i. Find models by project, office, date range, and/or the user that uploaded it using the search filter</paper-item>
-              <h4>3. How do I upload a model?</h4>
-                <paper-item>1. Do a pull request on Sourcetree for the "NLVS" project in order to have the latest data</paper-item>
-                <paper-item>2. Open Grasshopper:</paper-item>
-                  <ul>- open the "NLVS" folder</ul>
-                  <ul>- select the "ModelToJSON_Qty.gh" file</ul>
-                <paper-item>3. Within box for Tekla repo:</paper-item>
-                  <ul>- toggle boolean to true next to "connect"</ul>
-                  <ul>- toggle boolean to true next to "activate"</ul>
-                  <ul>- next to "Model Groups" select the group for which you'd like to generate a JSON file</ul>
-                <paper-item>4. In the box titled Target JSON File Location:</paper-item>
-                  <ul>- provide the path to the location where you wish to save the generated JSON file</ul>
-                  <ul>- select the category within "Steel Models" for which you'd like to generate a JSON file</ul>
-                  <ul>- toggle the boolean to equal true for the JSON you want to generate (concrete or steel)</ul>
-                <paper-item>This will generate a JSON file that will appear in your specified folder</paper-item>
-                <paper-item>5. Toggle the boolean in the Target JSON File Location box back to false</paper-item>
-                <paper-item>6. Log onto three-polymer-wireframe and select the + icon on the top right corner and fill in the fields on the screen</paper-item>
+              <h4>2. How do I upload a model?</h4>
+                <paper-item>1. Open Grasshopper:</paper-item>
+                  <ul>- use the "FEA_Model_To_JSON_CSVInput" component to plug in the model data from Tekla/Revit</ul>
+                  <ul>- plug in the "beamHeaders", "beamMetadadataCsv", "plateHeaders", and "plateMetadataCsv" into the "FEA_Model_To_JSON" component's "beamMetaDataNames", "beamMetaData", "shellMetaDataNames", and "shellMetaData" slots, respectively</ul>
+                  <ul>- toggle boolean to true next to "activate" on the "FEA_Model_To_JSON" component</ul>
+                <paper-item>This will generate a JSON file that will appear in the folder specified in the target file location</paper-item>
+                <paper-item>2. Toggle the boolean in "activate" back to false</paper-item>
+                <paper-item>3. Log onto three-polymer-wireframe and select the + icon on the top right corner and fill in the fields on the screen</paper-item>
               <h4>3. Contact information</h4>
                 <paper-item>a.	Kermin Chok (Kermin.Chok@arup.com): Structural Engineer, Buildings, Los Angeles</paper-item>
                 <paper-item>b.	Trent Clifton (Trent.Clifton@arup.com): Web Developer, Buildings, Los Angeles</paper-item>
