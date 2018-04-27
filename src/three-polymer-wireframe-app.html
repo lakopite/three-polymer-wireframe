@@ -611,11 +611,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <three-view id="view" legend-position="top-left" scene-background-color="#F5F5F5">
         <three-model id="model" slot="model" metadata-fields="{{metadataFields}}" is-loading="{{modelLoading}}" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[_modelData]]"></three-model>
       </three-view>
-      <!-- <div id="instructions" class="test">
+      <div id="instructions" class="test">
         <div class="test2">left click & drag to rotate model<paper-icon-button style="height: 2.5em; width: 2.5em;" on-tap="hideInstructions" icon="my-icons:clear" title="clear" on-tap=""></paper-icon-button></div>
         <div id="nditem" class="test2" style="padding: 0em;">right click & drag to move model</div>
         <div class="test2">scroll wheel to zoom in/out</div>
-      </div> -->
+      </div>
     </div>
     <!-- Quantities tab -->
       <!-- For numerical aggregations -->
@@ -1202,8 +1202,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       hideInstructions() {
         var elem = this.$.instructions
-        elem.style.display = 'none';
-        document.body.removeChild(elem);
+        // elem.style.display = 'none';
+        elem.parentNode.removeChild(elem);
+        return false
       }
 
       closeToast() {
@@ -2171,6 +2172,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       createNumericalCsv() {
+        var elementType = this.selectedElementType.split('-')[0]
         var rowData = ''
         if (this.numericalAggregationsTableData.length > 0) {
           for (var i=0; i < this.numericalAggregationsTableData.length; i++) {
@@ -2186,12 +2188,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return h + that._quantUnitLabels(that.selectedContourBy)
           })
           this.numDataHeaders = headers_ + '\r\n'
-          var csvData = this.numDataHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + "Downloaded on: " + this._currentDateTimeFormat()
+          var csvData = this.numDataHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + "Element type: " + elementType + '\r\n' + "Downloaded on: " + this._currentDateTimeFormat()
           var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
           var link = document.createElement("a");
           link.href = uri;
           link.style = "visibility:hidden";
-          link.download = this.selectedModel + ".csv";
+          link.download = this.selectedModel + "_" + elementType + "_elements" + ".csv";
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -2199,6 +2201,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       createGroupDataCsv() {
+        var elementType = this.selectedElementType.split('-')[0]
         var rowData = ''
         if (this.groupSumData.length > 0) {
           for (var i=0; i < this.groupSumData.length; i++) {
@@ -2218,12 +2221,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return that.selectedSumField + " " + h + that._quantUnitLabels(that.selectedSumField)
           })
           this.groupDataHeaders = headers_ + '\r\n';
-          var csvData = this.groupDataHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + "Downloaded on: " + this._currentDateTimeFormat()
+          var csvData = this.groupDataHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + "Element type: " + elementType + '\r\n' + "Downloaded on: " + this._currentDateTimeFormat()
           var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
           var link = document.createElement("a");
           link.href = uri;
           link.style = "visibility:hidden";
-          link.download = this.selectedModel + ".csv";
+          link.download = this.selectedModel + "_" + elementType + "_elements" + ".csv";
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -2231,6 +2234,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       createCostDataCsv() {
+        var elementType = this.selectedElementType.split('-')[0]
         var rowData = ''
         if (this.costTableData.length > 0) {
           for (var i=0; i < this.costTableData.length; i++) {
@@ -2255,12 +2259,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
           })
           this.costTableHeaders = headers_ + '\r\n';
-          var csvData = this.costTableHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + "Downloaded on: " + this._currentDateTimeFormat()
+          var csvData = this.costTableHeaders + rowData + '\r\n' + this._currentFilters() + '\r\n' + "Element type: " + elementType + '\r\n' + "Downloaded on: " + this._currentDateTimeFormat()
           var uri = 'data:text/csv;charset=utf-8,' + escape(csvData);
           var link = document.createElement("a");
           link.href = uri;
           link.style = "visibility:hidden";
-          link.download = this.selectedModel + ".csv";
+          link.download = this.selectedModel + "_" + elementType + "_elements" + ".csv";
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
