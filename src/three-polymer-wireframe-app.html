@@ -88,11 +88,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .three-container {
-        /* @apply(--layout-horizontal); */
-        @apply(--layout-vertical);
+        @apply(--layout-horizontal);
         @apply(--layout-center-justified);
         height: 100%;
-        /* height: 98%; */
       }
 
       #view {
@@ -130,11 +128,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       paper-button.filterBtn {
         background: var(--app-primary-color);
         color: #FFF;
-      }
-
-      #uploadSuccessToast {
-        --paper-toast-background-color: green;
-        --paper-toast-color: white;
       }
 
       paper-button[disabled] {
@@ -356,17 +349,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: block;
       }
 
-      .test {
-        @apply(--layout-vertical);
-        font-size: .7em;
-        @apply(--layout-self-end);
+      #instructionsToast {
+        margin-right: 2em;
+        padding-right: 0em;
+        --paper-toast-background-color: #BDBDBD;
+        --paper-toast-color: black;
       }
 
-      .test2 {
+      .halfPat {
+        margin: 1em;
+      }
+
+      .wrapItem {
         @apply(--layout-flex);
       }
 
-      #nditem {
+      #followingItem {
         margin-top: -.6em;
       }
 
@@ -465,7 +463,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-toast id="searchResultMsg"></paper-toast>
     <paper-toast id="validationToast" duration="0" class="fit-bottom">
       <paper-button on-tap="reopenUploadBox" class="yellow-toast">Try Again</paper-button>
-      <paper-button dialog-dismiss on-tap="closeToast" class="yellow-toast">Cancel</paper-button>
+      <paper-button dialog-dismiss on-tap="closeValidationToast" class="yellow-toast">Cancel</paper-button>
     </paper-toast>
     <paper-toast id="pollingStatusToast" duration="0"></paper-toast>
     <paper-toast id="uploadSuccessToast" duration="5000"></paper-toast>
@@ -611,11 +609,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <three-view id="view" legend-position="top-left" scene-background-color="#F5F5F5">
         <three-model id="model" slot="model" metadata-fields="{{metadataFields}}" is-loading="{{modelLoading}}" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[_modelData]]"></three-model>
       </three-view>
-      <div id="instructions" class="test">
-        <div class="test2">left click & drag to rotate model<paper-icon-button style="height: 2.5em; width: 2.5em;" on-tap="hideInstructions" icon="my-icons:clear" title="clear" on-tap=""></paper-icon-button></div>
-        <div id="nditem" class="test2" style="padding: 0em;">right click & drag to move model</div>
-        <div class="test2">scroll wheel to zoom in/out</div>
-      </div>
+      <paper-toast id="instructionsToast" duration="0" vertical-align="bottom" horizontal-align="right">
+        <div class="wrapItem">left click & drag to rotate model<span class="halfPat"><paper-icon-button style="height: 2.5em; width: 2.5em;" icon="my-icons:clear" title="clear" on-tap="closeInstructionsToast"></paper-icon-button></div>
+        <div id="followingItem"style="padding: 0em;">right click & drag to move model</div>
+        <div>scroll wheel to zoom in/out</div>
+      </paper-toast>
     </div>
     <!-- Quantities tab -->
       <!-- For numerical aggregations -->
@@ -1200,14 +1198,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         Polymer.dom(this.root).querySelector('#addModelDialog').open();
       }
 
-      hideInstructions() {
-        var elem = this.$.instructions
-        // elem.style.display = 'none';
-        elem.parentNode.removeChild(elem);
-        return false
+      closeInstructionsToast() {
+        this.$.instructionsToast.hide()
       }
 
-      closeToast() {
+      closeValidationToast() {
         this.$.validationToast.hide()
         this.userEmail = ''
         this.uploadSelectedProject = undefined
@@ -2067,6 +2062,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this._initCostChart();
         this.$['get-latest-fe-commit'].generateRequest();
         this.$['get-latest-be-commit'].generateRequest();
+        var toast = Polymer.dom(this.root).querySelector('#instructionsToast')
+        toast.show()
       }
 
       handleGetLatestFeCommitResp(event, response) {
