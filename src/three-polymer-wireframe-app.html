@@ -2062,8 +2062,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this._initCostChart();
         this.$['get-latest-fe-commit'].generateRequest();
         this.$['get-latest-be-commit'].generateRequest();
-        var toast = Polymer.dom(this.root).querySelector('#instructionsToast')
-        toast.show()
+        Polymer.dom(this.root).querySelector('#instructionsToast').show()
       }
 
       handleGetLatestFeCommitResp(event, response) {
