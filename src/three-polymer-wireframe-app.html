@@ -1168,6 +1168,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       uploadJsonModel() {
         var that = this
+        /**
+          Need to add functionality to support models that exceed API Gateway Size limit (10 MB)
+          if size > 10MB:
+            request a pre-signed post url from backend api
+          else:
+            continue with existing workflow
+        **/
         that.$['json-upload-request'].generateRequest();
         that._clearUploadInput()
         that.$.pollingStatusToast.show({ text: "Valid model posted to server. Waiting for confirmation..." })
