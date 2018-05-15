@@ -469,368 +469,369 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-toast id="uploadSuccessToast" duration="5000"></paper-toast>
     <paper-toast id="linkFailToast" duration="3000"></paper-toast>
     <paper-toast id="archivingToast" duration="5000"></paper-toast>
-    <app-drawer-layout fullbleed>
+    <app-drawer-layout id="drawerLayout" fullbleed>
     <!-- Drawer content -->
-    <app-drawer id="drawer" slot="drawer">
-    <div style="height: 100%; overflow: auto;">
-    <app-toolbar>
-      <paper-item>Model Options</paper-item>
-    </app-toolbar>
-    <div class="drawer-list">
-      <div class="model-div">
-        <paper-search-panel></paper-search-panel>
-        <paper-icon-button id="filterIcon" class="filter" icon="my-icons:filter-list" title="filter models" on-tap="showFilterModal"></paper-icon-button>
-        <paper-dropdown-menu label="Model">
-        <paper-listbox id="model-options" slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
-          <template id="searchOptions" is="dom-repeat" items="[[dataOptions]]" filter="applySearchFilters">
-            <paper-item id="model-dropdown" class="dropdown-item" name="[[item.model]]">
-              <paper-item-body two-line>
-                <div class="primary-item">[[_formatModelName(item.model)]]</div>
-                <div secondary class="secondary-item">[[_formatModelTimeStamp(item.s3_attributes.uploadTime)]]</div>
-              </paper-item-body>
-          </paper-item>
-        </template>
-        </paper-listbox>
-      </paper-dropdown-menu>
+      <app-drawer id="drawer" slot="drawer" swipe-open>
+      <div style="height: 100%; overflow: auto;">
+      <app-toolbar>
+        <paper-item>Model Options</paper-item>
+      </app-toolbar>
+      <div class="drawer-list">
+        <div class="model-div">
+          <paper-search-panel></paper-search-panel>
+          <paper-icon-button id="filterIcon" class="filter" icon="my-icons:filter-list" title="filter models" on-tap="showFilterModal"></paper-icon-button>
+          <paper-dropdown-menu label="Model">
+          <paper-listbox id="model-options" slot="dropdown-content" attr-for-selected="name" selected="{{selectedModel}}">
+            <template id="searchOptions" is="dom-repeat" items="[[dataOptions]]" filter="applySearchFilters">
+              <paper-item id="model-dropdown" class="dropdown-item" name="[[item.model]]">
+                <paper-item-body two-line>
+                  <div class="primary-item">[[_formatModelName(item.model)]]</div>
+                  <div secondary class="secondary-item">[[_formatModelTimeStamp(item.s3_attributes.uploadTime)]]</div>
+                </paper-item-body>
+            </paper-item>
+          </template>
+          </paper-listbox>
+        </paper-dropdown-menu>
+      </div>
+        <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
+        <div hidden$="{{_hideMainDropdown(selectedView)}}">
+          <paper-dropdown-menu label="Contour" id="main-contour-dropdown">
+            <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
+              <template is="dom-repeat" items="{{numDropdownOptions}}">
+                <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
+        </div>
+        <div id="filter-container">
+          <paper-item>Model Filters</paper-item>
+          <div class="horizontal">
+            <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min x" class="inline-input" type="number" value="{{geometryFilter.xMin}}" max="[[_computeMax(boundaries.xMax,geometryFilter.xMax)]]" min="[[boundaries.xMin]]"></paper-input>
+            <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max x" class="inline-input" type="number" value="{{geometryFilter.xMax}}" max="[[boundaries.xMax]]" min="[[_computeMin(boundaries.xMin,geometryFilter.xMin)]]"></paper-input>
+          </div>
+          <div class="horizontal">
+            <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min y" class="inline-input" type="number" value="{{geometryFilter.yMin}}" max="[[_computeMax(boundaries.yMax,geometryFilter.yMax)]]" min="[[boundaries.yMin]]"></paper-input>
+            <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max y" class="inline-input" type="number" value="{{geometryFilter.yMax}}" max="[[boundaries.yMax]]" min="[[_computeMin(boundaries.yMin,geometryFilter.yMin)]]"></paper-input>
+          </div>
+          <div class="horizontal">
+            <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min z" class="inline-input" type="number" value="{{geometryFilter.zMin}}" max="[[_computeMax(boundaries.zMax,geometryFilter.zMax)]]" min="[[boundaries.zMin]]"></paper-input>
+            <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max z" class="inline-input" type="number" value="{{geometryFilter.zMax}}" max="[[boundaries.zMax]]" min="[[_computeMin(boundaries.zMin,geometryFilter.zMin)]]"></paper-input>
+          </div>
+          <div class="horizontal">
+            <paper-button class="filterBtn" raised disabled$="{{_filtersDisabled}}" id="applyBtn" on-tap="applyFilters" type="number">Apply</paper-button>
+            <paper-button class="filterBtn" raised disabled$="{{modelLoading}}" id="resetBtn" on-tap="resetFilters" type="number">Reset</paper-button>
+          </div>
+        </div>
+        <!-- for csv xport button -->
+        <div hidden$="{{_hideCsvButton(selectedView)}}">
+          <div class="csv-button">
+            <paper-button id="csv-button" on-tap="createCsv">Export Table to CSV</paper-button>
+          </div>
+        </div>
+        <!-- end button -->
+      </div>
+      </div>
+    <!-- </div>
+    </div> -->
+    </app-drawer>
+    <!-- Main content -->
+      <app-header-layout has-scrolling-region>
+      <app-header slot="header" medium-tall>
+        <app-toolbar>
+          <paper-icon-button icon="my-icons:menu" on-tap="_toggleDrawer"></paper-icon-button>
+          <paper-icon-button class="archive-icon" icon="my-icons:archive" title="remove model" on-tap="confirmArchive"></paper-icon-button>
+          <paper-dialog id="archiveModal">
+            <h3>Are you sure you want to archive the following model?</h3>
+             <h4>[[selectedModel]]</h4>
+             <br />
+            <paper-button dialog-dismiss>Cancel</paper-button>
+            <paper-button raised class="filterBtn" dialog-dismiss on-tap="agreeToArchive">Archive</paper-button>
+          </paper-dialog>
+          <div id="hold-header" main-title>
+              Arup Model QuickView: [[_formatModelName(selectedModel)]]
+          </div>
+          <span class="pat"></span>
+          <div class="spacer"></div>
+          <paper-dialog modal id="loadingData">
+            <h3>Pulling data from server, please wait</h3>
+            <span class="pat"></span> <paper-spinner class="loading" active></paper-spinner>
+          </paper-dialog>
+          <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
+          <span class="pat"></span>
+          <!-- important dates -->
+          <paper-menu-button horizontal-align="right">
+            <paper-icon-button class="clock-icon" icon="my-icons:access-time" title="view important dates" slot="dropdown-trigger"></paper-icon-button>
+            <paper-listbox slot="dropdown-content">
+              <paper-item disabled>{{ _modelVersion(currentModelResp.modelInformation.VersionDate) }}</paper-item>
+              <paper-item disabled>{{ _jsonGenerated(currentModelResp.modelInformation.JSONCreateDate) }}</paper-item>
+              <paper-item disabled>{{_uploadedInfo(currentModelResp.modelInformation.s3_attributes.uploadTime, currentModelResp.modelInformation.user)}}</paper-item>
+              <paper-item disabled>FE build date: [[frontEndBuildDate]]</paper-item>
+              <paper-item disabled>BE build date: [[backEndBuildDate]]</paper-item>
+            </paper-listbox>
+          </paper-menu-button>
+          <!--  -->
+          <paper-icon-button on-tap="showDialog" icon="my-icons:add" title="add model"></paper-icon-button>
+          <paper-menu-button horizontal-align="right">
+            <paper-icon-button icon="my-icons:account-circle" slot="dropdown-trigger"></paper-icon-button>
+            <paper-listbox slot="dropdown-content">
+              <paper-item style="cursor:pointer;" on-tap="logout">Logout</paper-item>
+            </paper-listbox>
+          </paper-menu-button>
+        </app-toolbar>
+        <app-toolbar>
+          <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedView}}">
+            <paper-tab name="model-view">Model</paper-tab>
+            <paper-tab name="aggregations-view">Quantities</paper-tab>
+            <paper-tab name="cost-view" id="cost-tab" disabled$="{{_disableCostTab(metadataFields, currentModelResp, geometryFilter)}}">Cost</paper-tab>
+            <paper-tab name="faq-view" id="faq-tab">FAQ</paper-tab>
+          </paper-tabs>
+        </app-toolbar>
+      </app-header>
+      <iron-pages style="height:100%;" attr-for-selected="name" selected="{{selectedView}}">
+      <div name="model-view" class="three-container">
+        <three-view id="view" legend-position="top-left" scene-background-color="#F5F5F5">
+          <three-model id="model" slot="model" metadata-fields="{{metadataFields}}" is-loading="{{modelLoading}}" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[_modelData]]"></three-model>
+        </three-view>
+        <paper-toast id="instructionsToast" duration="0" vertical-align="bottom" horizontal-align="right">
+          <template is="dom-if" if="{{viewInstructions}}">
+            <div class="wrapItem">left click & drag to rotate model<span class="halfPat"><paper-icon-button style="height: 2.5em; width: 2.5em;" icon="{{_getInstructionsIcon(viewInstructions)}}" title="clear" on-tap="toggleInstructionsView"></paper-icon-button></div>
+            <div id="followingItem"style="padding: 0em;">right click & drag to move model</div>
+            <div>scroll wheel to zoom in/out</div>
+          </template>
+          <template is="dom-if" if="{{!viewInstructions}}">
+            <div class="wrapItem">View instructions<span class="halfPat"><paper-icon-button style="height: 2.5em; width: 2.5em;" icon="{{_getInstructionsIcon(viewInstructions)}}" title="view" on-tap="toggleInstructionsView"></paper-icon-button></div>
+          </template>
+        </paper-toast>
+      </div>
+      <!-- Quantities tab -->
+        <!-- For numerical aggregations -->
+      <div name="aggregations-view">
+        <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedElementType}}">
+          <paper-tab name="linear-view" id="linear-tab" disabled$="{{_disableLinearTab(linearNumFilterResult, linearStringFilterResult)}}">Linear Elements</paper-tab>
+          <paper-tab name="planar-view" id="planar-tab" disabled$="{{_disablePlanarTab(planarNumFilterResult, planarStringFilterResult)}}">Planar Elements</paper-tab>
+        </paper-tabs>
+        <div hidden$="[[!showNumericalAggregations]]">
+          <div class="num-wrapper">
+            <app-toolbar class="aggregation-toolbar">
+              <div main-title>Aggregations</div>
+            </app-toolbar>
+            <paper-dropdown-menu id="num-contour-dropdown" label="Select Contour">
+              <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
+                <template is="dom-repeat" items="{{numDropdownOptions}}">
+                  <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+                </template>
+              </paper-listbox>
+              </paper-dropdown-menu>
+          </div>
+          <!-- min/max/avg table -->
+          <vaadin-grid class="numerical-aggregations-table" items="[[numericalAggregationsTableData]]">
+            <vaadin-grid-column>
+              <template class="header">Name</template>
+              <template>[[item.name]] [[_quantUnitLabels(selectedContourBy)]]</template>
+              <template class="footer">Grand Total: [[_prettify(totalResult)]] [[_quantUnitLabels(selectedContourBy)]]</template>
+            </vaadin-grid-column>
+            <vaadin-grid-column>
+              <template class="header">Result</template>
+              <template>[[_prettify(item.result)]]</template>
+            </vaadin-grid-column>
+          </vaadin-grid>
+        </div>
+        <!-- For string aggregations -->
+        <div hidden$="[[!showStringAggregations]]">
+          <div class="str-header">
+            <app-toolbar class="aggregation-toolbar">
+              <div main-title>Data by Group</div>
+            </app-toolbar>
+            <paper-dropdown-menu id="str-contour-dropdown" label="Select Contour">
+              <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
+                <template is="dom-repeat" items="{{numDropdownOptions}}">
+                  <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+                </template>
+              </paper-listbox>
+            </paper-dropdown-menu>
+            <paper-dropdown-menu class="aggregation-toolbar" id="sumFieldDropDown" label="Select Sum Field">
+              <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
+                <template is="dom-repeat" items="{{numericalMetadataKeys}}">
+                  <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
+                </template>
+              </paper-listbox>
+            </paper-dropdown-menu>
+              <paper-fab mini id="strViewIcon" class="pie-icon" icon="{{_getStringIcon(stringPieView)}}" title="switch view" on-tap="strToggleView"></paper-fab>
+          </div>
+          <!-- wrap all string aggregation info -->
+          <div id="wrap-str-info">
+            <!-- div holds pie chart -->
+            <div id="sum-chart-container" hidden$="[[!stringPieView]]"></div>
+            <!-- data by group table -->
+            <div id="group-data-table-section" hidden$="[[stringPieView]]">
+              <vaadin-grid class="data-by-group-table" items="[[groupSumData]]">
+                <vaadin-grid-column width="200px">
+                  <template class="header">
+                    <vaadin-grid-sorter path="group">group</vaadin-grid-sorter>
+                  </template>
+                  <template>[[item.group]]</template>
+                  <template class="footer">Grand Total</template>
+                </vaadin-grid-column>
+                <vaadin-grid-column>
+                  <template class="header">
+                    <vaadin-grid-sorter path="elemsPerGroup">elements/group</vaadin-grid-sorter>
+                  </template>
+                  <template>[[_prettify(item.elemsPerGroup)]]</template>
+                  <template class="footer">[[_prettify(totalElements)]]</template>
+                </vaadin-grid-column>
+                <vaadin-grid-column>
+                  <template class="header">
+                    <vaadin-grid-sorter path="sum">sum [[selectedSumField]] [[_quantUnitLabels(selectedSumField)]]</vaadin-grid-sorter>
+                  </template>
+                  <template>[[_prettify(item.sum)]]</template>
+                  <template class="footer">[[_prettify(grandTotalSum)]] [[_quantUnitLabels(selectedSumField)]]</template>
+                </vaadin-grid-column>
+                <vaadin-grid-column id="otherUnitColumn">
+                  <template class="header">
+                    <vaadin-grid-sorter path="otherUnitSum">sum [[selectedSumField]] [[strOtherUnitLabel]]</vaadin-grid-sorter>
+                  </template>
+                  <template>[[_prettify(item.otherUnitSum)]]</template>
+                  <template class="footer">[[_prettify(grandTotalOtherUnitSum)]] [[strOtherUnitLabel]]</template>
+                </vaadin-grid-column>
+                <!-- NUMERICAL AGGREGATIONS WITHIN STRING AGGREGATION TABLE-->
+                <vaadin-grid-column>
+                  <template class="header">min [[selectedSumField]] [[_quantUnitLabels(selectedSumField)]]</template>
+                  <template>[[_prettify(item.min)]]</template>
+                </vaadin-grid-column>
+                <vaadin-grid-column>
+                  <template class="header">max [[selectedSumField]] [[_quantUnitLabels(selectedSumField)]]</template>
+                  <template>[[_prettify(item.max)]]</template>
+                </vaadin-grid-column>
+                <vaadin-grid-column>
+                  <template class="header">avg [[selectedSumField]] [[_quantUnitLabels(selectedSumField)]]</template>
+                  <template>[[_prettify(item.avg)]]</template>
+                </vaadin-grid-column>
+              </vaadin-grid>
+            </div>
+          </div>
+      </div>
     </div>
-      <paper-button hidden$="{{_hideShareBtn(selectedModel)}}" id="share-model" class="filterBtn" on-tap="_shareModelEmail">Share via Email</paper-button>
-      <div hidden$="{{_hideMainDropdown(selectedView)}}">
-        <paper-dropdown-menu label="Contour" id="main-contour-dropdown">
-          <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-            <template is="dom-repeat" items="{{numDropdownOptions}}">
+      <!-- Cost Tab -->
+      <div name="cost-view">
+        <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedElementType}}">
+          <paper-tab name="linear-view" id="linear-tab" disabled$="{{_disableLinearTab(linearNumFilterResult, linearStringFilterResult)}}">Linear Elements</paper-tab>
+          <paper-tab name="planar-view" id="planar-tab" disabled$="{{_disablePlanarTab(planarNumFilterResult, planarStringFilterResult)}}">Planar Elements</paper-tab>
+        </paper-tabs>
+        <div class="num-wrapper">
+          <app-toolbar class="aggregation-toolbar">
+            <div main-title>Cost of [[_capitalize(material)]] by Group</div>
+          </app-toolbar>
+          <paper-dropdown-menu id="cost-group" label="Select Group/Subgroup">
+          <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedCostGroup}}">
+            <template is="dom-repeat" items="[[costGroups]]">
               <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
             </template>
           </paper-listbox>
-        </paper-dropdown-menu>
-      </div>
-      <div id="filter-container">
-        <paper-item>Model Filters</paper-item>
-        <div class="horizontal">
-          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min x" class="inline-input" type="number" value="{{geometryFilter.xMin}}" max="[[_computeMax(boundaries.xMax,geometryFilter.xMax)]]" min="[[boundaries.xMin]]"></paper-input>
-          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max x" class="inline-input" type="number" value="{{geometryFilter.xMax}}" max="[[boundaries.xMax]]" min="[[_computeMin(boundaries.xMin,geometryFilter.xMin)]]"></paper-input>
-        </div>
-        <div class="horizontal">
-          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min y" class="inline-input" type="number" value="{{geometryFilter.yMin}}" max="[[_computeMax(boundaries.yMax,geometryFilter.yMax)]]" min="[[boundaries.yMin]]"></paper-input>
-          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max y" class="inline-input" type="number" value="{{geometryFilter.yMax}}" max="[[boundaries.yMax]]" min="[[_computeMin(boundaries.yMin,geometryFilter.yMin)]]"></paper-input>
-        </div>
-        <div class="horizontal">
-          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="min z" class="inline-input" type="number" value="{{geometryFilter.zMin}}" max="[[_computeMax(boundaries.zMax,geometryFilter.zMax)]]" min="[[boundaries.zMin]]"></paper-input>
-          <paper-input prevent-invalid-input allowed-pattern="[-.\d]" on-input="checkValidInput" label="max z" class="inline-input" type="number" value="{{geometryFilter.zMax}}" max="[[boundaries.zMax]]" min="[[_computeMin(boundaries.zMin,geometryFilter.zMin)]]"></paper-input>
-        </div>
-        <div class="horizontal">
-          <paper-button class="filterBtn" raised disabled$="{{_filtersDisabled}}" id="applyBtn" on-tap="applyFilters" type="number">Apply</paper-button>
-          <paper-button class="filterBtn" raised disabled$="{{modelLoading}}" id="resetBtn" on-tap="resetFilters" type="number">Reset</paper-button>
-        </div>
-      </div>
-      <!-- for csv xport button -->
-      <div hidden$="{{_hideCsvButton(selectedView)}}">
-        <div class="csv-button">
-          <paper-button id="csv-button" on-tap="createCsv">Export Table to CSV</paper-button>
-        </div>
-      </div>
-      <!-- end button -->
-    </div>
-    </div>
-  <!-- </div>
-  </div> -->
-  </app-drawer>
-  <!-- Main content -->
-    <app-header-layout has-scrolling-region>
-    <app-header slot="header" medium-tall>
-      <app-toolbar>
-        <paper-icon-button class="archive-icon" icon="my-icons:archive" title="remove model" on-tap="confirmArchive"></paper-icon-button>
-        <paper-dialog id="archiveModal">
-          <h3>Are you sure you want to archive the following model?</h3>
-           <h4>[[selectedModel]]</h4>
-           <br />
-          <paper-button dialog-dismiss>Cancel</paper-button>
-          <paper-button raised class="filterBtn" dialog-dismiss on-tap="agreeToArchive">Archive</paper-button>
-        </paper-dialog>
-        <div id="hold-header" main-title>
-            Arup Model QuickView: [[_formatModelName(selectedModel)]]
-        </div>
-        <span class="pat"></span>
-        <div class="spacer"></div>
-        <paper-dialog modal id="loadingData">
-          <h3>Pulling data from server, please wait</h3>
-          <span class="pat"></span> <paper-spinner class="loading" active></paper-spinner>
-        </paper-dialog>
-        <paper-spinner active$="{{isLoadingState(modelLoading,appLoading)}}"></paper-spinner>
-        <span class="pat"></span>
-        <!-- important dates -->
-        <paper-menu-button horizontal-align="right">
-          <paper-icon-button class="clock-icon" icon="my-icons:access-time" title="view important dates" slot="dropdown-trigger"></paper-icon-button>
-          <paper-listbox slot="dropdown-content">
-            <paper-item disabled>{{ _modelVersion(currentModelResp.modelInformation.VersionDate) }}</paper-item>
-            <paper-item disabled>{{ _jsonGenerated(currentModelResp.modelInformation.JSONCreateDate) }}</paper-item>
-            <paper-item disabled>{{_uploadedInfo(currentModelResp.modelInformation.s3_attributes.uploadTime, currentModelResp.modelInformation.user)}}</paper-item>
-            <paper-item disabled>FE build date: [[frontEndBuildDate]]</paper-item>
-            <paper-item disabled>BE build date: [[backEndBuildDate]]</paper-item>
-          </paper-listbox>
-        </paper-menu-button>
-        <!--  -->
-        <paper-icon-button on-tap="showDialog" icon="my-icons:add" title="add model"></paper-icon-button>
-        <paper-menu-button horizontal-align="right">
-          <paper-icon-button icon="my-icons:account-circle" slot="dropdown-trigger"></paper-icon-button>
-          <paper-listbox slot="dropdown-content">
-            <paper-item style="cursor:pointer;" on-tap="logout">Logout</paper-item>
-          </paper-listbox>
-        </paper-menu-button>
-      </app-toolbar>
-      <app-toolbar>
-        <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedView}}">
-          <paper-tab name="model-view">Model</paper-tab>
-          <paper-tab name="aggregations-view">Quantities</paper-tab>
-          <paper-tab name="cost-view" id="cost-tab" disabled$="{{_disableCostTab(metadataFields, currentModelResp, geometryFilter)}}">Cost</paper-tab>
-          <paper-tab name="faq-view" id="faq-tab">FAQ</paper-tab>
-        </paper-tabs>
-      </app-toolbar>
-    </app-header>
-    <iron-pages style="height:100%;" attr-for-selected="name" selected="{{selectedView}}">
-    <div name="model-view" class="three-container">
-      <three-view id="view" legend-position="top-left" scene-background-color="#F5F5F5">
-        <three-model id="model" slot="model" metadata-fields="{{metadataFields}}" is-loading="{{modelLoading}}" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[_modelData]]"></three-model>
-      </three-view>
-      <paper-toast id="instructionsToast" duration="0" vertical-align="bottom" horizontal-align="right">
-        <template is="dom-if" if="{{viewInstructions}}">
-          <div class="wrapItem">left click & drag to rotate model<span class="halfPat"><paper-icon-button style="height: 2.5em; width: 2.5em;" icon="{{_getInstructionsIcon(viewInstructions)}}" title="clear" on-tap="toggleInstructionsView"></paper-icon-button></div>
-          <div id="followingItem"style="padding: 0em;">right click & drag to move model</div>
-          <div>scroll wheel to zoom in/out</div>
-        </template>
-        <template is="dom-if" if="{{!viewInstructions}}">
-          <div class="wrapItem">View instructions<span class="halfPat"><paper-icon-button style="height: 2.5em; width: 2.5em;" icon="{{_getInstructionsIcon(viewInstructions)}}" title="view" on-tap="toggleInstructionsView"></paper-icon-button></div>
-        </template>
-      </paper-toast>
-    </div>
-    <!-- Quantities tab -->
-      <!-- For numerical aggregations -->
-    <div name="aggregations-view">
-      <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedElementType}}">
-        <paper-tab name="linear-view" id="linear-tab" disabled$="{{_disableLinearTab(linearNumFilterResult, linearStringFilterResult)}}">Linear Elements</paper-tab>
-        <paper-tab name="planar-view" id="planar-tab" disabled$="{{_disablePlanarTab(planarNumFilterResult, planarStringFilterResult)}}">Planar Elements</paper-tab>
-      </paper-tabs>
-      <div hidden$="[[!showNumericalAggregations]]">
-        <div class="num-wrapper">
-          <app-toolbar class="aggregation-toolbar">
-            <div main-title>Aggregations</div>
-          </app-toolbar>
-          <paper-dropdown-menu id="num-contour-dropdown" label="Select Contour">
-            <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-              <template is="dom-repeat" items="{{numDropdownOptions}}">
-                <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
-              </template>
-            </paper-listbox>
-            </paper-dropdown-menu>
-        </div>
-        <!-- min/max/avg table -->
-        <vaadin-grid class="numerical-aggregations-table" items="[[numericalAggregationsTableData]]">
-          <vaadin-grid-column>
-            <template class="header">Name</template>
-            <template>[[item.name]] [[_quantUnitLabels(selectedContourBy)]]</template>
-            <template class="footer">Grand Total: [[_prettify(totalResult)]] [[_quantUnitLabels(selectedContourBy)]]</template>
-          </vaadin-grid-column>
-          <vaadin-grid-column>
-            <template class="header">Result</template>
-            <template>[[_prettify(item.result)]]</template>
-          </vaadin-grid-column>
-        </vaadin-grid>
-      </div>
-      <!-- For string aggregations -->
-      <div hidden$="[[!showStringAggregations]]">
-        <div class="str-header">
-          <app-toolbar class="aggregation-toolbar">
-            <div main-title>Data by Group</div>
-          </app-toolbar>
-          <paper-dropdown-menu id="str-contour-dropdown" label="Select Contour">
-            <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedContourBy}}">
-              <template is="dom-repeat" items="{{numDropdownOptions}}">
-                <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
-              </template>
-            </paper-listbox>
           </paper-dropdown-menu>
-          <paper-dropdown-menu class="aggregation-toolbar" id="sumFieldDropDown" label="Select Sum Field">
-            <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="name" selected="{{selectedSumField}}">
-              <template is="dom-repeat" items="{{numericalMetadataKeys}}">
-                <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
-              </template>
-            </paper-listbox>
-          </paper-dropdown-menu>
-            <paper-fab mini id="strViewIcon" class="pie-icon" icon="{{_getStringIcon(stringPieView)}}" title="switch view" on-tap="strToggleView"></paper-fab>
+            <paper-fab mini disabled="{{_disableViewIcon(totalCost, costPieView)}}" id="costViewIcon" class="pie-icon" icon="{{_getCostIcon(costPieView)}}" title="switch view" on-tap="costToggleView"></paper-fab>
         </div>
-        <!-- wrap all string aggregation info -->
-        <div id="wrap-str-info">
-          <!-- div holds pie chart -->
-          <div id="sum-chart-container" hidden$="[[!stringPieView]]"></div>
-          <!-- data by group table -->
-          <div id="group-data-table-section" hidden$="[[stringPieView]]">
-            <vaadin-grid class="data-by-group-table" items="[[groupSumData]]">
-              <vaadin-grid-column width="200px">
-                <template class="header">
-                  <vaadin-grid-sorter path="group">group</vaadin-grid-sorter>
-                </template>
-                <template>[[item.group]]</template>
-                <template class="footer">Grand Total</template>
-              </vaadin-grid-column>
+        <div id="wrap-cost-info">
+          <div id="cost-table-section" hidden$="[[costPieView]]">
+          <!-- cost by group table -->
+            <vaadin-grid class="cost-by-group-table" items="{{costTableData}}">
+            <vaadin-grid-column width="200px">
+              <template class="header">
+                <vaadin-grid-sorter path="group">group</vaadin-grid-sorter>
+              </template>
+              <template>[[item.group]]</template>
+              <template class="footer">Grand Total</template>
+            </vaadin-grid-column>
+            <vaadin-grid-column>
+              <template class="header">
+                <vaadin-grid-sorter path="elemsPerGroup">elements/group</vaadin-grid-sorter>
+              </template>
+              <template>[[_prettify(item.elemsPerGroup)]]</template>
+              <template class="footer">[[_prettify(costTotalElements)]]</template>
+            </vaadin-grid-column>
               <vaadin-grid-column>
                 <template class="header">
-                  <vaadin-grid-sorter path="elemsPerGroup">elements/group</vaadin-grid-sorter>
-                </template>
-                <template>[[_prettify(item.elemsPerGroup)]]</template>
-                <template class="footer">[[_prettify(totalElements)]]</template>
-              </vaadin-grid-column>
-              <vaadin-grid-column>
-                <template class="header">
-                  <vaadin-grid-sorter path="sum">sum [[selectedSumField]] [[_quantUnitLabels(selectedSumField)]]</vaadin-grid-sorter>
+                  <vaadin-grid-sorter path="sum">[[material]] sum [[_costUnitLabels(material, unitType)]]</vaadin-grid-sorter>
                 </template>
                 <template>[[_prettify(item.sum)]]</template>
-                <template class="footer">[[_prettify(grandTotalSum)]] [[_quantUnitLabels(selectedSumField)]]</template>
+                <template class="footer">[[_prettify(totalMaterialSum)]] [[_costUnitLabels(material, unitType)]]</template>
               </vaadin-grid-column>
-              <vaadin-grid-column id="otherUnitColumn">
+              <vaadin-grid-column>
                 <template class="header">
-                  <vaadin-grid-sorter path="otherUnitSum">sum [[selectedSumField]] [[strOtherUnitLabel]]</vaadin-grid-sorter>
+                  <vaadin-grid-sorter path="otherUnitSum">[[material]] sum [[costOtherUnitLabel]]</vaadin-grid-sorter>
                 </template>
                 <template>[[_prettify(item.otherUnitSum)]]</template>
-                <template class="footer">[[_prettify(grandTotalOtherUnitSum)]] [[strOtherUnitLabel]]</template>
+                <template class="footer">[[_prettify(totalMaterialSumDiffUnit)]] [[costOtherUnitLabel]]</template>
               </vaadin-grid-column>
-              <!-- NUMERICAL AGGREGATIONS WITHIN STRING AGGREGATION TABLE-->
-              <vaadin-grid-column>
-                <template class="header">min [[selectedSumField]] [[_quantUnitLabels(selectedSumField)]]</template>
-                <template>[[_prettify(item.min)]]</template>
-              </vaadin-grid-column>
-              <vaadin-grid-column>
-                <template class="header">max [[selectedSumField]] [[_quantUnitLabels(selectedSumField)]]</template>
-                <template>[[_prettify(item.max)]]</template>
-              </vaadin-grid-column>
-              <vaadin-grid-column>
-                <template class="header">avg [[selectedSumField]] [[_quantUnitLabels(selectedSumField)]]</template>
-                <template>[[_prettify(item.avg)]]</template>
-              </vaadin-grid-column>
-            </vaadin-grid>
-          </div>
-        </div>
-    </div>
-  </div>
-    <!-- Cost Tab -->
-    <div name="cost-view">
-      <paper-tabs bottom-item attr-for-selected="name" selected="{{selectedElementType}}">
-        <paper-tab name="linear-view" id="linear-tab" disabled$="{{_disableLinearTab(linearNumFilterResult, linearStringFilterResult)}}">Linear Elements</paper-tab>
-        <paper-tab name="planar-view" id="planar-tab" disabled$="{{_disablePlanarTab(planarNumFilterResult, planarStringFilterResult)}}">Planar Elements</paper-tab>
-      </paper-tabs>
-      <div class="num-wrapper">
-        <app-toolbar class="aggregation-toolbar">
-          <div main-title>Cost of [[_capitalize(material)]] by Group</div>
-        </app-toolbar>
-        <paper-dropdown-menu id="cost-group" label="Select Group/Subgroup">
-        <paper-listbox slot="dropdown-content" attr-for-selected="name" selected="{{selectedCostGroup}}">
-          <template is="dom-repeat" items="[[costGroups]]">
-            <paper-item class="dropdown-item" name="{{item}}">{{item}}</paper-item>
-          </template>
-        </paper-listbox>
-        </paper-dropdown-menu>
-          <paper-fab mini disabled="{{_disableViewIcon(totalCost, costPieView)}}" id="costViewIcon" class="pie-icon" icon="{{_getCostIcon(costPieView)}}" title="switch view" on-tap="costToggleView"></paper-fab>
-      </div>
-      <div id="wrap-cost-info">
-        <div id="cost-table-section" hidden$="[[costPieView]]">
-        <!-- cost by group table -->
-          <vaadin-grid class="cost-by-group-table" items="{{costTableData}}">
-          <vaadin-grid-column width="200px">
-            <template class="header">
-              <vaadin-grid-sorter path="group">group</vaadin-grid-sorter>
-            </template>
-            <template>[[item.group]]</template>
-            <template class="footer">Grand Total</template>
-          </vaadin-grid-column>
-          <vaadin-grid-column>
-            <template class="header">
-              <vaadin-grid-sorter path="elemsPerGroup">elements/group</vaadin-grid-sorter>
-            </template>
-            <template>[[_prettify(item.elemsPerGroup)]]</template>
-            <template class="footer">[[_prettify(costTotalElements)]]</template>
-          </vaadin-grid-column>
-            <vaadin-grid-column>
-              <template class="header">
-                <vaadin-grid-sorter path="sum">[[material]] sum [[_costUnitLabels(material, unitType)]]</vaadin-grid-sorter>
-              </template>
-              <template>[[_prettify(item.sum)]]</template>
-              <template class="footer">[[_prettify(totalMaterialSum)]] [[_costUnitLabels(material, unitType)]]</template>
-            </vaadin-grid-column>
-            <vaadin-grid-column>
-              <template class="header">
-                <vaadin-grid-sorter path="otherUnitSum">[[material]] sum [[costOtherUnitLabel]]</vaadin-grid-sorter>
-              </template>
-              <template>[[_prettify(item.otherUnitSum)]]</template>
-              <template class="footer">[[_prettify(totalMaterialSumDiffUnit)]] [[costOtherUnitLabel]]</template>
-            </vaadin-grid-column>
-            <vaadin-grid-column style="width: 90px;">
-              <template class="header">Cost/[[costOtherUnitLabel]]
-                <div id ="apply-all-div">
-                  <paper-input-container style="width: 75px;">
-                    <label slot="label">Apply all</label>
-                    <iron-input slot="input" id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{applyToAll}}" on-change="{{_enableApplyAllBtn(applyToAll)}}">
+              <vaadin-grid-column style="width: 90px;">
+                <template class="header">Cost/[[costOtherUnitLabel]]
+                  <div id ="apply-all-div">
+                    <paper-input-container style="width: 75px;">
+                      <label slot="label">Apply all</label>
+                      <iron-input slot="input" id="apply-all-input" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{applyToAll}}" on-change="{{_enableApplyAllBtn(applyToAll)}}">
+                        <input class="print-clean">
+                      </iron-input>
+                    </paper-input-container>
+                    <paper-icon-button id="apply-all-btn" on-tap="_applyAllCostResults" icon="my-icons:check-circle" title="apply to all" disabled></paper-icon-button>
+                  </div>
+                </template>
+                <template>
+                  <paper-input-container style="width: 70px;">
+                    <label slot="label">Cost per unit</label>
+                    <iron-input slot="input" id="cost-input-[[index]]" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{item.input}}" on-change="_setCostResults">
                       <input class="print-clean">
                     </iron-input>
                   </paper-input-container>
-                  <paper-icon-button id="apply-all-btn" on-tap="_applyAllCostResults" icon="my-icons:check-circle" title="apply to all" disabled></paper-icon-button>
-                </div>
+                </template>
+              </vaadin-grid-column>
+            <vaadin-grid-column>
+              <template class="header">
+                <vaadin-grid-sorter path="costResult">Cost Amount</vaadin-grid-sorter>
               </template>
-              <template>
-                <paper-input-container style="width: 70px;">
-                  <label slot="label">Cost per unit</label>
-                  <iron-input slot="input" id="cost-input-[[index]]" prevent-invalid-input allowed-pattern="[.\d]" minlength="1" bind-value="{{item.input}}" on-change="_setCostResults">
-                    <input class="print-clean">
-                  </iron-input>
-                </paper-input-container>
-              </template>
+              <template>[[_prettifyDollar(item.costResult)]]</template>
+              <template class="footer">[[_prettifyDollar(totalCost)]]</template>
             </vaadin-grid-column>
-          <vaadin-grid-column>
-            <template class="header">
-              <vaadin-grid-sorter path="costResult">Cost Amount</vaadin-grid-sorter>
-            </template>
-            <template>[[_prettifyDollar(item.costResult)]]</template>
-            <template class="footer">[[_prettifyDollar(totalCost)]]</template>
-          </vaadin-grid-column>
-          </vaadin-grid>
-        </div>
-        <!-- to hold cost pie chart -->
-        <div id="cost-chart-container" hidden$="[[!costPieView]]"></div>
-      </div>
-    </div>
-    <!-- FAQ -->
-          <div name="faq-view">
-            <paper-card class="faq-card">
-              <h4>1. What can users do on this site?</h4>
-                <paper-item>a. Upload models and view them in 3D</paper-item>
-                <paper-item>b. Have easy access to automated calculations that represent measurements of their different sticks</paper-item>
-                <paper-item>c. Easily calculate of cost for each group of sticks and their subgroups</paper-item>
-                <paper-item>d. Adjust the options under the Model Filters heading in order to generate the corresponding data</paper-item>
-                <paper-item>e. View data by group/subgroup represented on a table and a a pie chart that illustrates the numerical proportion of each</paper-item>
-                <paper-item>f. Toggle back and forth between table and chart views</paper-item>
-                <paper-item>g. Share a model with a user via email</paper-item>
-                <paper-item>h. Export any of the data to a CSV file</paper-item>
-                <paper-item>i. Find models by project, office, date range, and/or the user that uploaded it using the search filter</paper-item>
-              <h4>2. How do I upload a model?</h4>
-                <paper-item>1. Open Grasshopper:</paper-item>
-                  <ul>- use the "FEA_Model_To_JSON_CSVInput" component to plug in the model data from Tekla/Revit</ul>
-                  <ul>- plug in the "beamHeaders", "beamMetadadataCsv", "plateHeaders", and "plateMetadataCsv" into the "FEA_Model_To_JSON" component's "beamMetaDataNames", "beamMetaData", "shellMetaDataNames", and "shellMetaData" slots, respectively</ul>
-                  <ul>- toggle boolean to true next to "activate" on the "FEA_Model_To_JSON" component</ul>
-                <paper-item>This will generate a JSON file that will appear in the folder specified in the target file location</paper-item>
-                <paper-item>2. Toggle the boolean in "activate" back to false</paper-item>
-                <paper-item>3. Log onto three-polymer-wireframe and select the + icon on the top right corner and fill in the fields on the screen</paper-item>
-              <h4>3. Contact information</h4>
-                <paper-item>a.	Kermin Chok (Kermin.Chok@arup.com): Structural Engineer, Buildings, Los Angeles</paper-item>
-                <paper-item>b.	Trent Clifton (Trent.Clifton@arup.com): Web Developer, Buildings, Los Angeles</paper-item>
-                <paper-item>c.	Rubi Sanchez (Rubi.Sanchez@arup.com): Web Developer, Buildings, Los Angeles</paper-item>
-              <h4>4. Web Technologies</h4>
-                <paper-item>a.	Front end framework/hosting: Polymer 2.0/Firebase</paper-item>
-                <paper-item>b.	Tables: Vaadin-Grid</paper-item>
-                <paper-item>c.	Charting: Highcharts</paper-item>
-                <paper-item>d.	3D Rendering: three-polymer</paper-item>
-                <paper-item>e.  Serverless Backend: Chalice, Node, AWS Lambda, AWS API Gateway</paper-item>
-                <paper-item>f.	Database: MongoDB</paper-item>
-            </paper-card>
+            </vaadin-grid>
           </div>
-        </iron-pages>
-      </app-header-layout>
+          <!-- to hold cost pie chart -->
+          <div id="cost-chart-container" hidden$="[[!costPieView]]"></div>
+        </div>
+      </div>
+      <!-- FAQ -->
+            <div name="faq-view">
+              <paper-card class="faq-card">
+                <h4>1. What can users do on this site?</h4>
+                  <paper-item>a. Upload models and view them in 3D</paper-item>
+                  <paper-item>b. Have easy access to automated calculations that represent measurements of their different sticks</paper-item>
+                  <paper-item>c. Easily calculate of cost for each group of sticks and their subgroups</paper-item>
+                  <paper-item>d. Adjust the options under the Model Filters heading in order to generate the corresponding data</paper-item>
+                  <paper-item>e. View data by group/subgroup represented on a table and a a pie chart that illustrates the numerical proportion of each</paper-item>
+                  <paper-item>f. Toggle back and forth between table and chart views</paper-item>
+                  <paper-item>g. Share a model with a user via email</paper-item>
+                  <paper-item>h. Export any of the data to a CSV file</paper-item>
+                  <paper-item>i. Find models by project, office, date range, and/or the user that uploaded it using the search filter</paper-item>
+                <h4>2. How do I upload a model?</h4>
+                  <paper-item>1. Open Grasshopper:</paper-item>
+                    <ul>- use the "FEA_Model_To_JSON_CSVInput" component to plug in the model data from Tekla/Revit</ul>
+                    <ul>- plug in the "beamHeaders", "beamMetadadataCsv", "plateHeaders", and "plateMetadataCsv" into the "FEA_Model_To_JSON" component's "beamMetaDataNames", "beamMetaData", "shellMetaDataNames", and "shellMetaData" slots, respectively</ul>
+                    <ul>- toggle boolean to true next to "activate" on the "FEA_Model_To_JSON" component</ul>
+                  <paper-item>This will generate a JSON file that will appear in the folder specified in the target file location</paper-item>
+                  <paper-item>2. Toggle the boolean in "activate" back to false</paper-item>
+                  <paper-item>3. Log onto three-polymer-wireframe and select the + icon on the top right corner and fill in the fields on the screen</paper-item>
+                <h4>3. Contact information</h4>
+                  <paper-item>a.	Kermin Chok (Kermin.Chok@arup.com): Structural Engineer, Buildings, Los Angeles</paper-item>
+                  <paper-item>b.	Trent Clifton (Trent.Clifton@arup.com): Web Developer, Buildings, Los Angeles</paper-item>
+                  <paper-item>c.	Rubi Sanchez (Rubi.Sanchez@arup.com): Web Developer, Buildings, Los Angeles</paper-item>
+                <h4>4. Web Technologies</h4>
+                  <paper-item>a.	Front end framework/hosting: Polymer 2.0/Firebase</paper-item>
+                  <paper-item>b.	Tables: Vaadin-Grid</paper-item>
+                  <paper-item>c.	Charting: Highcharts</paper-item>
+                  <paper-item>d.	3D Rendering: three-polymer</paper-item>
+                  <paper-item>e.  Serverless Backend: Chalice, Node, AWS Lambda, AWS API Gateway</paper-item>
+                  <paper-item>f.	Database: MongoDB</paper-item>
+              </paper-card>
+            </div>
+          </iron-pages>
+        </app-header-layout>
     </app-drawer-layout>
   </template>
 
@@ -1082,6 +1083,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.$.loadingData.open();
         } else {
           this.$.loadingData.close();
+        }
+      }
+
+      _toggleDrawer() {
+        var drawer = Polymer.dom(this.root).querySelector("#drawer")
+        var drawerLayout = Polymer.dom(this.root).querySelector("#drawerLayout")
+        if (drawerLayout.forceNarrow || !drawerLayout.narrow) {
+          drawerLayout.forceNarrow = !drawerLayout.forceNarrow;
+        } else {
+          drawerLayout.drawer.toggle();
         }
       }
 
