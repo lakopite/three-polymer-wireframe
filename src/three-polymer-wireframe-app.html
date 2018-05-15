@@ -1212,14 +1212,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       toggleInstructionsView() {
-        // console.log(this.$.instructionsToast.style);
         this.viewInstructions = !this.viewInstructions
         this.$.instructionsToast.notifyResize()
+        //minimized
         if (!this.viewInstructions) {
-          this.$.instructionsToast.style.cssText = "outline: none; z-index: 105; position: fixed; box-sizing: border-box; left: 1113px; top: 858px; height: 7px; text-align:center; padding: .5em"
+          this.$.instructionsToast.style.cssText = "outline: none; z-index: 105; position: fixed; box-sizing: border-box; left: 1113px; top: 858px; min-width: 210px; text-align:right; padding: .5em"
         } else {
-          this.$.instructionsToast.style.cssText = "outline: none; z-index: 105; position: fixed; box-sizing: border-box; left: 1074px; top: 858px; max-height: 67px;"
+          //full
+          this.$.instructionsToast.style.cssText = "outline: none; z-index: 105; position: fixed; box-sizing: border-box; left: 1074px; top: 858px; min-width: 288px; max-height: 67px;"
         }
+        console.log(this.$.instructionsToast.style);
       }
 
       closeValidationToast() {
