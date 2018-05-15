@@ -350,10 +350,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       #instructionsToast {
-        margin-right: 2em;
-        padding-right: 0em;
         --paper-toast-background-color: #BDBDBD;
         --paper-toast-color: black;
+        margin-right: 2em;
+        padding-right: 0em;
       }
 
       .halfPat {
@@ -592,9 +592,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <three-model id="model" slot="model" metadata-fields="{{metadataFields}}" is-loading="{{modelLoading}}" contour-by="[[selectedContourBy]]" boundaries="{{boundaries}}" geometry-filter="{{geometryFilter}}" data="[[_modelData]]"></three-model>
       </three-view>
       <paper-toast id="instructionsToast" duration="0" vertical-align="bottom" horizontal-align="right">
-        <div class="wrapItem">left click & drag to rotate model<span class="halfPat"><paper-icon-button style="height: 2.5em; width: 2.5em;" icon="my-icons:clear" title="clear" on-tap="closeInstructionsToast"></paper-icon-button></div>
-        <div id="followingItem"style="padding: 0em;">right click & drag to move model</div>
-        <div>scroll wheel to zoom in/out</div>
+        <template is="dom-if" if="{{viewInstructions}}">
+          <div class="wrapItem">left click & drag to rotate model<span class="halfPat"><paper-icon-button style="height: 2.5em; width: 2.5em;" icon="{{_getInstructionsIcon(viewInstructions)}}" title="clear" on-tap="toggleInstructionsView"></paper-icon-button></div>
+          <div id="followingItem"style="padding: 0em;">right click & drag to move model</div>
+          <div>scroll wheel to zoom in/out</div>
+        </template>
+        <template is="dom-if" if="{{!viewInstructions}}">
+          <div class="wrapItem">View instructions<span class="halfPat"><paper-icon-button style="height: 2.5em; width: 2.5em;" icon="{{_getInstructionsIcon(viewInstructions)}}" title="view" on-tap="toggleInstructionsView"></paper-icon-button></div>
+        </template>
       </paper-toast>
     </div>
     <!-- Quantities tab -->
@@ -1010,6 +1015,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           costPieView: {
             type: Boolean,
             value: false
+          },
+          viewInstructions: {
+            type: Boolean,
+            value: true
           }
         };
       }
@@ -1187,8 +1196,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         Polymer.dom(this.root).querySelector('#addModelDialog').open();
       }
 
-      closeInstructionsToast() {
-        this.$.instructionsToast.hide()
+      _getInstructionsIcon(viewInstructions) {
+        return (viewInstructions) ? 'my-icons:close' : 'my-icons:expand-more'
+      }
+
+      toggleInstructionsView() {
+        // console.log(this.$.instructionsToast.style);
+        this.viewInstructions = !this.viewInstructions
+        this.$.instructionsToast.notifyResize()
+        if (!this.viewInstructions) {
+          this.$.instructionsToast.style.cssText = "outline: none; z-index: 105; position: fixed; box-sizing: border-box; left: 1113px; top: 858px; height: 7px; text-align:center; padding: .5em"
+        } else {
+          this.$.instructionsToast.style.cssText = "outline: none; z-index: 105; position: fixed; box-sizing: border-box; left: 1074px; top: 858px; max-height: 67px;"
+        }
       }
 
       closeValidationToast() {
@@ -1885,7 +1905,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _drawStrChart() {
         var chartdiv = Polymer.dom(this.root).querySelector("#sum-chart-container")
-        //console.log(this.strPieData);
+        console.log(this.strPieData);
         this.strPieChart = Highcharts.chart(chartdiv, {
         chart: {
             plotBackgroundColor: null,
@@ -1973,7 +1993,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _drawCostChart() {
         var chartdiv = Polymer.dom(this.root).querySelector("#cost-chart-container")
-        //console.log(this.strPieData);
         this.costPieChart = Highcharts.chart(chartdiv, {
         chart: {
             plotBackgroundColor: null,
