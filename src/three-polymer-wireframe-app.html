@@ -113,6 +113,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       .dropdown-item {
         cursor: pointer;
+        font-size: .95em;
+      }
+
+      .dropdown-item:hover {
+        background-color: #C5CAE9;
       }
 
       #uploaded-by {
@@ -1221,7 +1226,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           //full
           this.$.instructionsToast.style.cssText = "outline: none; z-index: 105; position: fixed; box-sizing: border-box; left: 1074px; top: 858px; min-width: 288px; max-height: 67px;"
         }
-        console.log(this.$.instructionsToast.style);
       }
 
       closeValidationToast() {
@@ -1358,8 +1362,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _clearUploadInput() {
         //clears user input from upload modal
         Polymer.dom(this.root).querySelector('#modelUpload').value = ''
+        // commenting out below because I want to remember the office
+        // this.uploadSelectedOffice = undefined;
         this.uploadSelectedProject = undefined;
-        this.uploadSelectedOffice = undefined;
         this.commentList = [""]
         Polymer.dom(this.root).querySelector('#comment-input-0').value = ''
         this._acceptUploadDisabled = true;
@@ -1395,6 +1400,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               this.$.uploadSuccessToast.show({ text: "Upload successful, filters removed. Please wait to be redirected to new model."})
               this.$['get-models-request'].generateRequest();
               this.clearAllFilters();
+              this.$.instructionsToast.show()
               // this.selectedModel = this.fullFileNameNoExtension
               //refresh models and redirect to new model
               //handles upload failure
