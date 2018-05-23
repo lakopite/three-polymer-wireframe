@@ -17,7 +17,7 @@
       }
 
     </style>
-    <div id="chartdiv"></div>
+    <div id="chartdiv" style="height: 100%"></div>
   </template>
 
   <script>
@@ -29,7 +29,7 @@
      * @polymer
      * @demo demo/index.html
      */
-    class ArupChart extends Polymer.Element {
+    class ArupChart extends Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element) {
       static get is() {
         return 'arup-chart';
       }
@@ -84,6 +84,7 @@
             type: Number,
             computed: 'countLegendItems(series)'
           },
+          //scale factors must be strings to support reciprocals
           yAxisScaleFactor: {
             type: String,
             value: "1"
@@ -97,6 +98,17 @@
             type: String,
             value: "arup chart",
             reflectToAttribute: true
+          },
+          hidden: {
+            type: Boolean,
+            value: false
+          },
+          //these are used to store original string value of scale factors if user sets them
+          originalStringYAxisScaleFactor: {
+            type: String
+          },
+          originalStringXAxisScaleFactor: {
+            type: String
           }
 
         }
@@ -104,7 +116,8 @@
 
       static get observers() {
         return [
-          'reDrawChart(series, title, subtitle, iterateAcrossAxis, xAxisScaleFactor, yAxisScaleFactor, xAxisCategories, xAxisLabel, yAxisLabel, exportFileName)'
+          '_reDrawChart(series, title, subtitle, iterateAcrossAxis, xAxisScaleFactor, yAxisScaleFactor, xAxisCategories, xAxisLabel, yAxisLabel, exportFileName)',
+          '_reflow(hidden)'
         ]
       }
 
@@ -117,15 +130,35 @@
         this._drawChart();
       }
 
+      connectedCallback() {
+        super.connectedCallback();
+        this.addEventListener('iron-resize', e => this._handleResize(e));
+      }
+
+      _handleResize(e) {
+        this.chart.reflow()
+      }
+
+      _reflow(hidden) {
+        if (!hidden)
+        this.chart.reflow();
+      }
+
+
       countLegendItems(series) {
         return series.length
       }
 
+      scaleFactorsBackToString() {
+        this.set('yAxisScaleFactor', this.originalStringYAxisScaleFactor)
+        this.set('xAxisScaleFactor', this.originalStringXAxisScaleFactor)
+      }
+
       computeSeriesWithScaleFactor(series, type) {
-        if (this.yAxisScaleFactor !== 1 || this.xAxisScaleFactor !== 1) {
+        if (this.yAxisScaleFactor !== "1" || this.xAxisScaleFactor !== "1") {
           //turns axis scale factors into numbers and allows reciprocals to work
-          // var originalYAxisScaleFactor = this.yAxisScaleFactor
-          // var originalXAxisScaleFactor = this.xAxisScaleFactor
+          this.originalStringYAxisScaleFactor = this.yAxisScaleFactor
+          this.originalStringXAxisScaleFactor = this.xAxisScaleFactor
 
           this.yAxisScaleFactor = this.yAxisScaleFactor.includes("/") ? parseFloat(this.yAxisScaleFactor.split("/")[0]) / parseFloat(this.yAxisScaleFactor.split("/")[1]) : parseFloat(this.yAxisScaleFactor)
           this.xAxisScaleFactor = this.xAxisScaleFactor.includes("/") ? parseFloat(this.xAxisScaleFactor.split("/")[0]) / parseFloat(this.xAxisScaleFactor.split("/")[1]) : parseFloat(this.xAxisScaleFactor)
@@ -133,12 +166,14 @@
           if (type === 'pie') {
             return series.map(el=>{
               el[1] = el[1] * this.yAxisScaleFactor;
-            })
+            }),
+            this.scaleFactorsBackToString()
           } else if (type === 'line' && this.iterateAcrossAxis === 'x') {
             var that = this;
             _.forEach(series, function(item) {
               item.data = item.data.map(el => el * that.yAxisScaleFactor);
-            })
+            }),
+            this.scaleFactorsBackToString()
           }
           else if (type === 'line' && this.iterateAcrossAxis === 'y') {
             var data = [];
@@ -156,15 +191,15 @@
                   el[1] = el[1] * that.yAxisScaleFactor;
                 }
               })
-            })
+            }),
+            this.scaleFactorsBackToString()
           }
-          // this.yAxisScaleFactor = originalYAxisScaleFactor
-          // this.xAxisScaleFactor = originalXAxisScaleFactor
         }
       }
 
-      reDrawChart() {
+      _reDrawChart() {
         this._drawChart();
+        this.chart.reflow();
       }
 
       _drawChart() {
@@ -270,7 +305,7 @@
         }
         // console.log(this.legendItemCount);
         // console.log("SERIES");
-        console.log(this.series);
+        // console.log(this.series);
         // console.log(this.chart)
         // console.log("CHART SERIES");
         // console.log(this.chart.series);

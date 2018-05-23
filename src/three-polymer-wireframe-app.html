@@ -210,10 +210,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         height: calc(100vh - 240px);
       }
 
-      #strPieChart, #costPieChart {
-        height: calc(100vh - 240px);
-      }
-
       .data-by-group-table, .cost-by-group-table {
         height: calc(100vh - 240px);
       }
@@ -671,7 +667,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <!-- wrap all string aggregation info -->
           <div id="wrap-str-info">
             <!-- div holds pie chart -->
-            <arup-chart hidden$="[[!stringPieView]]" type="pie" id="strPieChart" title="Sum by Group" subtitle="{{selectedSumField}}" series="{{strPieData}}" export-file-name="{{strChartExportName}}"></arup-chart>
+            <arup-chart hidden$="[[!stringPieView]]" y-axis-scale-factor="5" type="pie" id="strPieChart" title="Sum by Group" subtitle="{{selectedSumField}}" series="{{strPieData}}" export-file-name="{{strChartExportName}}"></arup-chart>
             <!-- data by group table -->
             <div id="group-data-table-section" hidden$="[[stringPieView]]">
               <vaadin-grid class="data-by-group-table" items="[[groupSumData]]">
