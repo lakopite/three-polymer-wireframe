@@ -1033,8 +1033,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_aggregations(_modelData, selectedContourBy, selectedView, selectedElementType)',
           '_getAggregationLabels(_modelData, selectedContourBy)',
           '_getSumByForSelectedSumField(selectedSumField)',
-          // '_resizeStringChart(stringPieView)',
-          // '_resizeCostChart(costPieView)',
           '_getCostByForSelectedCostGroup(selectedCostGroup)',
           '_showLoading(modelLoading, appLoading)'
         ]
@@ -1043,34 +1041,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       constructor() {
         super();
       }
-
-      // connectedCallback() {
-      //   super.connectedCallback();
-      //   this.addEventListener('iron-resize', e => this._handleResize(e));
-      // }
-
-      // _resizeStringChart(stringPieView) {
-      //   if (stringPieView) {
-      //     this.strPieChart.reflow()
-      //   }
-      // }
-      //
-      // _resizeCostChart(costPieView) {
-      //   if (costPieView) {
-      //     this.costPieChart.reflow()
-      //   }
-      // }
-      //
-      // _handleResize(e) {
-      //   var that = this;
-      //   setTimeout(function() {
-      //     if (that.stringPieView) {
-      //       that.strPieChart.reflow()
-      //     } else if (that.costPieView) {
-      //       that.costPieChart.reflow()
-      //     }
-      //   }, 0)
-      // }
 
       logout() {
         this.dispatchEvent(new CustomEvent('logout', {bubbles: true, composed: true}))
@@ -1081,6 +1051,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.$.loadingData.open();
         } else {
           this.$.loadingData.close();
+          this.$.instructionsToast.open();
         }
       }
 
@@ -1393,7 +1364,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               this.$.uploadSuccessToast.show({ text: "Upload successful, filters removed. Please wait to be redirected to new model."})
               this.$['get-models-request'].generateRequest();
               this.clearAllFilters();
-              this.$.instructionsToast.show()
               // this.selectedModel = this.fullFileNameNoExtension
               //refresh models and redirect to new model
               //handles upload failure
