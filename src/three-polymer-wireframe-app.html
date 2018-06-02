@@ -1003,7 +1003,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           },
           projectList: {
             type: Array,
-            value: ["NLVS East", "NLVS West", "NLVS North", "NLVS South", "NLVS Operable Walls", "NLVS Roof Support", "NLVS Roof Canopy", "NLVS Cable Truss", "NLVS Bowl Concrete", "Wrapper Concrete", "Wrapper Steel", "Samples"]
+            value: ["NLVS East", "NLVS West", "NLVS North", "NLVS South", "NLVS Operable Walls", "NLVS Roof Support", "NLVS Roof Canopy", "NLVS Cable Truss", "NLVS Bowl Concrete", "Wrapper Concrete", "Wrapper Steel", "LAX Steel", "LAX Wrapper", "Samples"]
           },
           officeList: {
             type: Array,
@@ -1256,6 +1256,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var extension = fileName.slice(fileName.indexOf('.'))
         var fileNameWithTimeStamp = fileName.slice(0, fileName.lastIndexOf('.')) + "_" + this._currentDateTimeFormat() + extension
         this.fullFileNameNoExtension = fileNameWithTimeStamp.slice(0, fileNameWithTimeStamp.lastIndexOf('.'))
+        console.log(inputFile.size / 1000000 + " MB");
       	var reader = new FileReader()
         var that = this;
         // Capture the file information
