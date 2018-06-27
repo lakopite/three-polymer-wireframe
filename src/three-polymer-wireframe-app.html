@@ -387,7 +387,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <iron-ajax id="get-latest-be-commit-date" method="GET" url="https://api.github.com/repos/lakopite/model-viewer-api/git/commits/[[beSha]]" handle-as="json" on-response="handleGetLatestBeCommitDateResp" on-error="handleGetLatestCommitDateError"></iron-ajax>
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
-      <h5>*Please make sure your filename does not contain any spaces or special characters beyond underscores</h5>
+      <h5>*Please make sure you visit the FAQ tab to follow certain specifications for uploads</h5>
       <paper-dialog-scrollable>
         <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" on-input="_enableUploadBtn">
           <div slot="suffix" label="user">@arup.com</div>
@@ -820,7 +820,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                   <paper-item>1. Open Grasshopper:</paper-item>
                     <ul>- use the "FEA_Model_To_JSON_CSVInput" component to plug in the model data from Tekla/Revit</ul>
                     <ul>- make sure each model filters one material type (separate models for concrete and steel)</ul>
-                    <ul>- make sure that you plug in the appropriate property names, according to what you want to sort by (*property names must have an underscore between each of them; they may not contain any spaces or special characters beyond underscores)</ul>
+                    <ul>- make sure that you plug in the appropriate property names, according to what you want to sort by (*property names must have an underscore between each of them; they may not contain any spaces or special characters)</ul>
+                    <ul>- make sure filename does not contain any spaces or special characters beyond underscores and does not end with a number</ul>
                     <ul>- plug in the "beamHeaders", "beamMetadadataCsv", "plateHeaders", and "plateMetadataCsv" into the "FEA_Model_To_JSON" component's "beamMetaDataNames", "beamMetaData", "shellMetaDataNames", and "shellMetaData" slots, respectively</ul>
                     <ul>- toggle boolean to true next to "activate" on the "FEA_Model_To_JSON" component</ul>
                   <paper-item>This will generate a JSON file that will appear in the folder specified in the target file location</paper-item>
