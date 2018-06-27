@@ -1276,8 +1276,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               //parse JSON
               that.jsonUploadPayload = JSON.parse(e.target.result)
               // check that file name matches name in doc
-              if (_.toLower(that.jsonUploadPayload.modelInformation.name) + ".json"!== _.toLower(fileName))
-              throw "file name is "  + "\"'" + fileName + "'\"" + " and modelInformation.name is " + "\"'" + that.jsonUploadPayload.modelInformation.name + "'\"" + ". These must match."
+              // if (_.toLower(that.jsonUploadPayload.modelInformation.name) + ".json"!== _.toLower(fileName))
+              // throw "file name is "  + "\"'" + fileName + "'\"" + " and modelInformation.name is " + "\"'" + that.jsonUploadPayload.modelInformation.name + "'\"" + ". These must match."
               // check that modelInfo keys exists
               if (_.has(that.jsonUploadPayload, 'modelInformation') === false)
               throw "it is missing a 'modelInformation' key. This property is required."
