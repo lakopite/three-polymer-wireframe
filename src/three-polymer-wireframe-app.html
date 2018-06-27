@@ -387,6 +387,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <iron-ajax id="get-latest-be-commit-date" method="GET" url="https://api.github.com/repos/lakopite/model-viewer-api/git/commits/[[beSha]]" handle-as="json" on-response="handleGetLatestBeCommitDateResp" on-error="handleGetLatestCommitDateError"></iron-ajax>
     <paper-dialog modal id="addModelDialog">
       <h2>Add a Model</h2>
+      <h5>*Please make sure your model name does not contain any spaces or special characters beyond underscores</h5>
       <paper-dialog-scrollable>
         <paper-input id="user-email" label="username" prevent-invalid-input allowed-pattern="([A-Za-z0-9\._-]+)" on-input="_enableUploadBtn">
           <div slot="suffix" label="user">@arup.com</div>
