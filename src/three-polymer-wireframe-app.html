@@ -1007,7 +1007,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           },
           projectList: {
             type: Array,
-            value: ["NLVS East", "NLVS West", "NLVS North", "NLVS South", "NLVS Operable Walls", "NLVS Roof Support", "NLVS Roof Canopy", "NLVS Cable Truss", "NLVS Bowl Concrete", "Wrapper Concrete", "Wrapper Steel", "LAX Steel", "LAX Concrete", "Samples"]
+            value: ["NLVS East", "NLVS West", "NLVS North", "NLVS South", "NLVS Operable Walls", "NLVS Roof Support", "NLVS Roof Canopy", "NLVS Cable Truss", "NLVS Bowl Concrete", "Wrapper Concrete", "Wrapper Steel", "LAX T2 New Work Steel", "LAX T3 New Work Steel", "LAX T3 HH New Work Steel", "LAX T3.5 New Work Steel", "LAX Steel", "LAX Concrete", "Samples"]
           },
           officeList: {
             type: Array,
@@ -2713,6 +2713,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           result = item.s3_attributes.project === this.userSearchInput.project
           if (!result) {return result}
         }
+        console.log(item);
         //each if statement above checks to see if condition is met (true using result); if a model fails on the previous/any of the input conditions: doesn't return the model at all
         return result;
         }
