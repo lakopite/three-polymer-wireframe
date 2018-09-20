@@ -590,6 +590,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <paper-tab name="model-view">Model</paper-tab>
             <paper-tab name="aggregations-view">Quantities</paper-tab>
             <paper-tab name="cost-view" id="cost-tab" disabled$="{{_disableCostTab(metadataFields, currentModelResp, geometryFilter)}}">Cost</paper-tab>
+            <paper-tab name="aggregations-view">Quantities</paper-tab>
             <paper-tab name="faq-view" id="faq-tab">FAQ</paper-tab>
           </paper-tabs>
         </app-toolbar>
@@ -1794,6 +1795,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var propname = o.metadata.propertyname;
           } else {
             var propname = o.metadata.meta_propname_1;
+          }
+          if (o.metadata.propname) {
+            var propname = o.metadata.propname
           }
           var splitPropname = propname.split("_");
           return o.metadata.propertyname_last = splitPropname[splitPropname.length-1];
