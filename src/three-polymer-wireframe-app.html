@@ -1789,7 +1789,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           })
         })
         var resultFilterInput = this.selectedElementType === 'linear-view' ?  this.linearStringFilterResult : this.planarStringFilterResult
-        // this is to add a propertyname field that groups together anything after the last underscore in case naming convention divided this
+        // this is to add a propertyname field that groups together anything after the last underscore in case naming convention divided this.
         resultFilterInput = _.forEach(resultFilterInput, function(o) {
           if (o.metadata.propertyname) {
             var propname = o.metadata.propertyname;
