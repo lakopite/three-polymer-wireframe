@@ -1951,6 +1951,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var d = new Date();
         var curr_date = (d.getDate() <= 9 ? '0': '') + (d.getDate())
         var curr_month = (d.getMonth() <= 9 ? '0': '') + (d.getMonth()+1)
+        var month = d.getMonth() + 1
+        var curr_month = month <= 9 ? '0' + month : month
         var curr_year = d.getFullYear();
         var curr_year_formatted = curr_year.toString().substring(2)
         var curr_hour = (d.getHours() <= 9 ? '0': '') + d.getHours()
