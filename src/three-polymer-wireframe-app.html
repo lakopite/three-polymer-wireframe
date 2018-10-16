@@ -1795,8 +1795,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           } else {
             var propname = o.metadata.meta_propname_1;
           }
-          var splitPropname = propname.split("_");
-          return o.metadata.propertyname_last = splitPropname[splitPropname.length-1];
+          if (_.includes(propname, '_')) {
+            var splitPropname = propname.split("_");
+            return o.metadata.propertyname_last = splitPropname[splitPropname.length-1];
+          }
         })
         this._generateNumDropdownOptions()
         if (resultFilterInput.length > 0) {
